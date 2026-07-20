@@ -1,0 +1,20 @@
+{
+  "titulo": "Taxa de erro 5xx em checkout-api subiu para 34% apos deploy",
+  "servico": "checkout-api",
+  "severidade": "critical",
+  "metricas": {
+    "taxa_erro": "34%",
+    "taxa_erro_baseline": "0.2%",
+    "deploy_recente": "v2.14.0 ha 6 minutos",
+    "cpu": "23%",
+    "memoria": "41%"
+  },
+  "logs": [
+    "ERROR c.l.checkout.PaymentHandler - Unhandled exception processing order 88213",
+    "java.lang.NullPointerException: Cannot invoke \"CouponDTO.getDiscount()\" because \"coupon\" is null",
+    "  at com.loja.checkout.PaymentHandler.applyDiscount(PaymentHandler.java:142)",
+    "  at com.loja.checkout.PaymentHandler.process(PaymentHandler.java:87)",
+    "WARN  c.l.checkout.CouponClient - coupon-service returned 200 with empty body for code SEMDESCONTO",
+    "INFO  deploy - rollout v2.14.0 completed, 12/12 pods ready, cpu e memoria estaveis"
+  ]
+}

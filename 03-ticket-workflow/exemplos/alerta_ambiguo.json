@@ -1,0 +1,22 @@
+{
+  "titulo": "Pods do servico relatorios reiniciando em loop por OOMKilled",
+  "servico": "relatorios-api",
+  "severidade": "high",
+  "metricas": {
+    "reinicios_ultima_hora": 14,
+    "memory_limit_atual": "512Mi",
+    "memory_limit_anterior": "1Gi",
+    "memory_usage_pico": "511Mi",
+    "memoria_media_7d": "180Mi",
+    "volume_requisicoes": "estavel, sem aumento"
+  },
+  "logs": [
+    "kubelet: Memory cgroup out of memory: Killed process 1 (java) total-vm:2841232kB, anon-rss:523904kB",
+    "State: Terminated, Reason: OOMKilled, Exit Code: 137",
+    "platform-audit: LimitRange 'rightsizing-q3' aplicado ha 3 dias reduziu memory limit de relatorios-api de 1Gi para 512Mi",
+    "platform-audit: outros 2 servicos do mesmo namespace tiveram limite reduzido no mesmo lote e nao apresentaram OOM",
+    "INFO  c.l.relatorios.ExportService - iniciando exportacao consolidada, 41200 registros",
+    "WARN  c.l.relatorios.ExportService - carregando resultado completo em memoria antes de serializar",
+    "GC overhead: 6 full GCs nos ultimos 90 segundos, heap after GC subindo a cada ciclo"
+  ]
+}

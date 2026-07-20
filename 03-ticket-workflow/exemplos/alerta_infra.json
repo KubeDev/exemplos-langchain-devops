@@ -1,0 +1,18 @@
+{
+  "titulo": "Disco do no ip-10-0-3-42 acima de 98% de uso",
+  "servico": "kubernetes-node-pool-a",
+  "severidade": "critical",
+  "metricas": {
+    "node": "ip-10-0-3-42.ec2.internal",
+    "mountpoint": "/var/lib/containerd",
+    "espaco_disponivel": "1.8%",
+    "cpu": "31%",
+    "memoria": "44%"
+  },
+  "logs": [
+    "kubelet: eviction manager: attempting to reclaim ephemeral-storage",
+    "kubelet: failed to garbage collect required amount of images. Wanted to free 8589934592 bytes, but freed 214748364 bytes",
+    "containerd: failed to create shim task: no space left on device",
+    "kubelet: Evicted pod checkout-api-7d9f8b-x2klm due to DiskPressure"
+  ]
+}

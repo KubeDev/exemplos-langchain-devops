@@ -84,8 +84,13 @@ def main():
     console.print(f"[bold cyan]Projeto:[/bold cyan] {caminho}\n")
 
     # As tres pecas do agente.
+    # MODELO
     llm = ChatAnthropic(model="claude-sonnet-5")          # 1. o modelo
+
+    # TOOLS (Ferramentas)
     tools = get_tools(caminho)                            # 2. as ferramentas
+
+    # AGENTE (Orquestrador)
     agent = create_agent(                                 # 3. o loop
         llm,
         tools=tools,

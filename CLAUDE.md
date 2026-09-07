@@ -23,7 +23,7 @@ abrangente de erro, abstrações "para quando crescer". Nenhuma entra sem pedido
 
 | Pasta | Lição |
 |---|---|
-| `01-chat-devops` | modelo, `SystemMessage`/`HumanMessage`, `invoke()` vs `stream()` |
+| `01-chat-devops` | chamada isolada: modelo, mensagens, `invoke()` vs `stream()` e metadados do `AIMessage` |
 | `02-chat-devops-memoria` | memória é uma lista que você reenvia; o modelo não lembra |
 | `03-ticket-workflow` | LCEL: `prompt \| modelo \| parser`, chains e roteamento |
 | `04-smart-docker` | agente: modelo + tools + loop, quem decide é o modelo |
@@ -32,9 +32,9 @@ abrangente de erro, abstrações "para quando crescer". Nenhuma entra sem pedido
 próximo, e a ausência é o gancho. Antes de adicionar algo, verifique se ele não é a lição de
 um exemplo posterior.
 
-O inverso também vale: **não faça um exemplo convergir para outro**. A diferença entre
-`01-chat-devops/src/app.py` e `02-chat-devops-memoria/src/app.py` precisa continuar pequena e
-legível a olho nu — é o diff entre os dois que ensina.
+O inverso também vale: **não faça um exemplo convergir para outro**. O `01` é uma chamada
+isolada; o `02` introduz interação contínua e histórico. Preserve essa fronteira ao comparar
+os dois arquivos.
 
 ## Convenção de nomes de pasta
 
@@ -75,15 +75,14 @@ configuração. Se dois exemplos precisam do mesmo código, ele é **duplicado**
   `uv run`, **de dentro da pasta do exemplo**.
 - `uv.lock` e `.python-version` são commitados: a aula precisa ser reproduzível.
 
-**Versões alinhadas em toda a série** (verificado em 2026-07-20): Python `>=3.12`,
-`langchain>=1.3.14`, `langchain-anthropic>=1.4.8`. Ao subir a versão de um exemplo, suba a dos
-quatro e rode o `PLANO_TESTE.md` de quem tiver um — divergência de versão entre aulas gera a
-pergunta "por que esse é diferente?" no meio da apresentação.
+Python `>=3.12` e LangChain permanecem alinhados. A integração de provider é deliberadamente
+diferente: o `01` usa Gemini; os exemplos `02` a `04` continuam com Anthropic. Preserve essa
+diferença até existir uma decisão explícita de migrar os exemplos posteriores.
 
 ## Layout interno
 
-Código em `src/` nos quatro exemplos. Os que rodam como comando declaram
-`[project.scripts]` no `pyproject.toml`.
+Código em `src/` nos quatro exemplos. O `01` roda diretamente com `uv run src/app.py`; os
+exemplos que expõem comando declaram `[project.scripts]` no `pyproject.toml`.
 
 O `03-ticket-workflow` é uma API FastAPI e ainda assim usa `src/` — a consistência entre as
 aulas vale mais que a convenção `app/` do framework. **Atenção ao mexer nele:** `app` continua
@@ -92,12 +91,12 @@ para `src` quebra o projeto. O comando é `uv run uvicorn src.main:app`.
 
 ## Modelos e parâmetros
 
-**Não use `temperature`** (nem `top_p`/`top_k`) em nenhum exemplo. Sonnet 5 e Opus 4.7+
-removeram os parâmetros de sampling e devolvem `400`. Isso já custou execução mais de uma vez.
+**Não use `temperature`** (nem `top_p`/`top_k`) nos exemplos. Escolha de sampling não é
+conteúdo desta série e já quebrou execuções em providers que não aceitam esses parâmetros.
 
-Os modelos são configuráveis por variável de ambiente, com default no código. Onde há
-assimetria deliberada de modelo (o `03-ticket-workflow` usa Haiku na triagem e Sonnet na
-análise), ela **é** conteúdo da aula — não unifique sem discutir o impacto pedagógico.
+O `01` fixa Gemini no código para tornar provider e modelo visíveis na primeira aula. Nos
+demais exemplos, preserve a configuração já existente. Onde há assimetria deliberada de
+modelo, como no `03-ticket-workflow`, ela **é** conteúdo da aula.
 
 ## Os logs são a interface da apresentação
 
@@ -107,9 +106,9 @@ deixe o código mais "limpo".
 
 ## Credenciais
 
-`ANTHROPIC_API_KEY` **nunca** é gravada em arquivo do repositório. Cada exemplo tem
-`.env.example` com placeholder e `.env` no `.gitignore`. Ao validar qualquer coisa, peça a
-chave ao usuário, use apenas no ambiente do processo e descarte ao final.
+Credenciais **nunca** são gravadas no repositório: o `01` usa `GOOGLE_API_KEY`; os demais
+exemplos continuam usando `ANTHROPIC_API_KEY`. Cada exemplo tem `.env.example` com placeholder
+e `.env` no `.gitignore`. Ao validar, use a chave apenas no ambiente do processo.
 
 **Este repositório será aberto ao público.** Antes de commitar qualquer coisa, confirme que
 nenhum segredo, caminho pessoal ou nome de cliente entrou no diff. Saídas de execução

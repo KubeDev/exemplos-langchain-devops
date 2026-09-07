@@ -5,27 +5,29 @@ saber para **não estragá-lo**.
 
 ## Natureza do projeto
 
-Exemplo didático `01` da série `langchain-devops-examples` — o **primeiro**. A lição são três
+Exemplo didático `01` da série `langchain-devops-examples` — o **primeiro**. A lição são quatro
 coisas e nada além delas:
 
 1. `init_chat_model("provider:modelo")` inicializa o modelo
 2. `SystemMessage` define o comportamento, `HumanMessage` é a pergunta
 3. `invoke()` devolve a resposta inteira, `stream()` devolve pedaço a pedaço
+4. `AIMessage` separa conteúdo, uso e metadados da execução
 
 O código é lido em sala de aula, projetado numa tela, não operado em produção. É o menor
-programa possível que mostra essas três coisas.
+programa possível que mostra essas quatro coisas.
+
+As únicas funções nomeadas são `responder()` e `responder_streaming()`. Uma pergunta fixa é
+executada uma vez no nível do módulo; preserve a ausência de `main()`, loop e entrada interativa.
 
 **Regra de ouro — quando simplicidade e robustez colidirem, vence a simplicidade.** É o
 inverso do default e é intencional. Aqui vale em dobro: este é o primeiro contato do aluno
 com LangChain. Cada abstração a mais é uma coisa a mais para explicar antes de chegar ao
 ponto.
 
-## O chat é stateless — e isso é a lição, não um bug
+## A chamada é isolada — e isso é a lição, não um bug
 
-Cada pergunta monta a lista de mensagens do zero. O modelo **não lembra** da pergunta
-anterior, e o aluno precisa ver isso acontecer. **Não adicione histórico aqui**: memória é o
-exemplo `02` (`02-chat-devops-memoria`), e ela existe como exemplo separado justamente porque
-a ausência dela aqui é pedagógica.
+O exemplo envia uma pergunta e termina. **Não adicione loop nem histórico aqui**: interação
+contínua e memória pertencem ao exemplo `02` (`02-chat-devops-memoria`).
 
 Se você "consertar" o esquecimento, apaga a razão de o exemplo `02` existir.
 
@@ -40,7 +42,7 @@ Se você "consertar" o esquecimento, apaga a razão de o exemplo `02` existir.
 
 ```bash
 uv sync
-uv run chat-devops
+uv run src/app.py
 ```
 
 ## Não adicione sem pedido explícito
@@ -54,12 +56,14 @@ Um `if` a mais neste arquivo é caro. O tamanho é a feature.
 
 ## Armadilhas que já custaram uma execução
 
-- **Não use `temperature`** (nem `top_p`/`top_k`). Sonnet 5 e Opus 4.7+ removeram os
-  parâmetros de sampling e devolvem `400`.
+- **Não adicione parâmetros de sampling.** Escolha de parâmetros não é conteúdo desta aula.
 - **`resposta.text` é atributo, não método.** Nas versões atuais do LangChain ele é uma
   propriedade; `resposta.text()` quebra.
 - **`stream()` precisa de `flush=True`.** Sem ele o terminal só mostra a resposta no fim, e a
   demonstração de streaming — que é metade da lição — não aparece na tela.
+- **Mantenha `automatic_function_calling={"disable": True}` em `invoke()` e `stream()`.** O
+  `google-genai 2.22.0` emite um aviso de AFC no caminho `Models.generate_content` mesmo sem
+  tools. O argumento funciona na chamada; no construtor, o LangChain o rejeita e produz outro aviso.
 - **As duas funções ficam lado a lado, ambas usadas ou não.** `responder_streaming()` existe
   para ser trocada com `responder()` ao vivo, com uma linha. Não apague a que estiver
   inativa: o contraste entre as duas é conteúdo.
@@ -70,19 +74,18 @@ Um arquivo só. Isso é deliberado.
 
 | Arquivo | Conteúdo | Cuidado |
 |---|---|---|
-| `src/app.py` | modelo, system prompt, as duas formas de consumir a saída e o loop do terminal — **é o arquivo que vai no projetor** | não fatie em módulos; a lição é caber numa tela |
+| `src/app.py` | modelo, system prompt, pergunta e duas formas de consumir a saída — **é o arquivo que vai no projetor** | não fatie em módulos; a lição é caber numa tela |
 
 Não crie `prompts.py`, `logs.py` ou `config.py` aqui. A separação de arquivos aparece a
 partir do exemplo `03`, quando passa a haver o que separar.
 
 ## Modelo
 
-`claude-sonnet-5` por padrão, sobrescrevível por `MODELO` no `.env`, no formato
-`provider:modelo` que o `init_chat_model` espera. O formato com prefixo **é** conteúdo da
-aula — é o que mostra que trocar de provedor é trocar uma string.
+`gemini-3.8-flash`, inicializado como `google_genai:gemini-3.8-flash`. O formato com prefixo
+**é** conteúdo da aula porque separa provider de modelo sem adicionar outra abstração.
 
 ## Credenciais
 
-`ANTHROPIC_API_KEY` **nunca** é gravada em arquivo do repositório. `.env.example` só tem
+`GOOGLE_API_KEY` **nunca** é gravada em arquivo do repositório. `.env.example` só tem
 placeholder; `.env` está no `.gitignore`. Ao validar, peça a chave ao usuário, use apenas no
 ambiente do processo e descarte ao final.

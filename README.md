@@ -11,19 +11,20 @@ demonstra sua ideia — o que falta num exemplo costuma ser o assunto do próxim
 
 | # | Pasta | O que resolve | O que ensina |
 |---|---|---|---|
-| 01 | [`01-chat-devops`](01-chat-devops) | Um assistente de DevOps no terminal | Inicializar um modelo, `SystemMessage` vs `HumanMessage`, `invoke()` vs `stream()` |
+| 01 | [`01-chat-devops`](01-chat-devops) | Uma pergunta DevOps ao Gemini | Modelo, mensagens, `invoke()` vs `stream()` e metadados do `AIMessage` |
 | 02 | [`02-chat-devops-memoria`](02-chat-devops-memoria) | O mesmo chat, agora lembrando da conversa | Que o modelo **não** tem memória — quem lembra é o seu código, reenviando a lista |
 | 03 | [`03-ticket-workflow`](03-ticket-workflow) | Alerta de observabilidade chega por webhook e vira ticket, roteado para infra ou dev | LCEL: `prompt \| modelo \| parser`, encadeamento e roteamento entre chains |
 | 04 | [`04-smart-docker`](04-smart-docker) | Um agente que investiga um projeto e analisa — ou escreve — o Dockerfile dele | Agente de verdade: modelo + ferramentas + loop, onde **quem decide o próximo passo é o modelo** |
 
-A ordem importa. O `02` só faz sentido depois de ver o `01` esquecer; o `04` só impressiona
+A ordem importa. O `02` adiciona interação e memória à chamada isolada do `01`; o `04` só impressiona
 depois de ver o fluxo fixo do `03`.
 
 ## Pré-requisitos
 
 - [uv](https://docs.astral.sh/uv/) — gerencia Python e dependências
 - Python 3.12 (o `uv` instala sozinho, se faltar)
-- Uma chave da API da Anthropic ([console.anthropic.com](https://console.anthropic.com))
+- Uma chave da Gemini Developer API para o exemplo `01`
+- Uma chave da API da Anthropic para os exemplos `02` a `04`
 
 ## Como rodar qualquer exemplo
 
@@ -31,14 +32,14 @@ Todo exemplo segue o mesmo ritual, sempre **de dentro da pasta dele**:
 
 ```bash
 cd 01-chat-devops
-cp .env.example .env      # preencha ANTHROPIC_API_KEY
+cp .env.example .env      # preencha GOOGLE_API_KEY
 uv sync
 ```
 
 O comando de execução muda por exemplo:
 
 ```bash
-cd 01-chat-devops          && uv run chat-devops
+cd 01-chat-devops          && uv run src/app.py
 cd 02-chat-devops-memoria  && uv run chat-devops-memoria
 cd 03-ticket-workflow      && uv run uvicorn src.main:app --reload
 cd 04-smart-docker         && uv run smart-docker /caminho/de/um/projeto

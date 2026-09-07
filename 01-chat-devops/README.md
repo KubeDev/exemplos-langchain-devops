@@ -1,57 +1,46 @@
-# 01 — Chat de terminal com LangChain
+# 01 — Primeira chamada com LangChain
 
-Primeiro exemplo da serie. Um chat de pergunta e resposta no terminal, no menor
-codigo possivel, para mostrar tres coisas do LangChain:
+Primeiro exemplo da série. Uma única pergunta DevOps, no menor código possível, para mostrar quatro coisas do LangChain:
 
-1. **Inicializar um modelo** com `init_chat_model("provider:modelo")`
-2. **A diferenca entre `SystemMessage` e `HumanMessage`** — o system prompt
-   define o comportamento, a mensagem humana e a pergunta
-3. **As duas formas de consumir a saida** — `invoke()` (resposta completa) e
-   `stream()` (pedaco a pedaco)
+1. Inicializar o Gemini com `init_chat_model("provider:modelo")`.
+2. Diferenciar `SystemMessage` de `HumanMessage`.
+3. Consumir a saída com `invoke()` ou `stream()`.
+4. Ler conteúdo, tipo, uso e metadados do `AIMessage`.
 
-O chat e **stateless**: cada pergunta monta a lista de mensagens do zero e nada
-e acumulado entre uma pergunta e outra.
+O exemplo faz uma chamada isolada. Não existe loop de interação nem histórico.
 
-## Pre-requisitos
+## Pré-requisitos
 
 - [uv](https://docs.astral.sh/uv/)
-- Uma chave da API da Anthropic
+- Uma chave da Gemini Developer API
 
 ## Como rodar
 
 ```bash
-cp .env.example .env      # preencha ANTHROPIC_API_KEY
+cp .env.example .env
 uv sync
-uv run chat-devops
+uv run src/app.py
 ```
 
-Encerre com linha vazia, `sair` ou `Ctrl+C`.
+Preencha `GOOGLE_API_KEY` no `.env`. Ao executar, a pergunta fixa é enviada uma vez e o processo termina após a resposta.
 
 ## Alternando entre `invoke` e `stream`
 
-Em `src/app.py`, dentro de `main()`, troque qual das duas linhas esta comentada:
+No final de `src/app.py`, troque qual chamada está comentada:
 
 ```python
 responder(pergunta)
 # responder_streaming(pergunta)
 ```
 
-- `responder()` usa `model.invoke(...)` — espera a resposta inteira e imprime
-- `responder_streaming()` usa `model.stream(...)` — imprime conforme gera
-
-## O system prompt
-
-A constante `SYSTEM_PROMPT`, no topo de `src/app.py`, impoe um formato fixo de
-resposta (comando → o que faz → risco) e limita o assunto a DevOps. Da para ver
-o efeito na pratica de dois jeitos:
-
-- perguntando algo fora do escopo (ex.: uma receita de bolo) — o modelo recusa
-- esvaziando o `SYSTEM_PROMPT` e repetindo a mesma pergunta — o formato some
+- `responder()` espera a resposta inteira e mostra o conteúdo, o tipo, o uso e os metadados.
+- `responder_streaming()` imprime os fragmentos conforme o modelo gera.
 
 ## Arquivos
 
-```
-src/app.py        modelo, system prompt, as duas funcoes de resposta e o loop
-.env.example      chave da API e o modelo usado
-pyproject.toml    dependencias e o comando `chat-devops`
+```text
+src/app.py        modelo, mensagens, pergunta e invoke/stream
+.env.example      chave da Gemini Developer API
+pyproject.toml    dependências do exemplo
+uv.lock           versões resolvidas
 ```

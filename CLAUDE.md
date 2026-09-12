@@ -24,7 +24,7 @@ abrangente de erro, abstrações "para quando crescer". Nenhuma entra sem pedido
 | Pasta | Lição |
 |---|---|
 | `01-chat-devops` | chamada isolada: modelo, mensagens, `invoke()` vs `stream()` e metadados do `AIMessage` |
-| `02-chat-devops-memoria` | memória é uma lista que você reenvia; o modelo não lembra |
+| `02-chat-devops-memoria` | memória é uma lista; `ChatPromptTemplate` compõe a entrada que você reenvia |
 | `03-ticket-workflow` | LCEL: `prompt \| modelo \| parser`, chains e roteamento |
 | `04-smart-docker` | agente: modelo + tools + loop, quem decide é o modelo |
 

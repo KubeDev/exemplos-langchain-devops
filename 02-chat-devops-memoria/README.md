@@ -1,8 +1,8 @@
 # 02 — Chat de terminal com memoria, feita na mao
 
 Segundo passo depois do `01`. O mesmo chat de DevOps, agora lembrando do que foi
-dito antes — sem abstracao de historico, sem banco, sem magica. So uma lista de
-mensagens que cresce a cada turno.
+dito antes — sem abstracao de historico, sem banco, sem magica. Uma lista guarda
+as mensagens anteriores, e um `ChatPromptTemplate` compoe a entrada de cada chamada.
 
 O ponto da aula e este: **o modelo continua sem memoria**. Ele nao guarda nada
 entre uma chamada e outra. Quem lembra e o seu codigo, reenviando a conversa
@@ -16,21 +16,52 @@ No `01`, cada pergunta montava a lista do zero:
 model.invoke([SystemMessage(SYSTEM_PROMPT), HumanMessage(pergunta)])
 ```
 
-Aqui existe uma lista que sobrevive entre as voltas do loop:
+Aqui existe uma lista que sobrevive entre as voltas do loop e guarda somente os
+turnos anteriores:
 
 ```python
-historico = [SystemMessage(SYSTEM_PROMPT)]   # o system prompt entra UMA vez
+historico = []
 ...
-historico.append(HumanMessage(pergunta))     # a pergunta entra na lista
-historico.append(responder(historico))       # a resposta tambem
+resposta = responder(historico, pergunta)
+historico.append(HumanMessage(pergunta))
+historico.append(resposta)
 ```
 
 Repare em quem faz o que:
 
 - `main()` e o **dono** do historico — e o unico lugar que anexa mensagens
-- `responder()` so envia a lista e devolve a resposta; nao mexe no historico
-- o `SYSTEM_PROMPT` fica na **posicao 0**, uma vez so — nao e reenviado a cada
-  turno como uma mensagem nova
+- `responder()` compoe a entrada e devolve a resposta; nao mexe no historico
+- o system prompt e a pergunta atual pertencem ao template, nao ao historico
+
+## Como o prompt e composto
+
+O template descreve a ordem das mensagens que o modelo deve receber:
+
+```python
+prompt = ChatPromptTemplate.from_messages(
+    [
+        SystemMessage(SYSTEM_PROMPT),
+        MessagesPlaceholder("historico"),
+        ("human", "{pergunta}"),
+    ]
+)
+```
+
+Cada chamada passa um dicionario com o historico e a pergunta atual. A invocacao
+produz um `ChatPromptValue`, que pode ser convertido na lista final de mensagens:
+
+```python
+prompt_value = prompt.invoke({"historico": historico, "pergunta": pergunta})
+mensagens = prompt_value.to_messages()
+resposta = model.invoke(mensagens)
+```
+
+As responsabilidades ficam separadas:
+
+- o template e a receita fixa de composicao
+- o historico e o estado dinamico mantido pela aplicacao
+- o `ChatPromptValue` e o resultado de uma invocacao do template
+- `mensagens` e a entrada final enviada ao modelo
 
 ## Pre-requisitos
 
@@ -70,8 +101,9 @@ A segunda pergunta se perde: sem historico, "isso" nao existe.
 
 ## O comando `limpar`
 
-Digite `limpar` e a lista volta a ter so o system prompt. Repita a pergunta de
-acompanhamento logo em seguida — o modelo perde o contexto na hora.
+Digite `limpar` e a lista volta a ficar vazia. Repita a pergunta de acompanhamento
+logo em seguida — o modelo perde o contexto na hora. O template ainda acrescenta o
+system prompt e a pergunta atual, mas nenhuma mensagem da conversa anterior.
 
 E a forma mais direta de ver que a memoria **e** a lista. Apagou a lista,
 esqueceu.
@@ -95,7 +127,7 @@ Resolver na mao e o proximo passo.
 ## Arquivos
 
 ```
-src/app.py        o historico, a funcao de resposta e o loop
+src/app.py        o template, o historico, a funcao de resposta e o loop
 .env.example      chave da API e o modelo usado
 pyproject.toml    dependencias e o comando `chat-devops-memoria`
 ```

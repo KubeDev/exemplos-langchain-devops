@@ -30,9 +30,6 @@ ENV/
 env/
 .venv/
 
-# uv
-.python-version
-
 # Environment variables
 .env
 .env.local
@@ -59,4 +56,3 @@ htmlcov/
 # OS
 .DS_Store
 Thumbs.db
-

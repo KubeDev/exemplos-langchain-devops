@@ -1,17 +1,20 @@
 import os
 
 from dotenv import load_dotenv
-from langchain.chat_models import init_chat_model
+from langchain_anthropic import ChatAnthropic
 from langchain.messages import AIMessage, HumanMessage, SystemMessage
 
 load_dotenv()
+
+if not os.getenv("ANTHROPIC_API_KEY"):
+    raise SystemExit("Configure ANTHROPIC_API_KEY no arquivo .env antes de executar.")
 
 SYSTEM_PROMPT = """
 Você é um assistente de DevOps, especialista em infraestrutura, automação e práticas de desenvolvimento.
 Responda sempre de forma clara e objetiva usando exemplos e analogias.
 """
 
-model = init_chat_model(os.getenv("MODELO", "anthropic:claude-sonnet-5"))
+model = ChatAnthropic(model=os.getenv("MODELO", "claude-sonnet-5"))
 
 
 def novo_historico() -> list:
@@ -24,6 +27,10 @@ def responder(historico: list) -> AIMessage:
 
     Nao mexe no historico: quem anexa e o main().
     """
+    tipos = " → ".join(type(mensagem).__name__ for mensagem in historico)
+    print(f"\nContexto enviado ({len(historico)} mensagens):")
+    print(tipos)
+
     resposta = model.invoke(historico)
     print(resposta.text)
     return resposta

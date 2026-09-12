@@ -1,8 +1,8 @@
 # 02 — Chat de terminal com memoria, feita na mao
 
 Segundo passo depois do `01`. O mesmo chat de DevOps, agora lembrando do que foi
-dito antes — sem framework, sem banco, sem magica. So uma lista de mensagens que
-cresce a cada turno.
+dito antes — sem abstracao de historico, sem banco, sem magica. So uma lista de
+mensagens que cresce a cada turno.
 
 O ponto da aula e este: **o modelo continua sem memoria**. Ele nao guarda nada
 entre uma chamada e outra. Quem lembra e o seu codigo, reenviando a conversa
@@ -63,7 +63,7 @@ que voce esta falando.
 Agora rode a mesma sequencia no `01`:
 
 ```bash
-cd ../00 && uv run chat-devops
+cd ../01-chat-devops && uv run chat-devops
 ```
 
 A segunda pergunta se perde: sem historico, "isso" nao existe.

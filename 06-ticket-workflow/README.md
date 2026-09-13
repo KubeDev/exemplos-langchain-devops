@@ -1,4 +1,4 @@
-# 01 · Triagem de incidentes — primeiros passos com LangChain
+# 06 · Triagem de incidentes — primeiros passos com LangChain
 
 Um alerta de observabilidade chega por webhook. Uma chain classifica se o incidente é de
 infraestrutura ou de desenvolvimento, e a chain do especialista correspondente escreve o
@@ -186,7 +186,7 @@ Ficam registradas porque só aparecem quando o código roda de verdade:
 
 ## O que ficou de fora, de propósito
 
-Este é o exemplo `05` de uma série. Cada item abaixo é um exemplo futuro, não uma lacuna:
+Este é o exemplo `06` de uma série. Cada item abaixo é um exemplo futuro, não uma lacuna:
 
 - **Saída estruturada** (`with_structured_output`) — devolver Pydantic validado em vez de
   texto, para quando o resultado alimenta código.

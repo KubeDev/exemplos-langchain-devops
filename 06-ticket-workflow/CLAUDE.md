@@ -5,7 +5,7 @@ saber para **não estragá-lo**.
 
 ## Natureza do projeto
 
-Exemplo didático `05` da série `langchain-devops-examples`. A lição é **a chain**:
+Exemplo didático `06` da série `langchain-devops-examples`. A lição é **a chain**:
 `prompt | modelo | parser`. O código é lido em sala de aula, projetado numa tela, não
 operado em produção.
 

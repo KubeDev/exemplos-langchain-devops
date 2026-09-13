@@ -31,7 +31,6 @@ env/
 .venv/
 
 # uv
-.python-version
 
 # Environment variables
 .env

@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+set -a
+. ./.env
+set +a
+
+if [ -z "$KUBERNETES_MCP_TOKEN" ]; then
+    echo "Configure KUBERNETES_MCP_TOKEN no arquivo .env antes de executar."
+    exit 1
+fi
+
+export ALLOW_ONLY_READONLY_TOOLS=true
+export ENABLE_UNSAFE_STREAMABLE_HTTP_TRANSPORT=1
+export HOST=127.0.0.1
+export PORT=3001
+export MCP_AUTH_TOKEN="$KUBERNETES_MCP_TOKEN"
+
+exec npx -y mcp-server-kubernetes@4.1.6

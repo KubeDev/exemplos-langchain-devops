@@ -77,7 +77,7 @@ Um arquivo só. Isso é deliberado.
 | `src/app.py` | modelo, system prompt, pergunta e duas formas de consumir a saída — **é o arquivo que vai no projetor** | não fatie em módulos; a lição é caber numa tela |
 
 Não crie `prompts.py`, `logs.py` ou `config.py` aqui. A separação de arquivos aparece a
-partir do exemplo `04`, quando passa a haver o que separar.
+partir do exemplo `05`, quando passa a haver o que separar.
 
 ## Modelo
 

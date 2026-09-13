@@ -5,9 +5,9 @@ saber para **não estragá-lo**.
 
 ## Natureza do projeto
 
-Exemplo didático `05` da série `langchain-devops-examples`. A lição é **o agente**: modelo +
+Exemplo didático `06` da série `langchain-devops-examples`. A lição é **o agente**: modelo +
 ferramentas + loop, e o fato de que **quem decide o próximo passo é o modelo**, não o código.
-É o contraste direto com o exemplo `04`, onde o fluxo é uma chain fixa escrita por você.
+É o contraste direto com o exemplo `05`, onde o fluxo é uma chain fixa escrita por você.
 
 O código é lido em sala de aula, projetado numa tela. Ele foi preparado para a **Live 02 —
 Construção de Agentes com Python e LangChain**, de nivelamento: o público está vendo tool

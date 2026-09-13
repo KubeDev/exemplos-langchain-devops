@@ -186,7 +186,7 @@ Ficam registradas porque só aparecem quando o código roda de verdade:
 
 ## O que ficou de fora, de propósito
 
-Este é o exemplo `03` de uma série. Cada item abaixo é um exemplo futuro, não uma lacuna:
+Este é o exemplo `04` de uma série. Cada item abaixo é um exemplo futuro, não uma lacuna:
 
 - **Saída estruturada** (`with_structured_output`) — devolver Pydantic validado em vez de
   texto, para quando o resultado alimenta código.

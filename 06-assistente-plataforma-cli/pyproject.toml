@@ -1,17 +1,17 @@
 [project]
-name = "assistente-plataforma"
+name = "assistente-plataforma-cli"
 version = "0.1.0"
-description = "Exemplo didatico: assistente de plataforma acessa Kubernetes via MCP"
+description = "Exemplo didatico: agente Kubernetes exposto por uma CLI operacional"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "langchain[mcp]>=1.4.0",
     "langchain-anthropic>=1.4.8",
+    "langchain[mcp]>=1.4.0",
     "python-dotenv>=1.2.2",
 ]
 
 [project.scripts]
-assistente-plataforma = "src.app:main"
+assistente-plataforma-cli = "src.app:main"
 
 [build-system]
 requires = ["hatchling"]
@@ -22,5 +22,6 @@ packages = ["src"]
 
 [dependency-groups]
 dev = [
-    "pytest>=9.1.1",
+    "pytest>=8.0",
 ]
+

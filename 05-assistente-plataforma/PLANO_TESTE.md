@@ -1,5 +1,9 @@
 # Plano de teste — assistente de plataforma
 
+Antes da validação manual, execute `uv run pytest`. A suíte local cobre sanitização e allowlists,
+limite do resumo, ausência de conteúdo nos eventos, uma única chamada a `agent.ainvoke()`, ausência
+de streaming e separação entre `stdout` e `stderr`, sem acessar cluster ou APIs externas.
+
 ## 1. Ambiente
 
 - [ ] `node --version` e `npx --version` respondem.
@@ -34,10 +38,31 @@
 - [ ] Os dados correspondem a `kubectl get pods -n kube-system`.
 - [ ] Nenhum recurso do cluster é alterado.
 
-## 5. Fronteiras
+## 5. Observabilidade didática
+
+- [ ] `stdout` contém inventário, prompt `Pergunta:` e resposta final destinada ao usuário.
+- [ ] `stderr` contém o recebimento e tamanho da pergunta e o início da decisão do modelo.
+- [ ] `stderr` identifica a ferramenta selecionada e seus argumentos sanitizados.
+- [ ] Somente os oito nomes esperados podem aparecer; qualquer outro vira `<nome omitido>`.
+- [ ] Somente `pods`, `pod` e `kube-system` podem permanecer visíveis nos argumentos; valores dos
+  demais campos são omitidos.
+- [ ] O fim da ferramenta aparece com resumo estrutural, sem conteúdo do resultado.
+- [ ] A resposta final aparece como confirmação e contagem de caracteres, seguida pela duração total.
+- [ ] Uma decisão anterior à ferramenta e outra posterior ao resultado ficam observáveis quando o
+  agente realiza tool calling.
+- [ ] Campos `token`, `authorization`, `api_key`, `password` e `secret` aparecem como `[REDACTED]`.
+- [ ] Configuração MCP, headers, mensagens completas, estado do agente e raciocínio do modelo não
+  aparecem em nenhuma saída.
+- [ ] O system prompt proíbe consultas a `Secret` e a revelação de credenciais.
+- [ ] Uma execução com `stdout` e `stderr` redirecionados para arquivos distintos preserva a
+  separação dos canais.
+
+## 6. Fronteiras
 
 - [ ] O projeto lê uma pergunta por execução e não recebe argumentos de linha de comando.
+- [ ] A execução usa `agent.ainvoke()` e não usa `stream()`, `astream()` ou eventos de streaming.
 - [ ] Não há middleware, retry, cache, memória, RAG ou implementação de server.
+- [ ] O código não percorre `tool_calls` nem cria `ToolMessage` manualmente.
 - [ ] O código Python não executa `kubectl` diretamente.
 - [ ] O código Python não contém comando `npx` nem configuração stdio.
 - [ ] O valor de `KUBERNETES_MCP_TOKEN` não aparece no script nem no histórico do terminal.

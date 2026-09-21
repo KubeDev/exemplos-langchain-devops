@@ -33,8 +33,26 @@ pergunta deve solicitar os pods de `kube-system` com nome, status e reinicializa
 deve conter exatamente as oito ferramentas MCP read-only publicadas pelo server e nenhuma
 capacidade definida no cliente.
 
-A resposta deve ser conferida contra `kubectl get pods -n kube-system`; não crie estado artificial
-nem dependa da existência de pod defeituoso.
+A resposta deve ser conferida contra `kubectl get pods -n kube-system`. Os callbacks em
+`src/observability.py` tornam o recebimento da pergunta, decisões do modelo, ferramenta, argumentos
+sanitizados, resumo estrutural do resultado, conclusão da resposta final e duração visíveis em
+`stderr`; trate esses eventos como evidência didática da execução. Não crie estado artificial nem
+dependa da existência de pod defeituoso.
+
+## Observabilidade didática
+
+- Preserve `input()`, uma única interação e `agent.ainvoke()` sem streaming.
+- Passe callbacks pela configuração pública da invocação; não percorra `tool_calls` nem crie
+  `ToolMessage` manualmente.
+- Mantenha a resposta normal em `stdout` e todos os eventos de observabilidade em `stderr`.
+- Restrinja valores visíveis dos argumentos a `pods`, `pod` e `kube-system`; omita os demais.
+- Restrinja nomes visíveis de ferramenta às oito ferramentas esperadas do catálogo read-only.
+- Resuma pergunta, resultado da ferramenta e resposta final somente por tipo, itens ou caracteres.
+- Sanitização deve cobrir pelo menos token, authorization, API key, password e secret.
+- Preserve no system prompt a proibição de consultar `Secret` ou revelar credenciais.
+- Nunca registre configuração MCP, headers, estado completo, prompts internos, mensagens completas,
+  debug bruto ou chain of thought.
+- Esta instrumentação existe para a aula; não a transforme em stack de tracing de produção.
 
 ## Fronteiras curriculares
 
@@ -44,6 +62,7 @@ nem dependa da existência de pod defeituoso.
 - Não adicione capacidades locais ou de escrita, middleware, retry, cache, memória ou RAG.
 - Não abra nem reproduza manualmente o ciclo interno de tool calling.
 - Preserve uma pergunta interativa por execução; argumentos de CLI e chat contínuo pertencem às aulas seguintes.
+- Não adicione streaming; a saída incremental pertence à Aula 07.
 
 ## Ambiente e credenciais
 

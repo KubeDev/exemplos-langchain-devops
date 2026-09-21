@@ -28,8 +28,10 @@ abrangente de erro, abstrações "para quando crescer". Nenhuma entra sem pedido
 | `03-agente-runbook` | runtime mínimo de agente e conhecimento privado inserido diretamente no contexto |
 | `04-agente-runbook-tool` | primeira ferramenta registrada no agente e seleção do `runbook_id` pelo modelo |
 | `05-assistente-plataforma` | acesso ao Kubernetes em linguagem natural com catálogo descoberto de um MCP server HTTP |
-| `06-ticket-workflow` | LCEL: `prompt \| modelo \| parser`, chains e roteamento |
-| `07-smart-docker` | agente: modelo + tools + loop, quem decide é o modelo |
+| `06-assistente-plataforma-cli` | execução single shot com argumento, contexto, canais e códigos de saída |
+| `07-assistente-plataforma-chat` | conversa com histórico de sessão e resposta progressiva em Streamlit |
+| `08-ticket-workflow` | LCEL: `prompt \| modelo \| parser`, chains e roteamento |
+| `09-smart-docker` | agente: modelo + tools + loop, quem decide é o modelo |
 
 **Não antecipe a aula seguinte.** O recurso ausente num exemplo geralmente é o assunto do
 próximo, e a ausência é o gancho. Antes de adicionar algo, verifique se ele não é a lição de
@@ -79,15 +81,15 @@ configuração. Se dois exemplos precisam do mesmo código, ele é **duplicado**
 - `uv.lock` e `.python-version` são commitados: a aula precisa ser reproduzível.
 
 Python `>=3.12` e LangChain permanecem alinhados. A integração de provider é deliberadamente
-diferente: o `01` usa Gemini; os exemplos `02` a `07` continuam com Anthropic. Preserve essa
+diferente: o `01` usa Gemini; os exemplos `02` a `09` continuam com Anthropic. Preserve essa
 diferença até existir uma decisão explícita de migrar os exemplos posteriores.
 
 ## Layout interno
 
-Código em `src/` nos sete exemplos. O `01` roda diretamente com `uv run src/app.py`; os
+Código em `src/` nos nove exemplos. O `01` roda diretamente com `uv run src/app.py`; os
 exemplos que expõem comando declaram `[project.scripts]` no `pyproject.toml`.
 
-O `06-ticket-workflow` é uma API FastAPI e ainda assim usa `src/` — a consistência entre as
+O `08-ticket-workflow` é uma API FastAPI e ainda assim usa `src/` — a consistência entre as
 aulas vale mais que a convenção `app/` do framework. **Atenção ao mexer nele:** `app` continua
 sendo o nome da instância (`app = FastAPI()`, `@app.post`), então um find-and-replace de `app`
 para `src` quebra o projeto. O comando é `uv run uvicorn src.main:app`.
@@ -99,7 +101,7 @@ conteúdo desta série e já quebrou execuções em providers que não aceitam e
 
 O `01` fixa Gemini no código para tornar provider e modelo visíveis na primeira aula. Nos
 demais exemplos, preserve a configuração já existente. Onde há assimetria deliberada de
-modelo, como no `06-ticket-workflow`, ela **é** conteúdo da aula.
+modelo, como no `08-ticket-workflow`, ela **é** conteúdo da aula.
 
 ## Os logs são a interface da apresentação
 
@@ -115,5 +117,5 @@ e `.env` no `.gitignore`. Ao validar, use a chave apenas no ambiente do processo
 
 **Este repositório será aberto ao público.** Antes de commitar qualquer coisa, confirme que
 nenhum segredo, caminho pessoal ou nome de cliente entrou no diff. Saídas de execução
-(`tickets/**/*.md` no `06`, `relatorio.md` no `07`) e `.claude/settings.local.json` estão
+(`tickets/**/*.md` no `08`, `relatorio.md` no `09`) e `.claude/settings.local.json` estão
 ignorados — mantenha assim.

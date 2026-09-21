@@ -6,6 +6,7 @@ from langchain.agents import create_agent
 from langchain.mcp import MCPAdapter
 from langchain_anthropic import ChatAnthropic
 
+from src.observability import DidacticObservabilityCallback
 from src.tools import MCP_CONFIG
 
 load_dotenv()
@@ -15,7 +16,8 @@ if not os.getenv("ANTHROPIC_API_KEY"):
 
 SYSTEM_PROMPT = """
 Você é um assistente de plataforma que consulta o estado do Kubernetes usando as ferramentas
-disponíveis. Nunca altere recursos. Se uma informação não estiver disponível, diga que não sabe.
+disponíveis. Nunca altere recursos, consulte Secrets ou revele credenciais. Se uma informação não
+estiver disponível, diga que não sabe.
 """
 
 
@@ -32,9 +34,18 @@ async def executar() -> None:
         agent = create_agent(model=model, tools=tools, system_prompt=SYSTEM_PROMPT)
 
         pergunta = input("\nPergunta: ")
-        resultado = await agent.ainvoke({"messages": [("human", pergunta)]})
+        observability = DidacticObservabilityCallback()
+        observability.question_received(pergunta)
+
+        resultado = await agent.ainvoke(
+            {"messages": [("human", pergunta)]},
+            config={"callbacks": [observability]},
+        )
+        resposta = resultado["messages"][-1].text
+        observability.final_answer(resposta)
+
         print("Resposta:")
-        print(resultado["messages"][-1].text)
+        print(resposta)
 
 
 def main() -> None:

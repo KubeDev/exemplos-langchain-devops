@@ -12,29 +12,31 @@ demonstra sua ideia — o que falta num exemplo costuma ser o assunto do próxim
 | # | Pasta | O que resolve | O que ensina |
 |---|---|---|---|
 | 01 | [`01-chat-devops`](01-chat-devops) | Uma pergunta DevOps ao Gemini | Modelo, mensagens, `invoke()` vs `stream()` e metadados do `AIMessage` |
-| 02 | [`02-chat-devops-memoria`](02-chat-devops-memoria) | O mesmo chat, agora lembrando da conversa | Que o modelo **não** tem memória — quem lembra é o seu código, reenviando a lista |
-| 03 | [`03-agente-runbook`](03-agente-runbook) | Responder sobre um runbook privado carregado pela aplicação | Runtime mínimo de agente, objetos `Document` e conhecimento inserido diretamente no contexto |
-| 04 | [`04-agente-runbook-tool`](04-agente-runbook-tool) | Consultar diferentes runbooks pelo identificador presente na pergunta | Criação de ferramenta, registro com `create_agent` e seleção de parâmetro pelo modelo |
-| 05 | [`05-assistente-plataforma`](05-assistente-plataforma) | Consultar o cluster Kubernetes em linguagem natural | Descoberta e registro do catálogo de ferramentas de um MCP server HTTP |
-| 06 | [`06-assistente-plataforma-cli`](06-assistente-plataforma-cli) | Executar uma consulta operacional por processo | Contrato de CLI com argumento, contexto, canais e códigos de saída |
-| 07 | [`07-assistente-plataforma-chat`](07-assistente-plataforma-chat) | Conversar com o assistente e acompanhar a resposta | Histórico de sessão e retorno progressivo em Streamlit |
-| 08 | [`08-ticket-workflow`](08-ticket-workflow) | Alerta de observabilidade chega por webhook e vira ticket, roteado para infra ou dev | LCEL: `prompt \| modelo \| parser`, encadeamento e roteamento entre chains |
-| 09 | [`09-smart-docker`](09-smart-docker) | Um agente que investiga um projeto e analisa — ou escreve — o Dockerfile dele | Agente com ferramentas e loop, onde **quem decide o próximo passo é o modelo** |
+| 02 | [`02-chat-devops-sem-memoria`](02-chat-devops-sem-memoria) | A mesma pergunta, agora num chat que continua aberto | Que um terminal contínuo não é uma conversa: cada chamada começa do zero |
+| 03 | [`03-chat-devops-memoria`](03-chat-devops-memoria) | O mesmo chat, agora lembrando da conversa | Que o modelo **não** tem memória — quem lembra é o seu código, reenviando a lista |
+| 04 | [`04-agente-runbook`](04-agente-runbook) | Responder sobre um runbook privado carregado pela aplicação | Runtime mínimo de agente, objetos `Document` e conhecimento inserido diretamente no contexto |
+| 05 | [`05-agente-runbook-tool`](05-agente-runbook-tool) | Consultar diferentes runbooks pelo identificador presente na pergunta | Criação de ferramenta, registro com `create_agent` e seleção de parâmetro pelo modelo |
+| 06 | [`06-assistente-plataforma`](06-assistente-plataforma) | Consultar o cluster Kubernetes em linguagem natural | Descoberta e registro do catálogo de ferramentas de um MCP server HTTP |
+| 07 | [`07-assistente-plataforma-cli`](07-assistente-plataforma-cli) | Executar uma consulta operacional por processo | Contrato de CLI com argumento, contexto, canais e códigos de saída |
+| 08 | [`08-assistente-plataforma-chat`](08-assistente-plataforma-chat) | Conversar com o assistente e acompanhar a resposta | Histórico de sessão e retorno progressivo em Streamlit |
+| 09 | [`09-ticket-workflow`](09-ticket-workflow) | Alerta de observabilidade chega por webhook e vira ticket, roteado para infra ou dev | LCEL: `prompt \| modelo \| parser`, encadeamento e roteamento entre chains |
+| 10 | [`10-smart-docker`](10-smart-docker) | Um agente que investiga um projeto e analisa — ou escreve — o Dockerfile dele | Agente com ferramentas e loop, onde **quem decide o próximo passo é o modelo** |
 
-A ordem importa. O `02` adiciona interação e memória à chamada isolada do `01`; o `03` entra no
-runtime sem tools e torna o contexto externo explícito; o `04` registra a primeira ferramenta no
-agente; o `05` conecta o agente a ferramentas Kubernetes publicadas por um MCP server e torna o
-fluxo observável; o `06` transforma uma solicitação em execução single shot; o `07` adiciona
-conversa, memória de sessão e retorno progressivo; o `08` explicita um fluxo fixo; e o `09`
+A ordem importa. O `02` coloca a chamada isolada do `01` num loop e mostra que o modelo
+esquece; o `03` resolve isso com memória explícita; o `04` entra no runtime sem tools e
+torna o contexto externo explícito; o `05` registra a primeira ferramenta no agente; o `06`
+conecta o agente a ferramentas Kubernetes publicadas por um MCP server e torna o fluxo
+observável; o `07` transforma uma solicitação em execução single shot; o `08` adiciona
+conversa, memória de sessão e retorno progressivo; o `09` explicita um fluxo fixo; e o `10`
 amplia o agente para investigar um projeto.
 
 ## Pré-requisitos
 
 - [uv](https://docs.astral.sh/uv/) — gerencia Python e dependências
 - Python 3.12 (o `uv` instala sozinho, se faltar)
-- Uma chave da Gemini Developer API para o exemplo `01`
-- Uma chave da API da Anthropic para os exemplos `02` a `09`
-- Node.js, `npx`, `kubectl` e um cluster de estudo para os exemplos `05` a `07`
+- Uma chave da Gemini Developer API para os exemplos `01` e `02`
+- Uma chave da API da Anthropic para os exemplos `03` a `10`
+- Node.js, `npx`, `kubectl` e um cluster de estudo para os exemplos `06` a `08`
 
 ## Como rodar qualquer exemplo
 
@@ -50,18 +52,19 @@ O comando de execução muda por exemplo:
 
 ```bash
 cd 01-chat-devops          && uv run src/app.py
-cd 02-chat-devops-memoria  && uv run chat-devops-memoria
-cd 03-agente-runbook        && uv run agente-runbook
-cd 04-agente-runbook-tool   && uv run agente-runbook-tool
-cd 05-assistente-plataforma && uv run assistente-plataforma
-cd 06-assistente-plataforma-cli && uv run assistente-plataforma-cli "Liste os pods com reinicializações" --namespace kube-system
-cd 07-assistente-plataforma-chat && uv run streamlit run src/app.py
-cd 08-ticket-workflow       && uv run uvicorn src.main:app --reload
-cd 09-smart-docker          && uv run smart-docker /caminho/de/um/projeto
+cd 02-chat-devops-sem-memoria && uv run chat-devops-sem-memoria
+cd 03-chat-devops-memoria  && uv run chat-devops-memoria
+cd 04-agente-runbook        && uv run agente-runbook
+cd 05-agente-runbook-tool   && uv run agente-runbook-tool
+cd 06-assistente-plataforma && uv run assistente-plataforma
+cd 07-assistente-plataforma-cli && uv run assistente-plataforma-cli "Liste os pods com reinicializações" --namespace kube-system
+cd 08-assistente-plataforma-chat && uv run streamlit run src/app.py
+cd 09-ticket-workflow       && uv run uvicorn src.main:app --reload
+cd 10-smart-docker          && uv run smart-docker /caminho/de/um/projeto
 ```
 
-O `08` sobe uma API — os cenários de teste estão em
-[`08-ticket-workflow/cenarios.http`](08-ticket-workflow/cenarios.http) e em `exemplos/*.json`.
+O `09` sobe uma API — os cenários de teste estão em
+[`09-ticket-workflow/cenarios.http`](09-ticket-workflow/cenarios.http) e em `exemplos/*.json`.
 
 Cada pasta tem um `README.md` próprio, com a explicação completa daquele exemplo. Comece por
 ele.

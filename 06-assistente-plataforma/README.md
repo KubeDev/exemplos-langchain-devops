@@ -1,4 +1,4 @@
-# 05 — Assistente de plataforma com Kubernetes via MCP
+# 06 — Assistente de plataforma com Kubernetes via MCP
 
 Este exemplo independente conecta um agente LangChain a um Kubernetes MCP server pronto. A
 pessoa descreve em linguagem natural o estado que deseja consultar; o agente escolhe uma das

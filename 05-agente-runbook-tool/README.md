@@ -1,6 +1,6 @@
-# 04 — Primeira ferramenta no agente
+# 05 — Primeira ferramenta no agente
 
-Quarto passo depois do `03-agente-runbook`. O exemplo mantém o domínio dos runbooks,
+Quinto passo depois do `04-agente-runbook`. O exemplo mantém o domínio dos runbooks,
 mas deixa de inserir o documento no system prompt. O agente recebe uma ferramenta capaz
 de carregar o runbook solicitado e decide chamá-la com o identificador presente na pergunta.
 

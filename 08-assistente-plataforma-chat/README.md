@@ -1,6 +1,6 @@
-# 07 — Assistente de plataforma em interface conversacional
+# 08 — Assistente de plataforma em interface conversacional
 
-Este exemplo independente expõe o assistente Kubernetes da Aula 05 em uma interface de chat.
+Este exemplo independente expõe o assistente Kubernetes da Aula 06 em uma interface de chat.
 A conversa fica em `st.session_state`, é reenviada integralmente ao agente em cada turno e desaparece
 quando a sessão do navegador termina. A resposta final chega progressivamente à mensagem do
 assistente; chamadas de ferramentas e marcos da execução aparecem somente no terminal do Streamlit.

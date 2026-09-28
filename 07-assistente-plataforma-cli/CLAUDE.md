@@ -4,7 +4,7 @@ Leia o `README.md` antes de alterar este exemplo. Ele define o contrato público
 
 ## Natureza do projeto
 
-Exemplo didático `06` da série `langchain-devops-examples`. A lição é: **uma CLI operacional tem
+Exemplo didático `07` da série `langchain-devops-examples`. A lição é: **uma CLI operacional tem
 contrato explícito de entrada, canais de saída e código de retorno**. O projeto é autocontido e o
 código será projetado em aula; simplicidade vence generalidade.
 
@@ -40,7 +40,7 @@ percorra `tool_calls`, não crie `ToolMessage` e não chame `kubectl` pelo Pytho
 ## Fronteiras curriculares
 
 Não adicione chat contínuo, memória ou persistência; isso muda o contrato de uma solicitação por
-processo. Não adicione streaming ou retorno parcial; esse é o conteúdo da Aula 07. Não adicione
+processo. Não adicione streaming ou retorno parcial; esse é o conteúdo da Aula 08. Não adicione
 middleware, retry, cache, RAG, interface web ou opções que transformem a CLI em clone do `kubectl`.
 
 ## Ambiente

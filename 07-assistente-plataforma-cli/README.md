@@ -1,6 +1,6 @@
-# 06 — Assistente de plataforma na linha de comando
+# 07 — Assistente de plataforma na linha de comando
 
-Este exemplo autocontido transforma o assistente Kubernetes da Aula 05 em um comando de terminal.
+Este exemplo autocontido transforma o assistente Kubernetes da Aula 06 em um comando de terminal.
 A pessoa informa uma solicitação em linguagem natural como argumento; a aplicação executa uma única
 invocação do agente e encerra com resposta e código de retorno próprios para automação.
 
@@ -19,7 +19,7 @@ O contrato operacional é simples:
 Cada processo atende exatamente uma solicitação. Não há prompt interativo, sessão, memória,
 streaming ou loop manual de tool calling.
 
-## O que permanece da Aula 05
+## O que permanece da Aula 06
 
 A CLI continua sendo cliente de um `mcp-server-kubernetes@4.1.6` separado, por Streamable HTTP. O
 server é iniciado em modo read-only, ligado a `127.0.0.1` e protegido por token. A aplicação descobre

@@ -5,7 +5,7 @@ preservam a função didática do exemplo.
 
 ## Natureza do projeto
 
-Exemplo didático `03` da série `langchain-devops-examples`. A lição é: **um arquivo privado
+Exemplo didático `04` da série `langchain-devops-examples`. A lição é: **um arquivo privado
 só vira conhecimento disponível quando a aplicação carrega seu conteúdo e o inclui na
 entrada do modelo**.
 
@@ -47,7 +47,7 @@ retriever ou RAG. O documento inteiro na janela é a limitação que a aula prec
 - O runbook deve conter fatos fictícios e específicos que não possam ser recuperados de
   conhecimento público.
 
-## Preserve a continuidade com o exemplo 02
+## Preserve a continuidade com o exemplo 03
 
 O `ChatPromptTemplate` continua visível e mantém instruções, histórico e pergunta. A única
 nova variável é `contexto`. Não converta a composição em LCEL nem esconda os objetos

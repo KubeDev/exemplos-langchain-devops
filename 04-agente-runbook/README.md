@@ -1,6 +1,6 @@
-# 03 — Primeiro agente com conhecimento externo
+# 04 — Primeiro agente com conhecimento externo
 
-Terceiro passo depois do `02-chat-devops-memoria`. O exemplo troca a chamada direta ao
+Quarto passo depois do `03-chat-devops-memoria`. O exemplo troca a chamada direta ao
 modelo pelo runtime de agentes do LangChain e permite executar a mesma pergunta operacional
 primeiro sem o runbook privado e depois com o documento carregado no contexto.
 

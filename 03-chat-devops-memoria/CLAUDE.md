@@ -5,13 +5,13 @@ saber para **não estragá-lo**.
 
 ## Natureza do projeto
 
-Exemplo didático `02` da série `langchain-devops-examples`. A lição cabe numa frase: **o
+Exemplo didático `03` da série `langchain-devops-examples`. A lição cabe numa frase: **o
 modelo continua sem memória** — ele não guarda nada entre uma chamada e outra. Quem lembra é o
 seu código, reenviando a conversa inteira toda vez.
 
-É o contraste direto com o exemplo `01`, que monta a lista do zero a cada pergunta. Aqui a
-lista sobrevive ao loop e entra num `ChatPromptTemplate` junto do system prompt e da pergunta
-atual.
+É o contraste direto com o exemplo `02`, que tem o mesmo loop mas monta a lista do zero a
+cada pergunta. Aqui a lista sobrevive ao loop e entra num `ChatPromptTemplate` junto do system
+prompt e da pergunta atual.
 
 O código é lido em sala de aula, projetado numa tela, não operado em produção.
 
@@ -114,8 +114,8 @@ Um arquivo só. Isso é deliberado.
 |---|---|---|
 | `src/app.py` | o template, `novo_historico()`, `responder()` e o loop que anexa — **é o arquivo que vai no projetor** | não fatie em módulos; a composição e a memória precisam permanecer visíveis juntas |
 
-Manter a proximidade com o `01-chat-devops/src/app.py` é requisito: quanto menor a diferença
-entre os dois arquivos, mais clara fica a lição. Refatoração que só afete este exemplo afasta
+Manter a proximidade com o `02-chat-devops-sem-memoria/src/app.py` é requisito: quanto menor a
+diferença entre os dois arquivos, mais clara fica a lição. Refatoração que só afete este exemplo afasta
 os dois e torna o diff ilegível na aula.
 
 ## Modelo

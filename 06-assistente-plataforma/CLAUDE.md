@@ -4,7 +4,7 @@ Leia o `README.md` antes de alterar este exemplo. Ele registra a demonstração 
 
 ## Natureza do projeto
 
-Exemplo didático `05` da série `langchain-devops-examples`. A lição é: **um assistente de
+Exemplo didático `06` da série `langchain-devops-examples`. A lição é: **um assistente de
 plataforma pode descobrir capacidades Kubernetes publicadas por um MCP server e usá-las em
 linguagem natural**.
 
@@ -62,7 +62,7 @@ dependa da existência de pod defeituoso.
 - Não adicione capacidades locais ou de escrita, middleware, retry, cache, memória ou RAG.
 - Não abra nem reproduza manualmente o ciclo interno de tool calling.
 - Preserve uma pergunta interativa por execução; argumentos de CLI e chat contínuo pertencem às aulas seguintes.
-- Não adicione streaming; a saída incremental pertence à Aula 07.
+- Não adicione streaming; a saída incremental pertence à Aula 08.
 
 ## Ambiente e credenciais
 

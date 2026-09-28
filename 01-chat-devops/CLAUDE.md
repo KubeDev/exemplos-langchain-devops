@@ -26,10 +26,11 @@ ponto.
 
 ## A chamada é isolada — e isso é a lição, não um bug
 
-O exemplo envia uma pergunta e termina. **Não adicione loop nem histórico aqui**: interação
-contínua e memória pertencem ao exemplo `02` (`02-chat-devops-memoria`).
+O exemplo envia uma pergunta e termina. **Não adicione loop nem histórico aqui**: a interação
+contínua pertence ao exemplo `02` (`02-chat-devops-sem-memoria`) e a memória ao exemplo `03`
+(`03-chat-devops-memoria`).
 
-Se você "consertar" o esquecimento, apaga a razão de o exemplo `02` existir.
+Se você "consertar" o esquecimento, apaga a razão de os exemplos `02` e `03` existirem.
 
 ## Ambiente e pacotes — `uv`, sem exceção
 
@@ -77,7 +78,7 @@ Um arquivo só. Isso é deliberado.
 | `src/app.py` | modelo, system prompt, pergunta e duas formas de consumir a saída — **é o arquivo que vai no projetor** | não fatie em módulos; a lição é caber numa tela |
 
 Não crie `prompts.py`, `logs.py` ou `config.py` aqui. A separação de arquivos aparece a
-partir do exemplo `05`, quando passa a haver o que separar.
+partir do exemplo `06`, quando passa a haver o que separar.
 
 ## Modelo
 

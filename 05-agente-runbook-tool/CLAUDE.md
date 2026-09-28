@@ -5,15 +5,15 @@ preservam a função didática do exemplo.
 
 ## Natureza do projeto
 
-Exemplo didático `04` da série `langchain-devops-examples`. A lição é: **configurar uma
+Exemplo didático `05` da série `langchain-devops-examples`. A lição é: **configurar uma
 ferramenta no agente e observar se ele envia o identificador correto ao usá-la**.
 
 O código será lido em aula e projetado numa tela. Quando simplicidade e robustez colidirem,
 vence a simplicidade.
 
-## Preserve o contraste com o exemplo 03
+## Preserve o contraste com o exemplo 04
 
-O `03-agente-runbook` insere o documento diretamente no contexto antes da primeira chamada.
+O `04-agente-runbook` insere o documento diretamente no contexto antes da primeira chamada.
 Este exemplo não pode fazer isso. O `SYSTEM_PROMPT` não contém `{contexto}` e os runbooks só
 são carregados dentro de `consultar_runbook()`.
 

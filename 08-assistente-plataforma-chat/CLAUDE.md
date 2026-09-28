@@ -1,7 +1,7 @@
 # Contexto para sessões de IA neste projeto
 
-Leia o `README.md` antes de alterar o exemplo. Este é o projeto autocontido da Aula 07: a mesma
-capacidade Kubernetes da Aula 05 ganha interface conversacional, histórico de sessão e resposta
+Leia o `README.md` antes de alterar o exemplo. Este é o projeto autocontido da Aula 08: a mesma
+capacidade Kubernetes da Aula 06 ganha interface conversacional, histórico de sessão e resposta
 progressiva.
 
 ## Invariantes didáticas

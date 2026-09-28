@@ -1,6 +1,6 @@
-# 02 — Chat de terminal com memoria, feita na mao
+# 03 — Chat de terminal com memoria, feita na mao
 
-Segundo passo depois do `01`. O mesmo chat de DevOps, agora lembrando do que foi
+Terceiro passo, logo depois do `02`. O mesmo chat de DevOps, agora lembrando do que foi
 dito antes — sem abstracao de historico, sem banco, sem magica. Uma lista guarda
 as mensagens anteriores, e um `ChatPromptTemplate` compoe a entrada de cada chamada.
 
@@ -8,9 +8,9 @@ O ponto da aula e este: **o modelo continua sem memoria**. Ele nao guarda nada
 entre uma chamada e outra. Quem lembra e o seu codigo, reenviando a conversa
 inteira toda vez.
 
-## O que muda em relacao ao `01`
+## O que muda em relacao ao `02`
 
-No `01`, cada pergunta montava a lista do zero:
+No `02`, o loop ja existia, mas cada pergunta montava a lista do zero:
 
 ```python
 model.invoke([SystemMessage(SYSTEM_PROMPT), HumanMessage(pergunta)])
@@ -91,10 +91,10 @@ Voce: e como eu desfaco isso?
 Aqui a segunda pergunta e respondida com `kubectl uncordon` — o modelo sabe do
 que voce esta falando.
 
-Agora rode a mesma sequencia no `01`:
+Agora rode a mesma sequencia no `02`:
 
 ```bash
-cd ../01-chat-devops && uv run chat-devops
+cd ../02-chat-devops-sem-memoria && uv run chat-devops-sem-memoria
 ```
 
 A segunda pergunta se perde: sem historico, "isso" nao existe.

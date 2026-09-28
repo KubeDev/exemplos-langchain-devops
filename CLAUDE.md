@@ -24,8 +24,8 @@ abrangente de erro, abstrações "para quando crescer". Nenhuma entra sem pedido
 | Pasta | Lição |
 |---|---|
 | `01-chat-devops` | chamada isolada: modelo, mensagens, `invoke()` vs `stream()` e metadados do `AIMessage` |
-| `02-chat-devops-sem-memoria` | loop sem histórico: processo contínuo não é conversa, cada chamada começa do zero |
-| `03-chat-devops-memoria` | memória é uma lista; `ChatPromptTemplate` compõe a entrada que você reenvia |
+| `02-chat-devops-sem-memoria` | loop sem histórico: cada chamada começa do zero; `ChatPromptTemplate` compõe a entrada |
+| `03-chat-devops-memoria` | memória é uma lista; um `MessagesPlaceholder` reenvia essa lista a cada chamada |
 | `04-agente-runbook` | runtime mínimo de agente e conhecimento privado inserido diretamente no contexto |
 | `05-agente-runbook-tool` | primeira ferramenta registrada no agente e seleção do `runbook_id` pelo modelo |
 | `06-assistente-plataforma` | acesso ao Kubernetes em linguagem natural com catálogo descoberto de um MCP server HTTP |
@@ -39,8 +39,8 @@ próximo, e a ausência é o gancho. Antes de adicionar algo, verifique se ele n
 um exemplo posterior.
 
 O inverso também vale: **não faça um exemplo convergir para outro**. O `01` é uma chamada
-isolada; o `02` introduz o loop sem histórico; o `03` acrescenta o histórico. Preserve essas
-fronteiras ao comparar os arquivos.
+isolada; o `02` introduz o loop sem histórico e a composição por template; o `03` acrescenta
+o histórico. Preserve essas fronteiras ao comparar os arquivos.
 
 ## Convenção de nomes de pasta
 

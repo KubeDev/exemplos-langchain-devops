@@ -19,15 +19,30 @@ while True:
     responder(pergunta)
 ```
 
-O que **nao** muda e a lista enviada ao modelo. Ela continua sendo montada do zero a cada
-pergunta:
+O que **nao** muda e o conteudo enviado ao modelo: continua sendo o system prompt mais a
+pergunta atual, e nada alem disso. O que muda e a forma de compor. No `01` a lista era
+escrita na mao a cada chamada; aqui um `ChatPromptTemplate` descreve a ordem das mensagens
+uma vez so:
 
 ```python
-mensagens = [SystemMessage(SYSTEM_PROMPT), HumanMessage(pergunta)]
+prompt = ChatPromptTemplate.from_messages(
+    [
+        SystemMessage(SYSTEM_PROMPT),
+        ("human", "{pergunta}"),
+    ]
+)
 ```
 
-Essa lista nasce e morre dentro de `responder()`. Nada sobrevive entre uma volta do loop e a
-seguinte.
+A cada pergunta o template e invocado com um dicionario. A invocacao produz um
+`ChatPromptValue`, que vira a lista final de mensagens:
+
+```python
+prompt_value = prompt.invoke({"pergunta": pergunta})
+mensagens = prompt_value.to_messages()
+```
+
+O template e fixo e nao sabe nada do passado. A lista que ele produz nasce e morre dentro de
+`responder()`: nada sobrevive entre uma volta do loop e a seguinte.
 
 ## Pre-requisitos
 
@@ -63,6 +78,7 @@ Voce: qual e o meu nome?
 Repare no que o programa imprime antes de cada resposta:
 
 ```
+Prompt produzido: ChatPromptValue
 Mensagens enviadas (2 mensagens):
 SystemMessage → HumanMessage
 ```
@@ -73,12 +89,13 @@ voce envia, e aqui voce envia apenas a pergunta atual.
 ## O que este exemplo nao faz
 
 Nao guarda historico, de proposito. Lembrar da conversa e o assunto do `03`, que roda o mesmo
-loop e mostra esse mesmo contador crescendo a cada turno.
+loop e acrescenta um unico slot a este mesmo template — um `MessagesPlaceholder` — para voce
+ver esse contador crescer a cada turno.
 
 ## Arquivos
 
 ```text
-src/app.py        modelo, system prompt, funcao de resposta e o loop
+src/app.py        modelo, system prompt, template, funcao de resposta e o loop
 .env.example      chave da Gemini Developer API
 pyproject.toml    dependencias e o comando `chat-devops-sem-memoria`
 uv.lock           versoes resolvidas

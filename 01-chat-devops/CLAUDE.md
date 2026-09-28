@@ -48,9 +48,10 @@ uv run src/app.py
 
 ## Não adicione sem pedido explícito
 
-Histórico de conversa, `ChatPromptTemplate`, LCEL, chains, parsers, tools, structured output,
-LangGraph, `async`/`await`, retry, cache, testes, tratamento de erro de API, camada de
-serviço, abstrações "para quando crescer". **Todas são exemplos posteriores da série.**
+Histórico de conversa, `ChatPromptTemplate` (é a composição que o `02` introduz), LCEL,
+chains, parsers, tools, structured output, LangGraph, `async`/`await`, retry, cache,
+testes, tratamento de erro de API, camada de serviço, abstrações "para quando crescer".
+**Todas são exemplos posteriores da série.**
 Antecipar qualquer uma aqui rouba a aula seguinte e engorda o primeiro contato.
 
 Um `if` a mais neste arquivo é caro. O tamanho é a feature.

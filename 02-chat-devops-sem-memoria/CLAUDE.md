@@ -10,7 +10,8 @@ processo contínuo não é uma conversa** — o terminal fica aberto, mas cada p
 chamada isolada e o modelo não sabe o que foi dito antes.
 
 Fica entre o `01` (uma pergunta fixa, uma chamada, fim) e o `03` (o mesmo loop, agora com
-histórico). Do `01` herda o modelo e as mensagens; do `03` antecipa apenas o loop.
+histórico). Do `01` herda o modelo e as mensagens; para o `03` entrega o loop e a
+composição da entrada por template.
 
 O código é lido em sala de aula, projetado numa tela, não operado em produção.
 
@@ -19,13 +20,26 @@ inverso do default e é intencional.
 
 ## O esquecimento é a lição, não um bug
 
-A lista de mensagens é montada dentro de `responder()` a cada pergunta e descartada no fim.
-**Não adicione histórico, `limpar`, `ChatPromptTemplate` nem qualquer estado entre as voltas
-do loop**: tudo isso é a lição do `03-chat-devops-memoria`. Se você "consertar" o
+A lista de mensagens é produzida pelo template a cada pergunta e descartada no fim.
+**Não adicione histórico, `limpar`, `MessagesPlaceholder` nem qualquer estado entre as
+voltas do loop**: tudo isso é a lição do `03-chat-devops-memoria`. Se você "consertar" o
 esquecimento, apaga a razão de os dois exemplos existirem.
 
-O print `Mensagens enviadas (2 mensagens)` é a prova na tela. Ele precisa mostrar **sempre 2**
-e usar o mesmo formato do `03`, onde o contador cresce. Não o remova.
+Os prints `Prompt produzido: ChatPromptValue` e `Mensagens enviadas (2 mensagens)` são a
+prova na tela. O contador precisa mostrar **sempre 2**, e os dois prints precisam usar o
+mesmo formato do `03` — onde o histórico aparece e o contador cresce. Não os remova.
+
+## O template entra aqui, ainda sem nada a variar
+
+`ChatPromptTemplate.from_messages([SystemMessage(SYSTEM_PROMPT), ("human", "{pergunta}")])`
+é a receita fixa de composição. `responder()` a invoca com um dicionário e torna visíveis o
+`ChatPromptValue` e a lista final de mensagens, antes de chamar o modelo.
+
+O template tem só duas partes e nada de dinâmico além da pergunta — e isso é de propósito.
+Ele existe aqui para que o `03` acrescente **uma** coisa, o `MessagesPlaceholder("historico")`,
+e o diff entre os dois exemplos seja exatamente a lição da aula.
+
+Não transforme a composição em LCEL nem extraia o template para outro módulo.
 
 ## Ambiente e pacotes — `uv`, sem exceção
 
@@ -42,7 +56,7 @@ uv run chat-devops-sem-memoria
 
 ## Não adicione sem pedido explícito
 
-Histórico, `ChatPromptTemplate`, `stream()`, impressão de metadados do `AIMessage`, LCEL,
+Histórico, `MessagesPlaceholder`, `stream()`, impressão de metadados do `AIMessage`, LCEL,
 tools, `async`/`await`, retry, cache, testes, tratamento de erro de API. Streaming e metadados
 já foram a lição do `01`; o resto pertence a exemplos posteriores.
 

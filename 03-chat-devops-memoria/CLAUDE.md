@@ -9,9 +9,9 @@ Exemplo didático `03` da série `langchain-devops-examples`. A lição cabe num
 modelo continua sem memória** — ele não guarda nada entre uma chamada e outra. Quem lembra é o
 seu código, reenviando a conversa inteira toda vez.
 
-É o contraste direto com o exemplo `02`, que tem o mesmo loop mas monta a lista do zero a
-cada pergunta. Aqui a lista sobrevive ao loop e entra num `ChatPromptTemplate` junto do system
-prompt e da pergunta atual.
+É o contraste direto com o exemplo `02`, que tem o mesmo loop e o mesmo template, mas compõe
+só o system prompt e a pergunta atual. Aqui o template ganha um `MessagesPlaceholder` e a
+lista de mensagens sobrevive ao loop para entrar nesse slot.
 
 O código é lido em sala de aula, projetado numa tela, não operado em produção.
 
@@ -58,9 +58,13 @@ confirme que ele lembra, limpe, pergunte de novo. Não é uma conveniência de U
 O histórico novo é uma lista vazia. O system prompt reaparece na entrada porque é uma parte
 fixa do template, não porque sobreviveu dentro da memória.
 
-## O template torna a composição visível
+## O `MessagesPlaceholder` é o que nasce aqui
 
-O `ChatPromptTemplate` deve permanecer no mesmo `src/app.py` e conter exatamente estas três
+O `ChatPromptTemplate` já vem do `02`, com duas partes. O que este exemplo acrescenta é a
+terceira, no meio: o `MessagesPlaceholder("historico")`. Esse slot é a única diferença de
+composição entre os dois exemplos — é ele que a aula mostra.
+
+O template deve permanecer no mesmo `src/app.py` e conter exatamente estas três
 partes: `SystemMessage(SYSTEM_PROMPT)`, `MessagesPlaceholder("historico")` e pergunta parametrizada.
 `responder()` deve invocá-lo com um dicionário, tornar visíveis o `ChatPromptValue` e a lista
 final de mensagens, e só então chamar o modelo.

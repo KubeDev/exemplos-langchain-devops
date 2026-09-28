@@ -2,7 +2,8 @@ import os
 
 from dotenv import load_dotenv
 from langchain.chat_models import init_chat_model
-from langchain.messages import HumanMessage, SystemMessage
+from langchain.messages import SystemMessage
+from langchain_core.prompts import ChatPromptTemplate
 
 load_dotenv()
 
@@ -16,12 +17,23 @@ Responda de forma clara, objetiva e concisa.
 
 model = init_chat_model("google_genai:gemini-3.8-flash")
 
+prompt = ChatPromptTemplate.from_messages(
+    [
+        SystemMessage(SYSTEM_PROMPT),
+        ("human", "{pergunta}"),
+    ]
+)
+
 
 def responder(pergunta: str) -> None:
-    mensagens = [SystemMessage(SYSTEM_PROMPT), HumanMessage(pergunta)]
+    """Compoe as mensagens a partir do template e imprime a resposta do modelo."""
+    prompt_value = prompt.invoke({"pergunta": pergunta})
+    mensagens = prompt_value.to_messages()
 
-    print(f"\nMensagens enviadas ({len(mensagens)} mensagens):")
-    print(" → ".join(type(mensagem).__name__ for mensagem in mensagens))
+    tipos_enviados = " → ".join(type(mensagem).__name__ for mensagem in mensagens)
+    print(f"\nPrompt produzido: {type(prompt_value).__name__}")
+    print(f"Mensagens enviadas ({len(mensagens)} mensagens):")
+    print(tipos_enviados)
 
     resposta = model.invoke(mensagens, automatic_function_calling={"disable": True})
     print(resposta.text)
@@ -41,7 +53,8 @@ def main() -> None:
             break
 
         print("\nAssistente:")
-        # Nada e guardado: a lista de mensagens nasce e morre dentro de responder().
+        # O template e fixo e nao sabe nada do passado: a lista que ele produz
+        # nasce e morre dentro de responder().
         responder(pergunta)
         print()
 

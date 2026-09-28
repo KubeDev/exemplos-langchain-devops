@@ -1,8 +1,9 @@
 # 03 — Chat de terminal com memoria, feita na mao
 
 Terceiro passo, logo depois do `02`. O mesmo chat de DevOps, agora lembrando do que foi
-dito antes — sem abstracao de historico, sem banco, sem magica. Uma lista guarda
-as mensagens anteriores, e um `ChatPromptTemplate` compoe a entrada de cada chamada.
+dito antes — sem abstracao de historico, sem banco, sem magica. Uma lista guarda as
+mensagens anteriores, e um slot no template que ja vem do `02` reenvia essa lista a cada
+chamada.
 
 O ponto da aula e este: **o modelo continua sem memoria**. Ele nao guarda nada
 entre uma chamada e outra. Quem lembra e o seu codigo, reenviando a conversa
@@ -10,10 +11,16 @@ inteira toda vez.
 
 ## O que muda em relacao ao `02`
 
-No `02`, o loop ja existia, mas cada pergunta montava a lista do zero:
+No `02`, o loop e o template ja existiam, mas o template tinha duas partes e compunha
+sempre a mesma coisa: o system prompt e a pergunta atual.
 
 ```python
-model.invoke([SystemMessage(SYSTEM_PROMPT), HumanMessage(pergunta)])
+prompt = ChatPromptTemplate.from_messages(
+    [
+        SystemMessage(SYSTEM_PROMPT),
+        ("human", "{pergunta}"),
+    ]
+)
 ```
 
 Aqui existe uma lista que sobrevive entre as voltas do loop e guarda somente os
@@ -35,7 +42,8 @@ Repare em quem faz o que:
 
 ## Como o prompt e composto
 
-O template descreve a ordem das mensagens que o modelo deve receber:
+O template ganha uma unica parte nova em relacao ao `02`: o `MessagesPlaceholder` no meio,
+que reserva o lugar por onde o historico entra. O resto da ordem continua igual:
 
 ```python
 prompt = ChatPromptTemplate.from_messages(

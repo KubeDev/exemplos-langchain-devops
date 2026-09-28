@@ -12,7 +12,7 @@ if not os.getenv("ANTHROPIC_API_KEY"):
 
 SYSTEM_PROMPT = """
 Você é um assistente de DevOps, especialista em infraestrutura, automação e práticas de desenvolvimento.
-Responda sempre de forma clara e objetiva usando exemplos e analogias.
+Responda de forma clara, objetiva e concisa.
 """
 
 model = ChatAnthropic(model=os.getenv("MODELO", "claude-sonnet-5"))

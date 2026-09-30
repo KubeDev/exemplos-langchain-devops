@@ -18,6 +18,7 @@ código será projetado em aula; simplicidade vence generalidade.
 - Aviso do catálogo MCP e erros em `stderr`.
 - Códigos: `0` sucesso, `1` execução/configuração, `2` uso inválido.
 - Não adicione `--debug`.
+- A CLI é declarada com Typer: um único comando, sem subcomandos.
 
 ## Superfície do agente e do MCP
 

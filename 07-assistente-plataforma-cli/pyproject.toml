@@ -8,10 +8,11 @@ dependencies = [
     "langchain-anthropic>=1.4.8",
     "langchain[mcp]>=1.4.0",
     "python-dotenv>=1.2.2",
+    "typer>=0.27.2",
 ]
 
 [project.scripts]
-assistente-plataforma-cli = "src.app:main"
+assistente-plataforma-cli = "src.app:app"
 
 [build-system]
 requires = ["hatchling"]

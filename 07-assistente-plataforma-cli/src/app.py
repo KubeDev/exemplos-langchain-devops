@@ -1,9 +1,9 @@
-import argparse
 import asyncio
 import os
 import sys
-from collections.abc import Sequence
+from typing import Annotated
 
+import typer
 from dotenv import load_dotenv
 
 from src.tools import ConfigurationError, mcp_config
@@ -13,19 +13,6 @@ Você é um assistente de plataforma que consulta o estado do Kubernetes usando 
 disponíveis. Nunca altere recursos, consulte Secrets ou revele credenciais. Se uma informação não
 estiver disponível, diga que não sabe.
 """
-
-
-def criar_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        prog="assistente-plataforma-cli",
-        description="Consulta o Kubernetes em linguagem natural por meio de um agente.",
-    )
-    parser.add_argument("pergunta", help="solicitação em linguagem natural")
-    parser.add_argument(
-        "--namespace",
-        help="namespace usado como contexto adicional da solicitação",
-    )
-    return parser
 
 
 def compor_solicitacao(pergunta: str, namespace: str | None) -> str:
@@ -58,20 +45,29 @@ async def executar(pergunta: str, namespace: str | None = None) -> str:
     return resultado["messages"][-1].text
 
 
-def main(argv: Sequence[str] | None = None) -> None:
-    args = criar_parser().parse_args(argv)
+app = typer.Typer(add_completion=False)
 
+
+@app.command()
+def main(
+    pergunta: Annotated[str, typer.Argument(help="solicitação em linguagem natural")],
+    namespace: Annotated[
+        str | None,
+        typer.Option(help="namespace usado como contexto adicional da solicitação"),
+    ] = None,
+) -> None:
+    """Consulta o Kubernetes em linguagem natural por meio de um agente."""
     try:
-        resposta = asyncio.run(executar(args.pergunta, args.namespace))
+        resposta = asyncio.run(executar(pergunta, namespace))
     except ConfigurationError as error:
         print(f"Erro de configuração: {error}", file=sys.stderr)
-        raise SystemExit(1) from error
+        raise typer.Exit(1) from error
     except Exception as error:
         print(f"Falha durante a execução: {type(error).__name__}", file=sys.stderr)
-        raise SystemExit(1) from error
+        raise typer.Exit(1) from error
 
     print(resposta)
 
 
 if __name__ == "__main__":
-    main()
+    app()

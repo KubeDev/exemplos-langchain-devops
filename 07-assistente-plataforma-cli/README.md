@@ -94,6 +94,9 @@ aplicação.
 | `1` | falha de configuração ou execução | credencial ausente, server indisponível ou erro do agente |
 | `2` | uso inválido | pergunta ausente ou opção desconhecida |
 
+A CLI é declarada com [Typer](https://typer.tiangolo.com/): o código `2` de uso inválido vem do
+próprio Typer, sem tratamento no projeto.
+
 ## O que este exemplo não faz
 
 - Não implementa nem inicia o MCP server no processo cliente.
@@ -108,7 +111,7 @@ aplicação.
 ## Arquivos
 
 ```text
-src/app.py                   contrato da CLI e execução única do agente
+src/app.py                   contrato da CLI com Typer e execução única do agente
 src/tools.py                 configuração do endpoint MCP
 scripts/subir-mcp-kubernetes inicialização do server HTTP separado
 PLANO_TESTE.md               verificações manuais

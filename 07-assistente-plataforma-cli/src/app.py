@@ -6,6 +6,10 @@ from typing import Annotated
 import typer
 from dotenv import load_dotenv
 
+from langchain.agents import create_agent
+from langchain.mcp import MCPAdapter
+from langchain_anthropic import ChatAnthropic
+
 from src.tools import ConfigurationError, mcp_config
 
 SYSTEM_PROMPT = """
@@ -28,10 +32,6 @@ async def executar(pergunta: str, namespace: str | None = None) -> str:
         raise ConfigurationError(
             "Configure ANTHROPIC_API_KEY no arquivo .env antes de executar."
         )
-
-    from langchain.agents import create_agent
-    from langchain.mcp import MCPAdapter
-    from langchain_anthropic import ChatAnthropic
 
     model = ChatAnthropic(model=os.getenv("MODELO", "claude-sonnet-5"))
     solicitacao = compor_solicitacao(pergunta, namespace)

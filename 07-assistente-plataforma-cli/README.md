@@ -13,7 +13,7 @@ O contrato operacional é simples:
 - a pergunta é um argumento posicional obrigatório;
 - `--namespace` acrescenta contexto à solicitação, sem reproduzir opções do `kubectl`;
 - a resposta final é o único conteúdo escrito em `stdout`;
-- eventos didáticos e erros são escritos em `stderr`;
+- o aviso do catálogo MCP e os erros são escritos em `stderr`;
 - o código `0` indica sucesso, `1` falha de configuração ou execução e `2` uso inválido.
 
 Cada processo atende exatamente uma solicitação. Não há prompt interativo, sessão, memória,
@@ -31,10 +31,6 @@ pergunta + contexto           HTTP       catálogo read-only
 agent.ainvoke()             ─────────►   kubeconfig + Kubernetes
 ```
 
-Os callbacks continuam registrando em `stderr` somente marcos seguros: tamanho da solicitação,
-início da decisão, nome permitido da ferramenta, argumentos sanitizados, resumo limitado do retorno,
-confirmação da resposta e duração. Tokens, autorização, chaves, senhas e segredos são redigidos; o
-conteúdo integral da pergunta, das mensagens e do resultado da ferramenta não é registrado.
 Falhas de bibliotecas externas exibem somente o tipo da exceção, nunca sua mensagem potencialmente
 sensível; mensagens detalhadas ficam restritas às validações de configuração definidas no projeto.
 
@@ -83,11 +79,11 @@ Para provar a separação dos canais:
 
 ```bash
 uv run assistente-plataforma-cli "Liste os pods com reinicializações" \
-  --namespace kube-system >resposta.txt 2>eventos.txt
+  --namespace kube-system >resposta.txt 2>erros.txt
 ```
 
-`resposta.txt` deve conter somente a resposta destinada ao usuário. `eventos.txt` deve conter os
-eventos didáticos. Confira os dados do cenário com `kubectl get pods -n kube-system`, fora da
+`resposta.txt` deve conter somente a resposta destinada ao usuário. `erros.txt` deve conter apenas
+o aviso do catálogo MCP. Confira os dados do cenário com `kubectl get pods -n kube-system`, fora da
 aplicação.
 
 ## Códigos de retorno
@@ -113,8 +109,7 @@ aplicação.
 
 ```text
 src/app.py                   contrato da CLI e execução única do agente
-src/observability.py         eventos didáticos, sanitização e resumos
 src/tools.py                 configuração do endpoint MCP
 scripts/subir-mcp-kubernetes inicialização do server HTTP separado
-PLANO_TESTE.md               verificações automatizadas e manuais
+PLANO_TESTE.md               verificações manuais
 ```

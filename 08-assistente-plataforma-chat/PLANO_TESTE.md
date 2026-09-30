@@ -3,7 +3,6 @@
 ## 1. Ambiente e inicialização
 
 - [ ] `uv sync --locked` conclui sem alterar `uv.lock`.
-- [ ] `uv run python -m unittest discover -s tests -v` aprova todos os testes.
 - [ ] `uv run python -c "import src.app"` não falha por import ausente.
 - [ ] `uv run streamlit run src/app.py` inicia e exibe somente o campo de chat.
 - [ ] O server separado usa `mcp-server-kubernetes@4.1.6`, bind local, token e modo read-only.
@@ -27,16 +26,14 @@
 
 - [ ] A UI contém somente mensagens do usuário, respostas textuais e campo de chat.
 - [ ] Partes `tool_call_chunk`, conteúdo do nó `tools` e atualizações não aparecem na UI.
-- [ ] Nome da ferramenta e argumentos sanitizados aparecem somente em `stderr`.
-- [ ] Resultado da ferramenta aparece somente como tipo ou tamanho, nunca como conteúdo.
 - [ ] Falha de execução gera uma mensagem genérica na conversa e somente o tipo da exceção no terminal.
-- [ ] Token, headers, configuração MCP, mensagens completas e chain of thought não aparecem nos logs.
+- [ ] Token, headers e configuração MCP não aparecem no terminal.
 
 ## 5. Cenário manual da aula
 
 - [ ] Deixar terminal do Streamlit e navegador lado a lado.
 - [ ] Perguntar pelos pods de `kube-system` com nome, status e reinicializações.
-- [ ] Observar texto chegar progressivamente no navegador e eventos apenas no terminal.
+- [ ] Observar texto chegar progressivamente no navegador.
 - [ ] Fazer a pergunta de continuidade sobre os pods reiniciados.
 - [ ] Conferir ambas as respostas com `kubectl get pods -n kube-system`.
 - [ ] Confirmar que nenhum recurso Kubernetes foi alterado.

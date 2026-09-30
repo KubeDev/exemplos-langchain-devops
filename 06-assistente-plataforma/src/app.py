@@ -6,7 +6,6 @@ from langchain.agents import create_agent
 from langchain.mcp import MCPAdapter
 from langchain_anthropic import ChatAnthropic
 
-from src.observability import DidacticObservabilityCallback
 from src.tools import MCP_CONFIG
 
 load_dotenv()
@@ -34,15 +33,9 @@ async def executar() -> None:
         agent = create_agent(model=model, tools=tools, system_prompt=SYSTEM_PROMPT)
 
         pergunta = input("\nPergunta: ")
-        observability = DidacticObservabilityCallback()
-        observability.question_received(pergunta)
 
-        resultado = await agent.ainvoke(
-            {"messages": [("human", pergunta)]},
-            config={"callbacks": [observability]},
-        )
+        resultado = await agent.ainvoke({"messages": [("human", pergunta)]})
         resposta = resultado["messages"][-1].text
-        observability.final_answer(resposta)
 
         print("Resposta:")
         print(resposta)

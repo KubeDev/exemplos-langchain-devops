@@ -33,26 +33,15 @@ pergunta deve solicitar os pods de `kube-system` com nome, status e reinicializa
 deve conter exatamente as oito ferramentas MCP read-only publicadas pelo server e nenhuma
 capacidade definida no cliente.
 
-A resposta deve ser conferida contra `kubectl get pods -n kube-system`. Os callbacks em
-`src/observability.py` tornam o recebimento da pergunta, decisões do modelo, ferramenta, argumentos
-sanitizados, resumo estrutural do resultado, conclusão da resposta final e duração visíveis em
-`stderr`; trate esses eventos como evidência didática da execução. Não crie estado artificial nem
-dependa da existência de pod defeituoso.
+A resposta deve ser conferida contra `kubectl get pods -n kube-system`; essa comparação é a
+evidência da execução. Não crie estado artificial nem dependa da existência de pod defeituoso.
 
-## Observabilidade didática
+## Execução
 
 - Preserve `input()`, uma única interação e `agent.ainvoke()` sem streaming.
-- Passe callbacks pela configuração pública da invocação; não percorra `tool_calls` nem crie
-  `ToolMessage` manualmente.
-- Mantenha a resposta normal em `stdout` e todos os eventos de observabilidade em `stderr`.
-- Restrinja valores visíveis dos argumentos a `pods`, `pod` e `kube-system`; omita os demais.
-- Restrinja nomes visíveis de ferramenta às oito ferramentas esperadas do catálogo read-only.
-- Resuma pergunta, resultado da ferramenta e resposta final somente por tipo, itens ou caracteres.
-- Sanitização deve cobrir pelo menos token, authorization, API key, password e secret.
+- Não use callbacks nem logs de passos do agente: observabilidade não é assunto desta aula.
+- Não percorra `tool_calls` nem crie `ToolMessage` manualmente; isso é a lição do `10`.
 - Preserve no system prompt a proibição de consultar `Secret` ou revelar credenciais.
-- Nunca registre configuração MCP, headers, estado completo, prompts internos, mensagens completas,
-  debug bruto ou chain of thought.
-- Esta instrumentação existe para a aula; não a transforme em stack de tracing de produção.
 
 ## Fronteiras curriculares
 

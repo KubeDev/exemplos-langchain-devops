@@ -8,7 +8,6 @@ from langchain.mcp import MCPAdapter
 from langchain_anthropic import ChatAnthropic
 
 from src.chat import stream_agent_text
-from src.observability import DidacticObservabilityCallback
 from src.tools import mcp_config
 
 load_dotenv()
@@ -36,10 +35,8 @@ async def responder(messages: list[dict[str, str]]):
             print(f"- {tool.name}", flush=True)
 
         agent = create_agent(model=model, tools=tools, system_prompt=SYSTEM_PROMPT)
-        observability = DidacticObservabilityCallback()
-        observability.question_received(messages[-1]["content"])
 
-        async for text in stream_agent_text(agent, messages, observability):
+        async for text in stream_agent_text(agent, messages):
             yield text
 
 

@@ -6,7 +6,6 @@ from collections.abc import Sequence
 
 from dotenv import load_dotenv
 
-from src.observability import DidacticObservabilityCallback
 from src.tools import ConfigurationError, mcp_config
 
 SYSTEM_PROMPT = """
@@ -49,25 +48,14 @@ async def executar(pergunta: str, namespace: str | None = None) -> str:
 
     model = ChatAnthropic(model=os.getenv("MODELO", "claude-sonnet-5"))
     solicitacao = compor_solicitacao(pergunta, namespace)
-    observability = DidacticObservabilityCallback()
-    observability.question_received(solicitacao)
 
     async with MCPAdapter(mcp_config()) as adapter:
         tools = await adapter.list_tools()
-        print(
-            f"[observabilidade] catálogo MCP descoberto: {len(tools)} ferramentas",
-            file=sys.stderr,
-            flush=True,
-        )
+        print(f"Catálogo MCP: {len(tools)} ferramentas", file=sys.stderr, flush=True)
         agent = create_agent(model=model, tools=tools, system_prompt=SYSTEM_PROMPT)
-        resultado = await agent.ainvoke(
-            {"messages": [("human", solicitacao)]},
-            config={"callbacks": [observability]},
-        )
+        resultado = await agent.ainvoke({"messages": [("human", solicitacao)]})
 
-    resposta = resultado["messages"][-1].text
-    observability.final_answer(resposta)
-    return resposta
+    return resultado["messages"][-1].text
 
 
 def main(argv: Sequence[str] | None = None) -> None:

@@ -14,7 +14,7 @@ progressiva.
 - Use o streaming público do agente com `stream_mode="messages"`; renderize somente texto do nó do
   modelo.
 - Não percorra `tool_calls`, não crie `ToolMessage` e não implemente manualmente o loop do agente.
-- Mantenha callbacks e inventário no stdout/stderr do processo Streamlit.
+- Mantenha o inventário MCP no terminal do processo Streamlit; não use callbacks.
 
 ## Kubernetes e credenciais
 

@@ -3,7 +3,7 @@
 ## 1. Instalação e estrutura
 
 - [ ] `uv sync --locked` conclui sem alterar `uv.lock`.
-- [ ] `uv run python -c "import src.app, src.observability, src.tools"` conclui.
+- [ ] `uv run python -c "import src.app, src.tools"` conclui.
 - [ ] O comando instalado se chama `assistente-plataforma-cli`.
 - [ ] `.env`, `.venv` e caches estão ignorados.
 
@@ -26,19 +26,15 @@
 ## 4. Canais e códigos de retorno
 
 - [ ] Em sucesso, somente a resposta final aparece em `stdout` e o processo retorna `0`.
-- [ ] Catálogo MCP, decisões, tools, resumos e duração aparecem em `stderr`.
+- [ ] O aviso `Catálogo MCP: N ferramentas` aparece em `stderr`.
 - [ ] Falta de `ANTHROPIC_API_KEY` ou `KUBERNETES_MCP_TOKEN` aparece em `stderr` e retorna `1`.
 - [ ] Falha de conexão, modelo, tool ou formato de resultado retorna `1` sem resposta parcial em `stdout`.
 - [ ] Mensagens de exceções externas não aparecem em `stderr`; somente o tipo da falha é registrado.
-- [ ] Os testes com mocks cobrem sucesso, falha, uso inválido e separação dos canais.
 
 ## 5. Segurança e MCP
 
 - [ ] O server usa `mcp-server-kubernetes@4.1.6` em modo read-only e bind `127.0.0.1`.
 - [ ] URL e token vêm do ambiente; o token não aparece no código ou na saída.
-- [ ] Campos sensíveis são substituídos por `[REDACTED]`.
-- [ ] Valores fora da lista permitida são omitidos dos eventos.
-- [ ] Resultado de tool é resumido por estrutura ou tamanho, nunca despejado.
 - [ ] O system prompt proíbe alteração, consulta a `Secret` e revelação de credenciais.
 
 ## 6. Demonstração integrada

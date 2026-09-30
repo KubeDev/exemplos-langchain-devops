@@ -15,7 +15,7 @@ código será projetado em aula; simplicidade vence generalidade.
 - `--namespace` é contexto opcional incorporado à solicitação; não replique a interface do `kubectl`.
 - Uma solicitação por processo.
 - Somente a resposta final em `stdout`.
-- Eventos didáticos e erros em `stderr`.
+- Aviso do catálogo MCP e erros em `stderr`.
 - Códigos: `0` sucesso, `1` execução/configuração, `2` uso inválido.
 - Não adicione `--debug`.
 
@@ -28,14 +28,10 @@ O cliente descobre as ferramentas pelo adapter e as registra diretamente no agen
 Use exatamente uma chamada a `agent.ainvoke()`, sem streaming e sem loop manual de tool calling. Não
 percorra `tool_calls`, não crie `ToolMessage` e não chame `kubectl` pelo Python.
 
-## Observabilidade didática
+## Sem logs de passos
 
-- Todos os eventos vão para `stderr`.
-- Restrinja nomes visíveis às oito ferramentas read-only esperadas.
-- Restrinja valores de argumentos visíveis a `pods`, `pod` e `kube-system`.
-- Redija token, autorização, API key, senha e segredo.
-- Resuma resultado de tool somente por tipo, itens ou quantidade de caracteres.
-- Nunca registre mensagens completas, headers, configuração MCP, estado ou chain of thought.
+Não use callbacks nem registre decisões do modelo ou chamadas de ferramenta: observabilidade não é
+assunto desta aula.
 
 ## Fronteiras curriculares
 

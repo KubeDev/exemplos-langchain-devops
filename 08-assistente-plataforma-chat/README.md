@@ -29,7 +29,6 @@ async for part in agent.astream(
     {"messages": messages},
     stream_mode="messages",
     version="v2",
-    config={"callbacks": [observability]},
 ):
     text = text_from_stream_part(part)
     if text:
@@ -81,8 +80,7 @@ Agora mostre somente os que tiveram reinicializações.
 ```
 
 O segundo pedido depende do histórico. No navegador devem aparecer apenas mensagens. No terminal do
-Streamlit devem aparecer inventário MCP, decisões do modelo, ferramenta e argumentos sanitizados,
-resumo estrutural do resultado e duração. Compare os dados com:
+Streamlit aparece o inventário MCP. Compare os dados com:
 
 ```bash
 kubectl get pods -n kube-system
@@ -105,9 +103,7 @@ kubectl get pods -n kube-system
 ```text
 src/app.py                   interface e construção do agente
 src/chat.py                  filtro e streaming de texto para a UI
-src/observability.py         eventos sanitizados no stderr
 src/tools.py                 configuração do endpoint MCP
 scripts/subir-mcp-kubernetes server HTTP read-only separado
-tests/                       testes com agentes e eventos simulados
 PLANO_TESTE.md               validação técnica e roteiro manual
 ```

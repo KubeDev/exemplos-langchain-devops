@@ -31,8 +31,6 @@ abrangente de erro, abstrações "para quando crescer". Nenhuma entra sem pedido
 | `06-assistente-plataforma` | acesso ao Kubernetes em linguagem natural com catálogo descoberto de um MCP server HTTP |
 | `07-assistente-plataforma-cli` | execução single shot com argumento, contexto, canais e códigos de saída |
 | `08-assistente-plataforma-chat` | conversa com histórico de sessão e resposta progressiva em Streamlit |
-| `09-ticket-workflow` | LCEL: `prompt \| modelo \| parser`, chains e roteamento |
-| `10-smart-docker` | agente: modelo + tools + loop, quem decide é o modelo |
 
 **Não antecipe a aula seguinte.** O recurso ausente num exemplo geralmente é o assunto do
 próximo, e a ausência é o gancho. Antes de adicionar algo, verifique se ele não é a lição de
@@ -82,19 +80,14 @@ configuração. Se dois exemplos precisam do mesmo código, ele é **duplicado**
 - `uv.lock` e `.python-version` são commitados: a aula precisa ser reproduzível.
 
 Python `>=3.12` e LangChain permanecem alinhados. A integração de provider é deliberadamente
-diferente: os exemplos `01` e `02` usam Gemini; os exemplos `03` a `10` continuam com
+diferente: os exemplos `01` e `02` usam Gemini; os exemplos `03` a `08` continuam com
 Anthropic. Preserve essa diferença até existir uma decisão explícita de migrar os exemplos
 posteriores.
 
 ## Layout interno
 
-Código em `src/` nos dez exemplos. O `01` roda diretamente com `uv run src/app.py`; os
+Código em `src/` nos oito exemplos. O `01` roda diretamente com `uv run src/app.py`; os
 exemplos que expõem comando declaram `[project.scripts]` no `pyproject.toml`.
-
-O `09-ticket-workflow` é uma API FastAPI e ainda assim usa `src/` — a consistência entre as
-aulas vale mais que a convenção `app/` do framework. **Atenção ao mexer nele:** `app` continua
-sendo o nome da instância (`app = FastAPI()`, `@app.post`), então um find-and-replace de `app`
-para `src` quebra o projeto. O comando é `uv run uvicorn src.main:app`.
 
 ## Modelos e parâmetros
 
@@ -102,8 +95,7 @@ para `src` quebra o projeto. O comando é `uv run uvicorn src.main:app`.
 conteúdo desta série e já quebrou execuções em providers que não aceitam esses parâmetros.
 
 O `01` fixa Gemini no código para tornar provider e modelo visíveis na primeira aula; o `02`
-repete a mesma configuração. Nos demais exemplos, preserve a configuração já existente. Onde
-há assimetria deliberada de modelo, como no `09-ticket-workflow`, ela **é** conteúdo da aula.
+repete a mesma configuração. Nos demais exemplos, preserve a configuração já existente.
 
 ## Os logs são a interface da apresentação
 
@@ -118,6 +110,5 @@ demais exemplos continuam usando `ANTHROPIC_API_KEY`. Cada exemplo tem `.env.exa
 placeholder e `.env` no `.gitignore`. Ao validar, use a chave apenas no ambiente do processo.
 
 **Este repositório será aberto ao público.** Antes de commitar qualquer coisa, confirme que
-nenhum segredo, caminho pessoal ou nome de cliente entrou no diff. Saídas de execução
-(`tickets/**/*.md` no `09`, `relatorio.md` no `10`) e `.claude/settings.local.json` estão
-ignorados — mantenha assim.
+nenhum segredo, caminho pessoal ou nome de cliente entrou no diff. O
+`.claude/settings.local.json` está ignorado — mantenha assim.

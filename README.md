@@ -19,24 +19,21 @@ demonstra sua ideia — o que falta num exemplo costuma ser o assunto do próxim
 | 06 | [`06-assistente-plataforma`](06-assistente-plataforma) | Consultar o cluster Kubernetes em linguagem natural | Descoberta e registro do catálogo de ferramentas de um MCP server HTTP |
 | 07 | [`07-assistente-plataforma-cli`](07-assistente-plataforma-cli) | Executar uma consulta operacional por processo | Contrato de CLI com argumento, contexto, canais e códigos de saída |
 | 08 | [`08-assistente-plataforma-chat`](08-assistente-plataforma-chat) | Conversar com o assistente e acompanhar a resposta | Histórico de sessão e retorno progressivo em Streamlit |
-| 09 | [`09-ticket-workflow`](09-ticket-workflow) | Alerta de observabilidade chega por webhook e vira ticket, roteado para infra ou dev | LCEL: `prompt \| modelo \| parser`, encadeamento e roteamento entre chains |
-| 10 | [`10-smart-docker`](10-smart-docker) | Um agente que investiga um projeto e analisa — ou escreve — o Dockerfile dele | Agente com ferramentas e loop, onde **quem decide o próximo passo é o modelo** |
 
 A ordem importa. O `02` coloca a chamada isolada do `01` num loop, passa a compor a entrada
 por template e mostra que o modelo esquece; o `03` resolve isso com memória explícita, num
 slot do mesmo template; o `04` entra no runtime sem tools e
 torna o contexto externo explícito; o `05` registra a primeira ferramenta no agente; o `06`
 conecta o agente a ferramentas Kubernetes publicadas por um MCP server e torna o fluxo
-observável; o `07` transforma uma solicitação em execução single shot; o `08` adiciona
-conversa, memória de sessão e retorno progressivo; o `09` explicita um fluxo fixo; e o `10`
-amplia o agente para investigar um projeto.
+observável; o `07` transforma uma solicitação em execução single shot; e o `08` adiciona
+conversa, memória de sessão e retorno progressivo.
 
 ## Pré-requisitos
 
 - [uv](https://docs.astral.sh/uv/) — gerencia Python e dependências
 - Python 3.12 (o `uv` instala sozinho, se faltar)
 - Uma chave da Gemini Developer API para os exemplos `01` e `02`
-- Uma chave da API da Anthropic para os exemplos `03` a `10`
+- Uma chave da API da Anthropic para os exemplos `03` a `08`
 - Node.js, `npx`, `kubectl` e um cluster de estudo para os exemplos `06` a `08`
 
 ## Como rodar qualquer exemplo
@@ -60,12 +57,7 @@ cd 05-agente-runbook-tool   && uv run agente-runbook-tool
 cd 06-assistente-plataforma && uv run assistente-plataforma
 cd 07-assistente-plataforma-cli && uv run assistente-plataforma-cli "Liste os pods com reinicializações" --namespace kube-system
 cd 08-assistente-plataforma-chat && uv run streamlit run src/app.py
-cd 09-ticket-workflow       && uv run uvicorn src.main:app --reload
-cd 10-smart-docker          && uv run smart-docker /caminho/de/um/projeto
 ```
-
-O `09` sobe uma API — os cenários de teste estão em
-[`09-ticket-workflow/cenarios.http`](09-ticket-workflow/cenarios.http) e em `exemplos/*.json`.
 
 Cada pasta tem um `README.md` próprio, com a explicação completa daquele exemplo. Comece por
 ele.

@@ -40,7 +40,7 @@ evidência da execução. Não crie estado artificial nem dependa da existência
 
 - Preserve `input()`, uma única interação e `agent.ainvoke()` sem streaming.
 - Não use callbacks nem logs de passos do agente: observabilidade não é assunto desta aula.
-- Não percorra `tool_calls` nem crie `ToolMessage` manualmente; isso é a lição do `10`.
+- Não percorra `tool_calls` nem crie `ToolMessage` manualmente; o loop do agente fica fora desta série.
 - Preserve no system prompt a proibição de consultar `Secret` ou revelar credenciais.
 
 ## Fronteiras curriculares

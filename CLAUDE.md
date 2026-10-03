@@ -33,6 +33,7 @@ abrangente de erro, abstrações "para quando crescer". Nenhuma entra sem pedido
 | `08-assistente-plataforma-chat` | conversa com histórico de sessão e resposta progressiva em Streamlit |
 | `09-inventario-ec2` | a mesma ferramenta declarada de quatro formas e o esquema que o modelo recebe de cada uma |
 | `10-inventario-ec2-testes` | a ferramenta testada sem modelo: invocação direta, pedido de chamada e validação na execução |
+| `11-inventario-ec2-colisao` | duas ferramentas com descrições parecidas colidem; a correção é a descrição contrastiva |
 
 **Não antecipe a aula seguinte.** O recurso ausente num exemplo geralmente é o assunto do
 próximo, e a ausência é o gancho. Antes de adicionar algo, verifique se ele não é a lição de
@@ -82,7 +83,7 @@ configuração. Se dois exemplos precisam do mesmo código, ele é **duplicado**
 - `uv.lock` e `.python-version` são commitados: a aula precisa ser reproduzível.
 
 Python `>=3.12` e LangChain permanecem alinhados. A integração de provider é deliberadamente
-diferente: os exemplos `01` e `02` usam Gemini; os exemplos `03` a `09` continuam com
+diferente: os exemplos `01` e `02` usam Gemini; os exemplos `03` a `09` e o `11` continuam com
 Anthropic. O `10` não usa modelo. Preserve essa diferença até existir uma decisão explícita de migrar os exemplos
 posteriores.
 

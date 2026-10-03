@@ -21,6 +21,7 @@ demonstra sua ideia — o que falta num exemplo costuma ser o assunto do próxim
 | 08 | [`08-assistente-plataforma-chat`](08-assistente-plataforma-chat) | Conversar com o assistente e acompanhar a resposta | Histórico de sessão e retorno progressivo em Streamlit |
 | 09 | [`09-inventario-ec2`](09-inventario-ec2) | Consultar o inventário EC2 da conta | A mesma ferramenta declarada de quatro formas e o esquema que o modelo recebe de cada uma |
 | 10 | [`10-inventario-ec2-testes`](10-inventario-ec2-testes) | Garantir que a ferramenta do inventário funciona antes de entregá-la ao agente | Teste da ferramenta sem modelo: invocação direta, pedido de chamada escrito à mão e validação do esquema na execução |
+| 11 | [`11-inventario-ec2-colisao`](11-inventario-ec2-colisao) | Escolher entre duas ferramentas parecidas: estado e status das instâncias | Colisão entre ferramentas, diagnóstico pela chamada pedida e correção por descrição contrastiva |
 
 A ordem importa. O `02` coloca a chamada isolada do `01` num loop, passa a compor a entrada
 por template e mostra que o modelo esquece; o `03` resolve isso com memória explícita, num
@@ -30,16 +31,17 @@ conecta o agente a ferramentas Kubernetes publicadas por um MCP server e torna o
 observável; o `07` transforma uma solicitação em execução single shot; o `08` adiciona
 conversa, memória de sessão e retorno progressivo; o `09` sai do cluster para uma conta AWS e
 olha a ferramenta por dentro: as formas de declará-la e o esquema que cada uma envia ao modelo;
-e o `10` testa essa ferramenta sem modelo, no lugar da aplicação que executa o pedido.
+o `10` testa essa ferramenta sem modelo, no lugar da aplicação que executa o pedido;
+e o `11` coloca uma segunda ferramenta ao lado dela e mostra que descrições parecidas colidem.
 
 ## Pré-requisitos
 
 - [uv](https://docs.astral.sh/uv/) — gerencia Python e dependências
 - Python 3.12 (o `uv` instala sozinho, se faltar)
 - Uma chave da Gemini Developer API para os exemplos `01` e `02`
-- Uma chave da API da Anthropic para os exemplos `03` a `09` (o `10` não usa modelo)
+- Uma chave da API da Anthropic para os exemplos `03` a `09` e `11` (o `10` não usa modelo)
 - Node.js, `npx`, `kubectl` e um cluster de estudo para os exemplos `06` a `08`
-- Uma conta AWS com credencial de leitura do EC2 para os exemplos `09` e `10`
+- Uma conta AWS com credencial de leitura do EC2 para os exemplos `09` a `11`
 
 ## Como rodar qualquer exemplo
 
@@ -64,6 +66,7 @@ cd 07-assistente-plataforma-cli && uv run assistente-plataforma-cli "Liste os po
 cd 08-assistente-plataforma-chat && uv run streamlit run src/app.py
 cd 09-inventario-ec2        && uv run inventario-ec2 "Quais instâncias estão paradas?"
 cd 10-inventario-ec2-testes && uv run pytest -v
+cd 11-inventario-ec2-colisao && uv run inventario-ec2-colisao "Qual o status da worker-01?"
 ```
 
 Cada pasta tem um `README.md` próprio, com a explicação completa daquele exemplo. Comece por

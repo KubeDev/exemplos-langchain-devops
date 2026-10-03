@@ -32,6 +32,7 @@ abrangente de erro, abstrações "para quando crescer". Nenhuma entra sem pedido
 | `07-assistente-plataforma-cli` | execução single shot com argumento, contexto, canais e códigos de saída |
 | `08-assistente-plataforma-chat` | conversa com histórico de sessão e resposta progressiva em Streamlit |
 | `09-inventario-ec2` | a mesma ferramenta declarada de quatro formas e o esquema que o modelo recebe de cada uma |
+| `10-inventario-ec2-testes` | a ferramenta testada sem modelo: invocação direta, pedido de chamada e validação na execução |
 
 **Não antecipe a aula seguinte.** O recurso ausente num exemplo geralmente é o assunto do
 próximo, e a ausência é o gancho. Antes de adicionar algo, verifique se ele não é a lição de
@@ -82,12 +83,12 @@ configuração. Se dois exemplos precisam do mesmo código, ele é **duplicado**
 
 Python `>=3.12` e LangChain permanecem alinhados. A integração de provider é deliberadamente
 diferente: os exemplos `01` e `02` usam Gemini; os exemplos `03` a `09` continuam com
-Anthropic. Preserve essa diferença até existir uma decisão explícita de migrar os exemplos
+Anthropic. O `10` não usa modelo. Preserve essa diferença até existir uma decisão explícita de migrar os exemplos
 posteriores.
 
 ## Layout interno
 
-Código em `src/` nos nove exemplos. O `01` roda diretamente com `uv run src/app.py`; os
+Código em `src/` em todos os exemplos; o `10` tem também `tests/`. O `01` roda diretamente com `uv run src/app.py`; os
 exemplos que expõem comando declaram `[project.scripts]` no `pyproject.toml`.
 
 ## Modelos e parâmetros
@@ -108,7 +109,7 @@ deixe o código mais "limpo".
 
 Credenciais **nunca** são gravadas no repositório: o `01` e o `02` usam `GOOGLE_API_KEY`; os
 demais exemplos continuam usando `ANTHROPIC_API_KEY`; o `09` usa também a configuração
-padrão do boto3. Cada exemplo tem `.env.example` com placeholder e `.env` no `.gitignore`. Ao validar, use a chave apenas no ambiente do processo.
+padrão do boto3, e o `10` usa só ela. Cada exemplo tem `.env.example` com placeholder e `.env` no `.gitignore`. Ao validar, use a chave apenas no ambiente do processo.
 
 **Este repositório será aberto ao público.** Antes de commitar qualquer coisa, confirme que
 nenhum segredo, caminho pessoal ou nome de cliente entrou no diff. O

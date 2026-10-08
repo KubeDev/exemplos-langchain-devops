@@ -1,0 +1,23 @@
+[project]
+name = "inventario-droplets-colisao"
+version = "0.1.0"
+description = "Exemplo didatico: duas ferramentas de inventario de Droplets com descricoes que colidem"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "langchain>=1.4.3",
+    "langchain-anthropic>=1.7.5",
+    "pydo>=0.43.0",
+    "python-dotenv>=1.2.4",
+]
+
+[project.scripts]
+inventario-droplets-colisao = "src.app:main"
+inspecionar = "src.inspecionar:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]

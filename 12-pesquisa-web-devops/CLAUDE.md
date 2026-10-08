@@ -6,32 +6,28 @@ preservam a função didática do exemplo.
 ## Natureza do projeto
 
 Exemplo didático `12` da série `langchain-devops-examples`. A lição é: **existe ferramenta
-pronta, ela entra no agente com um pacote, uma chave e uma linha, e tem camada gratuita**.
+pronta, ela entra no agente com um pacote e uma chave; o esquema enviado ao modelo é do pacote,
+e a consulta sai do seu ambiente para um terceiro (o Tavily)**.
 
 O código será lido em aula e projetado numa tela. Quando simplicidade e robustez colidirem,
 vence a simplicidade.
 
-## A troca de ferramenta é o experimento
+## O agente
 
-- `src/app.py` importa e instancia as duas ferramentas (`busca` e `leitura`). A escolha é a
-  linha `tools=[...]` do `create_agent`. Não troque esse mecanismo por variável de ambiente,
-  argumento de CLI ou flag: a troca tem que ser visível no código.
-- O `app.py` sai com `tools=[busca]`, o ponto de partida da demo.
-- **Uma ferramenta registrada por vez.** Não registre as duas juntas: o encadeamento
-  busca → leitura e a colisão entre pacotes não são assunto desta aula.
+- `src/app.py` registra uma única ferramenta pronta, `busca` (`TavilySearch`), em `tools=[busca]`.
+- Não acrescente outra ferramenta, outro fornecedor nem mecanismo de troca.
 - A linha `Ferramenta: ...` é lida dos `tool_calls` das mensagens do resultado, porque a
-  ferramenta pronta não tem corpo nosso para o `print`. Mantenha o formato dos exemplos `09` a
-  `11`.
+  ferramenta pronta não tem corpo nosso para o `print`. Ela mostra os argumentos que vão para o
+  Tavily. Mantenha o formato dos exemplos `09` a `11`.
 
 ## Fronteiras curriculares
 
-- Não escreva ferramenta própria nem envolva as ferramentas prontas num `@tool`.
-- Não sobrescreva `name`, `description` nem esquema das ferramentas prontas.
-- Não configure parâmetros além de `max_results` no `TavilySearch`; o `FirecrawlScrape` fica
-  sem argumentos.
+- Não escreva ferramenta própria nem envolva a ferramenta pronta num `@tool`.
+- Não sobrescreva `name`, `description` nem esquema da ferramenta pronta.
+- Não configure parâmetros além de `max_results` no `TavilySearch`.
 - Não adicione `try/except`, contrato de retorno, retry, cache, recorte do retorno nem
   middleware.
-- Não adicione avaliação nem comparação entre fornecedores.
+- Não adicione comparação entre fornecedores.
 
 ## Ambiente e pacotes
 
@@ -41,6 +37,6 @@ vence a simplicidade.
 
 ## Credenciais
 
-`ANTHROPIC_API_KEY`, `TAVILY_API_KEY` e `FIRECRAWL_API_KEY` nunca entram no repositório.
-`.env.example` contém somente placeholders e `.env` permanece ignorado. Não fixe números de
-camada gratuita nos arquivos: aponte para as páginas de preço.
+`ANTHROPIC_API_KEY` e `TAVILY_API_KEY` nunca entram no repositório. `.env.example` contém
+somente placeholders e `.env` permanece ignorado. Não fixe números de plano, créditos ou preço
+nos arquivos: aponte para a página de preços.

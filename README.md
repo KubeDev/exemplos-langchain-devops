@@ -19,10 +19,13 @@ demonstra sua ideia — o que falta num exemplo costuma ser o assunto do próxim
 | 06 | [`06-assistente-plataforma`](06-assistente-plataforma) | Consultar o cluster Kubernetes em linguagem natural | Descoberta e registro do catálogo de ferramentas de um MCP server HTTP |
 | 07 | [`07-assistente-plataforma-cli`](07-assistente-plataforma-cli) | Executar uma consulta operacional por processo | Contrato de CLI com argumento, contexto, canais e códigos de saída |
 | 08 | [`08-assistente-plataforma-chat`](08-assistente-plataforma-chat) | Conversar com o assistente e acompanhar a resposta | Histórico de sessão e retorno progressivo em Streamlit |
-| 09 | [`09-inventario-ec2`](09-inventario-ec2) | Consultar o inventário EC2 da conta | A mesma ferramenta declarada de quatro formas e o esquema que o modelo recebe de cada uma |
-| 10 | [`10-inventario-ec2-testes`](10-inventario-ec2-testes) | Garantir que a ferramenta do inventário funciona antes de entregá-la ao agente | Teste da ferramenta sem modelo: invocação direta, pedido de chamada escrito à mão e validação do esquema na execução |
-| 11 | [`11-inventario-ec2-colisao`](11-inventario-ec2-colisao) | Escolher entre duas ferramentas parecidas: estado e status das instâncias | Colisão entre ferramentas, diagnóstico pela chamada pedida e correção por descrição contrastiva |
-| 12 | [`12-pesquisa-web-devops`](12-pesquisa-web-devops) | Pesquisar tendências de DevOps e cloud e ler um documento na web | Ferramentas prontas de pacotes de integração (Tavily e Firecrawl), registradas com uma chave e trocadas por uma linha |
+| 09 | [`09-inventario-droplets`](09-inventario-droplets) | Consultar os Droplets de uma conta DigitalOcean | A mesma ferramenta declarada de duas formas (docstring e Pydantic) e o esquema que o modelo recebe de cada uma |
+| 10 | [`10-inventario-droplets-testes`](10-inventario-droplets-testes) | Garantir que a ferramenta do inventário funciona antes de entregá-la ao agente | Teste da ferramenta sem modelo: invocação direta, pedido de chamada escrito à mão e validação do esquema na execução |
+| 11 | [`11-inventario-droplets-colisao`](11-inventario-droplets-colisao) | Escolher entre duas ferramentas parecidas: status e saúde dos Droplets | Colisão entre ferramentas, diagnóstico pela chamada pedida e correção por descrição contrastiva |
+| 12 | [`12-pesquisa-web-devops`](12-pesquisa-web-devops) | Pesquisar tendências de DevOps e cloud na web | Ferramenta pronta de pacote de integração (Tavily): o esquema é do pacote e a consulta sai do seu ambiente |
+| 13 | [`13-mcp-server-operacao`](13-mcp-server-operacao) | Publicar as ferramentas de operação uma vez e usá-las de dois clientes | Primeiro MCP server (FastMCP, stdio) consumido por um agente LangChain e pelo Claude Code |
+| 14 | [`14-mcp-retorno-escopo`](14-mcp-retorno-escopo) | Evitar que um recorte do server vire conclusão falsa do agente | Retorno com escopo declarado para um consumidor desconhecido: falha silenciosa, nível de detalhe, paginação e contrato versionado |
+| 15 | [`15-mcp-escrita-controlada`](15-mcp-escrita-controlada) | Desligar um Droplet de laboratório pelo agente | Escrita recortada: uma ação nomeada e estreita, token de escrita separado e a fronteira do protocolo |
 
 A ordem importa. O `02` coloca a chamada isolada do `01` num loop, passa a compor a entrada
 por template e mostra que o modelo esquece; o `03` resolve isso com memória explícita, num
@@ -30,21 +33,33 @@ slot do mesmo template; o `04` entra no runtime sem tools e
 torna o contexto externo explícito; o `05` registra a primeira ferramenta no agente; o `06`
 conecta o agente a ferramentas Kubernetes publicadas por um MCP server e torna o fluxo
 observável; o `07` transforma uma solicitação em execução single shot; o `08` adiciona
-conversa, memória de sessão e retorno progressivo; o `09` sai do cluster para uma conta AWS e
-olha a ferramenta por dentro: as formas de declará-la e o esquema que cada uma envia ao modelo;
-o `10` testa essa ferramenta sem modelo, no lugar da aplicação que executa o pedido;
-o `11` coloca uma segunda ferramenta ao lado dela e mostra que descrições parecidas colidem;
-e o `12` deixa de escrever a ferramenta e usa ferramentas prontas do ecossistema, com camada gratuita.
+conversa, memória de sessão e retorno progressivo; o `09` sai do cluster para uma conta
+DigitalOcean e olha a ferramenta por dentro: as formas de declará-la e o esquema que cada uma
+envia ao modelo; o `10` testa essa ferramenta sem modelo, no lugar da aplicação que executa o
+pedido; o `11` coloca uma segunda ferramenta ao lado dela e mostra que descrições parecidas
+colidem; o `12` deixa de escrever a ferramenta e usa uma pronta do ecossistema; o `13` publica
+as ferramentas num MCP server próprio, que dois clientes diferentes usam; o `14` faz o retorno
+desse server declarar o escopo em que foi produzido, porque quem consome é desconhecido; e o
+`15` abre a primeira escrita, recortada em uma ação estreita com token próprio.
 
 ## Pré-requisitos
 
 - [uv](https://docs.astral.sh/uv/) — gerencia Python e dependências
 - Python 3.12 (o `uv` instala sozinho, se faltar)
 - Uma chave da Gemini Developer API para os exemplos `01` e `02`
-- Uma chave da API da Anthropic para os exemplos `03` a `09`, `11` e `12` (o `10` não usa modelo)
+- Uma chave da API da Anthropic para os exemplos `03` a `09` e `11` a `15` (o `10` não usa modelo)
 - Node.js, `npx`, `kubectl` e um cluster de estudo para os exemplos `06` a `08`
-- Uma conta AWS com credencial de leitura do EC2 para os exemplos `09` a `11`
-- Chaves do Tavily e do Firecrawl para o exemplo `12` (as duas têm camada gratuita, sem cartão)
+- Uma conta DigitalOcean para os exemplos `09` a `11` e `13` a `15`, com tokens de escopo
+  customizado:
+  - um token de leitura (`droplet:read`) para os exemplos; o `11` acrescenta `monitoring:read`;
+  - um token de setup, usado só pelos scripts de `setup/` do `09` ou do `11` para criar e destruir os
+    Droplets de teste;
+  - um token de escrita (`droplet:read` e `droplet:update`) para o `15`
+- Uma chave do Tavily para o exemplo `12`
+- O Claude Code, para o segundo cliente do exemplo `13`
+
+> **Droplets de teste geram custo** enquanto existirem, mesmo desligados. Crie-os com o
+> `setup/` do `09` ou do `11` quando for estudar e destrua-os com o mesmo `setup/` ao terminar.
 
 ## Como rodar qualquer exemplo
 
@@ -67,10 +82,13 @@ cd 05-agente-runbook-tool   && uv run agente-runbook-tool
 cd 06-assistente-plataforma && uv run assistente-plataforma
 cd 07-assistente-plataforma-cli && uv run assistente-plataforma-cli "Liste os pods com reinicializações" --namespace kube-system
 cd 08-assistente-plataforma-chat && uv run streamlit run src/app.py
-cd 09-inventario-ec2        && uv run inventario-ec2 "Quais instâncias estão paradas?"
-cd 10-inventario-ec2-testes && uv run pytest -v
-cd 11-inventario-ec2-colisao && uv run inventario-ec2-colisao "Qual o status da worker-01?"
+cd 09-inventario-droplets   && uv run inventario-droplets "Quais Droplets estão em nyc1?"
+cd 10-inventario-droplets-testes && uv run pytest -v
+cd 11-inventario-droplets-colisao && uv run inventario-droplets-colisao "Qual a situação da web-01?"
 cd 12-pesquisa-web-devops   && uv run pesquisa-web-devops "Quais as tendências recentes de DevOps e cloud?"
+cd 13-mcp-server-operacao   && uv run agente-operacao
+cd 14-mcp-retorno-escopo    && uv run agente-operacao
+cd 15-mcp-escrita-controlada && uv run agente-operacao
 ```
 
 Cada pasta tem um `README.md` próprio, com a explicação completa daquele exemplo. Comece por

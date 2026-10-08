@@ -31,10 +31,13 @@ abrangente de erro, abstrações "para quando crescer". Nenhuma entra sem pedido
 | `06-assistente-plataforma` | acesso ao Kubernetes em linguagem natural com catálogo descoberto de um MCP server HTTP |
 | `07-assistente-plataforma-cli` | execução single shot com argumento, contexto, canais e códigos de saída |
 | `08-assistente-plataforma-chat` | conversa com histórico de sessão e resposta progressiva em Streamlit |
-| `09-inventario-ec2` | a mesma ferramenta declarada de quatro formas e o esquema que o modelo recebe de cada uma |
-| `10-inventario-ec2-testes` | a ferramenta testada sem modelo: invocação direta, pedido de chamada e validação na execução |
-| `11-inventario-ec2-colisao` | duas ferramentas com descrições parecidas colidem; a correção é a descrição contrastiva |
-| `12-pesquisa-web-devops` | ferramentas prontas de pacotes de integração (Tavily e Firecrawl), trocadas por uma linha |
+| `09-inventario-droplets` | a mesma ferramenta declarada de duas formas (docstring e Pydantic) e o esquema que o modelo recebe de cada uma |
+| `10-inventario-droplets-testes` | a ferramenta testada sem modelo: invocação direta, pedido de chamada e validação na execução |
+| `11-inventario-droplets-colisao` | duas ferramentas com descrições parecidas colidem; a correção é a descrição contrastiva |
+| `12-pesquisa-web-devops` | ferramenta pronta (Tavily) entra com um pacote e uma chave; o esquema é do pacote e a consulta sai do ambiente |
+| `13-mcp-server-operacao` | a mesma capacidade, publicada uma vez num MCP server (FastMCP, stdio), serve dois clientes: agente LangChain e Claude Code |
+| `14-mcp-retorno-escopo` | o retorno de uma ferramenta publicada declara o escopo em que foi produzido; sem isso, vazio ou parcial vira falha silenciosa |
+| `15-mcp-escrita-controlada` | a escrita entra recortada: uma ação nomeada e estreita (`desligar_droplet`), token de escrita separado, até a fronteira do protocolo |
 
 **Não antecipe a aula seguinte.** O recurso ausente num exemplo geralmente é o assunto do
 próximo, e a ausência é o gancho. Antes de adicionar algo, verifique se ele não é a lição de
@@ -59,7 +62,7 @@ exige renumerar em cascata todas as posteriores, e ajustar as referências cruza
 por referências antes de considerar o trabalho concluído:
 
 ```bash
-grep -rn --include='*.md' -E '`0[0-9]`' .
+grep -rn --include='*.md' -E '`[01][0-9]`' .
 ```
 
 ## Cada exemplo é autocontido — não existe workspace
@@ -84,13 +87,14 @@ configuração. Se dois exemplos precisam do mesmo código, ele é **duplicado**
 - `uv.lock` e `.python-version` são commitados: a aula precisa ser reproduzível.
 
 Python `>=3.12` e LangChain permanecem alinhados. A integração de provider é deliberadamente
-diferente: os exemplos `01` e `02` usam Gemini; os exemplos `03` a `09`, o `11` e o `12` continuam com
+diferente: os exemplos `01` e `02` usam Gemini; os exemplos `03` a `09` e `11` a `15` continuam com
 Anthropic. O `10` não usa modelo. Preserve essa diferença até existir uma decisão explícita de migrar os exemplos
 posteriores.
 
 ## Layout interno
 
-Código em `src/` em todos os exemplos; o `10` tem também `tests/`. O `01` roda diretamente com `uv run src/app.py`; os
+Código em `src/` em todos os exemplos; o `10`, o `13`, o `14` e o `15` têm também `tests/`.
+O `09` e o `11` têm `setup/`, com os scripts que criam e destroem os Droplets de teste. O `01` roda diretamente com `uv run src/app.py`; os
 exemplos que expõem comando declaram `[project.scripts]` no `pyproject.toml`.
 
 ## Modelos e parâmetros
@@ -109,9 +113,22 @@ deixe o código mais "limpo".
 
 ## Credenciais
 
-Credenciais **nunca** são gravadas no repositório: o `01` e o `02` usam `GOOGLE_API_KEY`; os
-demais exemplos continuam usando `ANTHROPIC_API_KEY`; o `09` usa também a configuração
-padrão do boto3, e o `10` usa só ela; o `12` usa também `TAVILY_API_KEY` e `FIRECRAWL_API_KEY`. Cada exemplo tem `.env.example` com placeholder e `.env` no `.gitignore`. Ao validar, use a chave apenas no ambiente do processo.
+Credenciais **nunca** são gravadas no repositório. As variáveis de cada exemplo:
+
+| Exemplo | Variáveis |
+|---|---|
+| `01`, `02` | `GOOGLE_API_KEY` |
+| `03` a `08` | `ANTHROPIC_API_KEY` |
+| `09` | `ANTHROPIC_API_KEY`, `DIGITALOCEAN_TOKEN` (`droplet:read`) e `DIGITALOCEAN_TOKEN_SETUP` (só para os scripts de `setup/`) |
+| `10` | `DIGITALOCEAN_TOKEN` (`droplet:read`); sem chave de modelo |
+| `11` | `ANTHROPIC_API_KEY`, `DIGITALOCEAN_TOKEN` (`droplet:read` e `monitoring:read`) e `DIGITALOCEAN_TOKEN_SETUP` |
+| `12` | `ANTHROPIC_API_KEY` e `TAVILY_API_KEY` |
+| `13`, `14` | `ANTHROPIC_API_KEY` e `DIGITALOCEAN_TOKEN` (`droplet:read`, lido só pelo server) |
+| `15` | `ANTHROPIC_API_KEY`, `DIGITALOCEAN_TOKEN` (`droplet:read`) e `DIGITALOCEAN_TOKEN_ESCRITA` (`droplet:read` e `droplet:update`) |
+
+Os tokens DigitalOcean usam escopo customizado, nunca acesso total. Cada exemplo tem
+`.env.example` com placeholder e `.env` no `.gitignore`. Ao validar, use a chave apenas no
+ambiente do processo.
 
 **Este repositório será aberto ao público.** Antes de commitar qualquer coisa, confirme que
 nenhum segredo, caminho pessoal ou nome de cliente entrou no diff. O

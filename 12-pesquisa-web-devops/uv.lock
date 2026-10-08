@@ -332,24 +332,6 @@ wheels = [
 ]
 
 [[package]]
-name = "firecrawl-py"
-version = "4.46.2"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "aiohttp" },
-    { name = "httpx" },
-    { name = "nest-asyncio" },
-    { name = "pydantic" },
-    { name = "python-dotenv" },
-    { name = "requests" },
-    { name = "websockets" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/52/92/1ff1de286a7e98ddfa21fbdf6b6dd80db908ffb6e619444c1e3f6a4e02f8/firecrawl_py-4.46.2.tar.gz", hash = "sha256:9d504036139b86ca5cd28acdc5cb958e956de1684c371d02a26f85273e509554", size = 259717, upload-time = "2026-10-02T15:00:44.195Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/ca/a5/384b4501a8f4c3ad8d4f5651d3ceafb1e235995b629771ddb466bbef45af/firecrawl_py-4.46.2-py3-none-any.whl", hash = "sha256:fba90cb07878cb466380623dfafc10ef8f158740cdca1206205c88f0bebbfbac", size = 318324, upload-time = "2026-10-02T15:00:42.858Z" },
-]
-
-[[package]]
 name = "frozenlist"
 version = "1.8.0"
 source = { registry = "https://pypi.org/simple" }
@@ -689,19 +671,6 @@ wheels = [
 ]
 
 [[package]]
-name = "langchain-firecrawl"
-version = "0.1.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "firecrawl-py" },
-    { name = "langchain-core" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/3b/9d/933a344bbf6bf6e6df8e822413029f1ff665e531e3c92da9a8862154daa1/langchain_firecrawl-0.1.0.tar.gz", hash = "sha256:f25fba0fab0603045a37ef191dc584366df0ae2373a766848522b96002ad1019", size = 192277, upload-time = "2026-06-04T16:02:25.024Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/3e/f0/687a9a1ec74e33e63cf9d14bbfccc73a0771a25c949572783126a97e1ed2/langchain_firecrawl-0.1.0-py3-none-any.whl", hash = "sha256:457e27fa183ee91c224ee17d6d87d94893a7b5ade1dcec4b7be03712fb2825db", size = 11786, upload-time = "2026-06-04T16:02:23.035Z" },
-]
-
-[[package]]
 name = "langchain-protocol"
 version = "0.0.19"
 source = { registry = "https://pypi.org/simple" }
@@ -951,15 +920,6 @@ wheels = [
 ]
 
 [[package]]
-name = "nest-asyncio"
-version = "1.6.0"
-source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/83/f8/51569ac65d696c8ecbee95938f89d4abf00f47d58d48f6fbabfe8f0baefe/nest_asyncio-1.6.0.tar.gz", hash = "sha256:6f172d5449aca15afd6c646851f4e31e02c598d553a667e38cafa997cfec55fe", size = 7418, upload-time = "2024-01-21T14:25:19.227Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/a0/c4/c2971a3ba4c6103a3d10c4b0f24f461ddc027f0f09763220cf35ca1401b3/nest_asyncio-1.6.0-py3-none-any.whl", hash = "sha256:87af6efd6b5e897c81050477ef65c62e2b2f35d51703cae01aff2905b1852e1c", size = 5195, upload-time = "2024-01-21T14:25:17.223Z" },
-]
-
-[[package]]
 name = "orjson"
 version = "3.12.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1066,7 +1026,6 @@ source = { editable = "." }
 dependencies = [
     { name = "langchain" },
     { name = "langchain-anthropic" },
-    { name = "langchain-firecrawl" },
     { name = "langchain-tavily" },
     { name = "python-dotenv" },
 ]
@@ -1075,7 +1034,6 @@ dependencies = [
 requires-dist = [
     { name = "langchain", specifier = ">=1.4.3" },
     { name = "langchain-anthropic", specifier = ">=1.7.5" },
-    { name = "langchain-firecrawl", specifier = ">=0.1.0" },
     { name = "langchain-tavily", specifier = ">=0.2.18" },
     { name = "python-dotenv", specifier = ">=1.2.4" },
 ]

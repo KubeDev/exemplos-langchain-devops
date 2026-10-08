@@ -1,0 +1,26 @@
+[
+  {
+    "id": "MUD-311",
+    "servico": "checkout-api",
+    "descricao": "Implantação da versão 2.14.0 (nova integração com o gateway de pagamento)",
+    "versao_anterior": "2.13.4",
+    "executada_em": "2026-10-06T15:25:00-03:00",
+    "responsavel": "time-pagamentos"
+  },
+  {
+    "id": "MUD-298",
+    "servico": "checkout-api",
+    "descricao": "Aumento do pool de conexões com o banco de 20 para 40",
+    "versao_anterior": "2.13.4",
+    "executada_em": "2026-09-29T10:00:00-03:00",
+    "responsavel": "time-plataforma"
+  },
+  {
+    "id": "MUD-305",
+    "servico": "fila-pedidos",
+    "descricao": "Atualização da biblioteca do consumidor de mensagens",
+    "versao_anterior": "1.8.0",
+    "executada_em": "2026-10-03T14:00:00-03:00",
+    "responsavel": "time-pedidos"
+  }
+]

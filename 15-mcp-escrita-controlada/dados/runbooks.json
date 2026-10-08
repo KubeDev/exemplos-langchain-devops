@@ -1,0 +1,36 @@
+[
+  {
+    "id": "RB-101",
+    "servico": "checkout-api",
+    "titulo": "Rollback do checkout-api após regressão de implantação",
+    "quando_aplicar": "Erros 5xx começam até 30 minutos depois de uma implantação do checkout-api.",
+    "passos": [
+      "Confirmar no histórico de mudanças a versão implantada e a anterior.",
+      "Comparar a taxa de 5xx antes e depois do horário da implantação.",
+      "Reimplantar a versão anterior registrada no histórico.",
+      "Acompanhar a taxa de 5xx por 15 minutos e atualizar o chamado."
+    ]
+  },
+  {
+    "id": "RB-102",
+    "servico": "checkout-api",
+    "titulo": "Checkout-api lento por saturação de CPU",
+    "quando_aplicar": "Latência p95 acima de 2 segundos sem implantação recente.",
+    "passos": [
+      "Verificar o uso de CPU dos Droplets do checkout-api.",
+      "Conferir se o tráfego está acima da média do horário.",
+      "Escalar para o time de plataforma antes de redimensionar Droplets."
+    ]
+  },
+  {
+    "id": "RB-205",
+    "servico": "fila-pedidos",
+    "titulo": "Fila de pedidos acumulando mensagens",
+    "quando_aplicar": "Mensagens pendentes acima de 10 mil por mais de 10 minutos.",
+    "passos": [
+      "Verificar se os consumidores estão ativos e conectados à fila.",
+      "Procurar mensagens que falham repetidamente e voltam para a fila.",
+      "Mover mensagens com erro para a fila de descarte e registrar no chamado."
+    ]
+  }
+]

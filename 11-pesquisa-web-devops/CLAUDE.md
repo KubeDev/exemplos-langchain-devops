@@ -5,7 +5,7 @@ preservam a função didática do exemplo.
 
 ## Natureza do projeto
 
-Exemplo didático `12` da série `langchain-devops-examples`. A lição é: **existe ferramenta
+Exemplo didático `11` da série `langchain-devops-examples`. A lição é: **existe ferramenta
 pronta, ela entra no agente com um pacote e uma chave; o esquema enviado ao modelo é do pacote,
 e a consulta sai do seu ambiente para um terceiro (o Tavily)**.
 
@@ -18,7 +18,7 @@ vence a simplicidade.
 - Não acrescente outra ferramenta, outro fornecedor nem mecanismo de troca.
 - A linha `Ferramenta: ...` é lida dos `tool_calls` das mensagens do resultado, porque a
   ferramenta pronta não tem corpo nosso para o `print`. Ela mostra os argumentos que vão para o
-  Tavily. Mantenha o formato dos exemplos `09` a `11`.
+  Tavily. Mantenha o formato dos exemplos `09` e `10`.
 
 ## Fronteiras curriculares
 

@@ -53,7 +53,7 @@ def test_chamado_encontrado_com_id_em_minusculas():
     assert chamado["servico"] == "checkout-api"
 
 
-# Escopo declarado no retorno, a lição do 14: a MUD-305 fica fora do período padrão.
+# Escopo declarado no retorno, a lição do 13: a MUD-305 fica fora do período padrão.
 
 
 def test_com_escopo_o_vazio_declara_o_recorte():

@@ -1,6 +1,6 @@
 # 12 — Ferramenta pronta: busca na web com Tavily
 
-Nos exemplos `09` a `11`, toda ferramenta foi escrita à mão: a função, a docstring, o esquema.
+Nos exemplos `09` e `10`, toda ferramenta foi escrita à mão: a função, a docstring, o esquema.
 Este exemplo faz o contrário. A ferramenta vem pronta de um pacote de integração do ecossistema
 LangChain, e o agente pesquisa sobre DevOps e cloud na web sem uma linha de ferramenta escrita
 aqui.

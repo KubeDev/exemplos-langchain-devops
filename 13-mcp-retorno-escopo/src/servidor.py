@@ -7,11 +7,13 @@ from typing import Annotated, Literal
 
 from dotenv import load_dotenv
 from fastmcp import FastMCP
-from fastmcp.exceptions import ToolError
 from fastmcp.tools import ToolResult
-from mcp.types import ToolAnnotations
 from pydantic import Field
 from pydo import Client
+
+# Troque o módulo para mudar o retorno das ferramentas:
+# sem_escopo · com_escopo
+from src.retornos.sem_escopo import retornar
 
 load_dotenv()
 
@@ -26,24 +28,10 @@ AGORA_DADOS = datetime.fromisoformat("2026-10-06T16:30:00-03:00")
 PERIODO_PADRAO_HORAS = 24
 
 # Descrição, esquema e retorno formam o contrato público do server; a versão vai no serverInfo.
-# Compatível (sobe o minor): ferramenta nova, parâmetro opcional novo, campo novo no retorno.
+# Compatível (sobe o minor): parâmetro opcional novo, campo novo no retorno.
 # Quebra (sobe o major): renomear ou remover ferramenta, parâmetro ou campo; tornar um parâmetro
 # obrigatório; trocar um valor padrão, como PERIODO_PADRAO_HORAS; reescrever uma descrição.
-mcp = FastMCP("operacao", version="1.1.0")
-
-# Fronteira do protocolo: o MCP padroniza descoberta, chamada, esquema e resultado.
-# Autorização por ação, auditoria e validação de conteúdo não vêm dele: este server não tem
-# gate, trilha nem aprovação, e isso é decisão declarada: essa lacuna fica fora deste exemplo.
-
-# Anotações (readOnlyHint, destructiveHint no protocolo) são dicas ao cliente, não controle:
-# o cliente pode pedir aprovação por causa delas, mas o server não tem como exigir.
-LEITURA = ToolAnnotations(read_only_hint=True)
-ESCRITA = ToolAnnotations(read_only_hint=False, destructive_hint=True)
-
-# Recorte da escrita: o token com droplet:update vale para todos os Droplets da conta,
-# então quem estreita é a aplicação. Só os Droplets do laboratório, e só se tiverem a tag.
-TAG_LABORATORIO = "inventario-droplets"
-DROPLETS_PERMITIDOS = Literal["web-01", "worker-01", "batch-01"]
+mcp = FastMCP("operacao", version="1.0.0")
 
 
 def ler(arquivo: str) -> list[dict]:
@@ -53,20 +41,6 @@ def ler(arquivo: str) -> list[dict]:
 def registrar(chamada: str) -> None:
     # No transporte stdio, o stdout é o canal do protocolo: o log vai para o stderr.
     print(f"Ferramenta: {chamada}", file=sys.stderr)
-
-
-def retornar(itens: list[dict], escopo: dict) -> ToolResult:
-    # O escopo vai no texto, porque é o texto que o modelo lê.
-    # O conteúdo estruturado serve a clientes que leem dados; no LangChain ele vira artefato.
-    linhas = [f"{chave}: {valor}" for chave, valor in escopo.items()]
-    texto = (
-        "Escopo da consulta\n"
-        + "\n".join(linhas)
-        + "\n\nResultado\n"
-        + json.dumps(itens, ensure_ascii=False, indent=2)
-    )
-
-    return ToolResult(content=texto, structured_content={"escopo": escopo, "itens": itens})
 
 
 def resumir_droplet(droplet: dict) -> dict:
@@ -79,7 +53,7 @@ def resumir_droplet(droplet: dict) -> dict:
 
 
 def detalhar_droplet(droplet: dict) -> dict:
-    # Os campos principais, os mesmos do 09 e do 13: nunca o objeto inteiro da API.
+    # Os campos principais, os mesmos do 09 e do 12: nunca o objeto inteiro da API.
     ip_publico = next(
         (rede["ip_address"] for rede in droplet["networks"]["v4"] if rede["type"] == "public"),
         None,
@@ -99,7 +73,7 @@ def detalhar_droplet(droplet: dict) -> dict:
     }
 
 
-@mcp.tool(annotations=LEITURA)
+@mcp.tool
 def listar_droplets(
     regiao: Annotated[
         str | None,
@@ -139,7 +113,7 @@ def listar_droplets(
     return retornar(droplets, escopo)
 
 
-@mcp.tool(annotations=LEITURA)
+@mcp.tool
 def consultar_chamado(chamado_id: str) -> str:
     """Consulta um chamado de operação pelo identificador, como CH-1042.
 
@@ -154,7 +128,7 @@ def consultar_chamado(chamado_id: str) -> str:
     return f"Chamado {chamado_id} não encontrado."
 
 
-@mcp.tool(annotations=LEITURA)
+@mcp.tool
 def buscar_runbook(servico: str | None = None, runbook_id: str | None = None) -> ToolResult:
     """Busca runbooks de operação pelo serviço, como checkout-api, ou pelo identificador, como RB-101.
 
@@ -180,7 +154,7 @@ def buscar_runbook(servico: str | None = None, runbook_id: str | None = None) ->
     return retornar(runbooks, escopo)
 
 
-@mcp.tool(annotations=LEITURA)
+@mcp.tool
 def consultar_historico_mudancas(
     servico: str,
     horas: Annotated[
@@ -215,59 +189,6 @@ def consultar_historico_mudancas(
     }
 
     return retornar(mudancas, escopo)
-
-
-@mcp.tool(annotations=ESCRITA)
-def desligar_droplet(
-    droplet: Annotated[
-        DROPLETS_PERMITIDOS,
-        Field(description=f"Nome de um Droplet do laboratório, com a tag {TAG_LABORATORIO}."),
-    ],
-) -> ToolResult:
-    """Desliga um Droplet do laboratório com shutdown gracioso, como o comando shutdown do sistema.
-
-    Só aceita os Droplets do laboratório. Não força o desligamento, não reinicia e não destrói.
-    """
-    registrar(f"desligar_droplet(droplet={droplet!r})")
-
-    # Escrita usa outro token (droplet:update); a leitura segue com o token só de leitura.
-    cliente = Client(token=os.environ["DIGITALOCEAN_TOKEN_ESCRITA"])
-
-    # O nome não basta: só vale o Droplet que carrega a tag do laboratório.
-    do_laboratorio = cliente.droplets.list(tag_name=TAG_LABORATORIO)["droplets"]
-    encontrados = [item for item in do_laboratorio if item["name"] == droplet]
-    if not encontrados:
-        raise ToolError(
-            f"{droplet} não tem a tag {TAG_LABORATORIO} nesta conta; nada foi feito. "
-            f"Use listar_droplets para ver os Droplets e as tags de cada um."
-        )
-    # Nome no DigitalOcean não é único: com dois iguais, o server não escolhe por conta própria.
-    if len(encontrados) > 1:
-        ids = ", ".join(str(item["id"]) for item in encontrados)
-        raise ToolError(
-            f"Há {len(encontrados)} Droplets {droplet} com a tag {TAG_LABORATORIO} (IDs {ids}); nada foi feito. "
-            "Renomeie ou remova os duplicados antes de pedir o desligamento."
-        )
-    encontrado = encontrados[0]
-
-    efeito = {
-        "pedido": f"shutdown gracioso de {droplet} ({encontrado['id']})",
-        "estado_anterior": encontrado["status"],
-    }
-
-    if encontrado["status"] == "off":
-        # Ação já aplicada: pedir de novo não dispara nada.
-        efeito["acao_disparada"] = "nenhuma: o Droplet já estava desligado"
-    else:
-        acao = cliente.droplet_actions.post(droplet_id=encontrado["id"], body={"type": "shutdown"})["action"]
-        efeito["acao_disparada"] = f"shutdown, action {acao['id']}, status {acao['status']}, iniciada em {acao['started_at']}"
-        efeito["garantia"] = "o comando foi emitido, não confirmado; consulte o status com listar_droplets"
-
-    efeito["nao_feito"] = "nenhum power_off, reboot ou destroy; nenhum outro Droplet foi tocado"
-    efeito["compensacao"] = "religar com a action power_on, fora deste server; a indisponibilidade já aconteceu"
-
-    texto = "Efeito da ação\n" + "\n".join(f"{chave}: {valor}" for chave, valor in efeito.items())
-    return ToolResult(content=texto, structured_content=efeito)
 
 
 def main() -> None:

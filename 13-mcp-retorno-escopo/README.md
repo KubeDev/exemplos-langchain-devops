@@ -1,6 +1,6 @@
 # 14 — Retorno com escopo declarado
 
-Este exemplo independente parte do server de operação do `13` e muda uma coisa: o **retorno** das
+Este exemplo independente parte do server de operação do `12` e muda uma coisa: o **retorno** das
 ferramentas. O server publicado é lido por agentes que o autor não conhece, e esses agentes não
 têm como saber em que recorte o resultado foi produzido.
 
@@ -88,7 +88,7 @@ resolve: ele tem de estar no texto.
 opcionais:
 
 - `detalhe`: `resumido` (padrão) traz só o nome legível, o status e a região; `completo` traz os
-  campos principais, os mesmos do `09` e do `13` (`id`, `nome`, `status`, `regiao`, `tamanho`,
+  campos principais, os mesmos do `09` e do `12` (`id`, `nome`, `status`, `regiao`, `tamanho`,
   `vcpus`, `memoria_mb`, `disco_gb`, `ip_publico`, `tags`, `criado_em`), nunca o objeto inteiro da API;
 - `pagina` e `limite`: como o filtro por região é feito no server, a página também é: ele busca os
   Droplets, filtra pela região e só então corta a página, declarando o filtro, `retornados: N de T`
@@ -150,7 +150,7 @@ causado o problema?
 2. Troque o import para `com_escopo` e repita a pergunta: a resposta cita o período consultado e
    o agente amplia a busca com `horas`, chegando à `MUD-305`.
 
-O Claude Code usa o mesmo `.mcp.json` do `13`; abra-o nesta pasta e faça a mesma pergunta.
+O Claude Code usa o mesmo `.mcp.json` do `12`; abra-o nesta pasta e faça a mesma pergunta.
 
 ## Verificação
 
@@ -202,7 +202,7 @@ de conteúdo e de conteúdo estruturado nas duas versões.
 src/servidor.py              MCP server: recortes, escopo de cada ferramenta e versão do contrato
 src/retornos/sem_escopo.py   retorno só com os itens
 src/retornos/com_escopo.py   retorno com o escopo no texto e o conteúdo estruturado ao lado
-src/agente.py                cliente LangChain, igual ao do 13
+src/agente.py                cliente LangChain, igual ao do 12
 dados/                       chamados, runbooks e histórico de mudanças fictícios
 tests/test_servidor.py       escopo declarado testado pelo cliente MCP em memória
 .mcp.json                    o mesmo server registrado para o Claude Code

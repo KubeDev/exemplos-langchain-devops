@@ -1,6 +1,6 @@
 # 15 — Escrita controlada
 
-Este exemplo independente parte do server de operação do `14`, já com o escopo declarado no
+Este exemplo independente parte do server de operação do `13`, já com o escopo declarado no
 retorno, e muda uma coisa: o server ganha **uma ferramenta de escrita**, `desligar_droplet`.
 
 O ponto da aula é este: **a escrita entra recortada**. O token com `droplet:update` permite
@@ -239,7 +239,7 @@ Veja o `enum` e as anotações de `desligar_droplet` na listagem de ferramentas.
 
 ```text
 src/servidor.py          MCP server: leitura com escopo declarado e a escrita recortada
-src/agente.py            cliente LangChain, igual ao do 14
+src/agente.py            cliente LangChain, igual ao do 13
 dados/                   chamados, runbooks e histórico de mudanças fictícios
 tests/test_servidor.py   recorte da escrita e efeito declarado, pelo cliente MCP em memória
 .mcp.json                o mesmo server registrado para o Claude Code

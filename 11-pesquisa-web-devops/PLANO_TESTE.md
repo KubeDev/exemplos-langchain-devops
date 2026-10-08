@@ -1,7 +1,7 @@
 # Plano de teste — ferramenta pronta
 
 Roteiro manual para validar o exemplo antes da gravação. Rode tudo de dentro de
-`12-pesquisa-web-devops`.
+`11-pesquisa-web-devops`.
 
 ## 1. Instalação e estrutura
 

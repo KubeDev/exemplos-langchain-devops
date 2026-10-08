@@ -4,19 +4,19 @@ Leia o `README.md` antes de alterar este exemplo. Ele registra a demonstração 
 
 ## Natureza do projeto
 
-Exemplo didático `14` da série `langchain-devops-examples`. A lição é: **o retorno de uma
+Exemplo didático `13` da série `langchain-devops-examples`. A lição é: **o retorno de uma
 ferramenta publicada declara o escopo em que foi produzido**, porque o consumidor é desconhecido;
 sem isso, vazio ou parcial sem erro vira falha silenciosa.
 
-O exemplo é autocontido e parte de uma cópia do `13` (código duplicado, nada compartilhado).
+O exemplo é autocontido e parte de uma cópia do `12` (código duplicado, nada compartilhado).
 Quando simplicidade e robustez colidirem, vence a simplicidade.
 
 ## Server
 
 - Todo o server fica em `src/servidor.py`, com FastMCP e `@mcp.tool`. As quatro ferramentas do
-  `13` continuam, todas de leitura.
+  `12` continuam, todas de leitura.
 - A alternância da demo é a troca do import de `retornar` (`src/retornos/sem_escopo.py` ×
-  `src/retornos/com_escopo.py`), no mesmo estilo do `11`. O recorte é idêntico nas duas versões;
+  `src/retornos/com_escopo.py`). O recorte é idêntico nas duas versões;
   só o retorno muda. Não transforme isso em variável de ambiente nem em flag.
 - O estado versionado começa em `sem_escopo`, para a demo abrir pela falha.
 - O escopo vai no **texto** (`content`). O `structured_content` é complementar: no cliente
@@ -25,7 +25,7 @@ Quando simplicidade e robustez colidirem, vence a simplicidade.
   esquema de propósito (é o caso de quebra silenciosa da aula).
 - A falha silenciosa da demo é `CH-1043` × `MUD-305` (03/10), fora das últimas 24 horas. Não mova
   as datas de `dados/` sem conferir os testes.
-- `listar_droplets` filtra por `regiao` (como `nyc1`) na aplicação, como o `13`; por isso pagina
+- `listar_droplets` filtra por `regiao` (como `nyc1`) na aplicação, como o `12`; por isso pagina
   localmente: busca, filtra e só então corta com `pagina`/`limite`, declarando o total filtrado.
   Lê `DIGITALOCEAN_TOKEN` dentro da função. `consultar_chamado` não declara escopo: é consulta por identificador.
 - A versão do contrato é `FastMCP("operacao", version=...)`. Não construa mecanismo de
@@ -34,7 +34,7 @@ Quando simplicidade e robustez colidirem, vence a simplicidade.
 
 ## Clientes
 
-- `src/agente.py` é o mesmo do `13`. Preserve `input()`, uma pergunta por execução e
+- `src/agente.py` é o mesmo do `12`. Preserve `input()`, uma pergunta por execução e
   `agent.ainvoke()` sem streaming. `MCP_CONFIG` e `.mcp.json` continuam iguais.
 
 ## Testes
@@ -45,7 +45,7 @@ pulado sem `DIGITALOCEAN_TOKEN`.
 
 ## Fronteiras curriculares
 
-- Não adicione ferramenta de escrita nem amplie o escopo do token: é o exemplo `15`.
+- Não adicione ferramenta de escrita nem amplie o escopo do token: é o exemplo `14`.
 - Não suba o server por HTTP nem faça deploy.
 - Não adicione autenticação, middleware, retry, cache, memória ou streaming.
 - Não pagine a listagem de ferramentas do protocolo.

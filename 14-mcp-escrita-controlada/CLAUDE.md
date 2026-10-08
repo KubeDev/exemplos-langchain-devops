@@ -4,22 +4,22 @@ Leia o `README.md` antes de alterar este exemplo. Ele registra a demonstração 
 
 ## Natureza do projeto
 
-Exemplo didático `15` da série `langchain-devops-examples`. A lição é: **a escrita entra
+Exemplo didático `14` da série `langchain-devops-examples`. A lição é: **a escrita entra
 recortada**: o server publica uma ação nomeada e estreita (`desligar_droplet`, via `shutdown`),
 menor do que o token permitiria, com parâmetro restrito, efeito declarado no retorno e registro
 do que ficou de fora. O limite desse recorte é a fronteira do protocolo.
 
-O exemplo é autocontido e parte de uma cópia do `14` (código duplicado, nada compartilhado), já
+O exemplo é autocontido e parte de uma cópia do `13` (código duplicado, nada compartilhado), já
 na versão com escopo: a alternância `sem_escopo` × `com_escopo` saiu e `retornar` mora em
 `src/servidor.py`. Quando simplicidade e robustez colidirem, vence a simplicidade.
 
 ## Server
 
-- Todo o server fica em `src/servidor.py`. As quatro ferramentas de leitura do `14` continuam,
+- Todo o server fica em `src/servidor.py`. As quatro ferramentas de leitura do `13` continuam,
   com `readOnlyHint`; `desligar_droplet` tem `destructiveHint`. Anotação é dica, não controle.
 - Recorte da escrita: `DROPLETS_PERMITIDOS` (`Literal`, vira `enum` no esquema) e
   `TAG_LABORATORIO = "inventario-droplets"` (conferida na função antes da action).
-- `listar_droplets` é igual à do `14`: filtro opcional por `regiao`, feito na aplicação, com
+- `listar_droplets` é igual à do `13`: filtro opcional por `regiao`, feito na aplicação, com
   paginação local depois do filtro. A tag não é filtro do usuário; é recorte da escrita.
 - A escrita não filtra por região (laboratório: `web-01`/`worker-01` em `nyc1`, `batch-01` em
   `sfo3`). Nome duplicado na tag é proteção: recusa com os IDs, sem escolher um. Não troque por
@@ -34,7 +34,7 @@ na versão com escopo: a alternância `sem_escopo` × `com_escopo` saiu e `retor
 
 ## Clientes
 
-- `src/agente.py` é o mesmo do `14`. Não filtre ferramentas no cliente: o filtro aparece só como
+- `src/agente.py` é o mesmo do `13`. Não filtre ferramentas no cliente: o filtro aparece só como
   trecho no README (escopo do agente).
 
 ## Testes

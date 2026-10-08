@@ -21,11 +21,10 @@ demonstra sua ideia — o que falta num exemplo costuma ser o assunto do próxim
 | 08 | [`08-assistente-plataforma-chat`](08-assistente-plataforma-chat) | Conversar com o assistente e acompanhar a resposta | Histórico de sessão e retorno progressivo em Streamlit |
 | 09 | [`09-inventario-droplets`](09-inventario-droplets) | Consultar os Droplets de uma conta DigitalOcean | A mesma ferramenta declarada de duas formas (docstring e Pydantic) e o esquema que o modelo recebe de cada uma |
 | 10 | [`10-inventario-droplets-testes`](10-inventario-droplets-testes) | Garantir que a ferramenta do inventário funciona antes de entregá-la ao agente | Teste da ferramenta sem modelo: invocação direta, pedido de chamada escrito à mão e validação do esquema na execução |
-| 11 | [`11-inventario-droplets-colisao`](11-inventario-droplets-colisao) | Escolher entre duas ferramentas parecidas: status e saúde dos Droplets | Colisão entre ferramentas, diagnóstico pela chamada pedida e correção por descrição contrastiva |
-| 12 | [`12-pesquisa-web-devops`](12-pesquisa-web-devops) | Pesquisar tendências de DevOps e cloud na web | Ferramenta pronta de pacote de integração (Tavily): o esquema é do pacote e a consulta sai do seu ambiente |
-| 13 | [`13-mcp-server-operacao`](13-mcp-server-operacao) | Publicar as ferramentas de operação uma vez e usá-las de dois clientes | Primeiro MCP server (FastMCP, stdio) consumido por um agente LangChain e pelo Claude Code |
-| 14 | [`14-mcp-retorno-escopo`](14-mcp-retorno-escopo) | Evitar que um recorte do server vire conclusão falsa do agente | Retorno com escopo declarado para um consumidor desconhecido: falha silenciosa, nível de detalhe, paginação e contrato versionado |
-| 15 | [`15-mcp-escrita-controlada`](15-mcp-escrita-controlada) | Desligar um Droplet de laboratório pelo agente | Escrita recortada: uma ação nomeada e estreita, token de escrita separado e a fronteira do protocolo |
+| 11 | [`11-pesquisa-web-devops`](11-pesquisa-web-devops) | Pesquisar tendências de DevOps e cloud na web | Ferramenta pronta de pacote de integração (Tavily): o esquema é do pacote e a consulta sai do seu ambiente |
+| 12 | [`12-mcp-server-operacao`](12-mcp-server-operacao) | Publicar as ferramentas de operação uma vez e usá-las de dois clientes | Primeiro MCP server (FastMCP, stdio) consumido por um agente LangChain e pelo Claude Code |
+| 13 | [`13-mcp-retorno-escopo`](13-mcp-retorno-escopo) | Evitar que um recorte do server vire conclusão falsa do agente | Retorno com escopo declarado para um consumidor desconhecido: falha silenciosa, nível de detalhe, paginação e contrato versionado |
+| 14 | [`14-mcp-escrita-controlada`](14-mcp-escrita-controlada) | Desligar um Droplet de laboratório pelo agente | Escrita recortada: uma ação nomeada e estreita, token de escrita separado e a fronteira do protocolo |
 
 A ordem importa. O `02` coloca a chamada isolada do `01` num loop, passa a compor a entrada
 por template e mostra que o modelo esquece; o `03` resolve isso com memória explícita, num
@@ -36,30 +35,29 @@ observável; o `07` transforma uma solicitação em execução single shot; o `0
 conversa, memória de sessão e retorno progressivo; o `09` sai do cluster para uma conta
 DigitalOcean e olha a ferramenta por dentro: as formas de declará-la e o esquema que cada uma
 envia ao modelo; o `10` testa essa ferramenta sem modelo, no lugar da aplicação que executa o
-pedido; o `11` coloca uma segunda ferramenta ao lado dela e mostra que descrições parecidas
-colidem; o `12` deixa de escrever a ferramenta e usa uma pronta do ecossistema; o `13` publica
-as ferramentas num MCP server próprio, que dois clientes diferentes usam; o `14` faz o retorno
+pedido; o `11` deixa de escrever a ferramenta e usa uma pronta do ecossistema; o `12` publica
+as ferramentas num MCP server próprio, que dois clientes diferentes usam; o `13` faz o retorno
 desse server declarar o escopo em que foi produzido, porque quem consome é desconhecido; e o
-`15` abre a primeira escrita, recortada em uma ação estreita com token próprio.
+`14` abre a primeira escrita, recortada em uma ação estreita com token próprio.
 
 ## Pré-requisitos
 
 - [uv](https://docs.astral.sh/uv/) — gerencia Python e dependências
 - Python 3.12 (o `uv` instala sozinho, se faltar)
 - Uma chave da Gemini Developer API para os exemplos `01` e `02`
-- Uma chave da API da Anthropic para os exemplos `03` a `09` e `11` a `15` (o `10` não usa modelo)
+- Uma chave da API da Anthropic para os exemplos `03` a `09` e `11` a `14` (o `10` não usa modelo)
 - Node.js, `npx`, `kubectl` e um cluster de estudo para os exemplos `06` a `08`
-- Uma conta DigitalOcean para os exemplos `09` a `11` e `13` a `15`, com tokens de escopo
+- Uma conta DigitalOcean para os exemplos `09`, `10` e `12` a `14`, com tokens de escopo
   customizado:
-  - um token de leitura (`droplet:read`) para os exemplos; o `11` acrescenta `monitoring:read`;
-  - um token de setup, usado só pelos scripts de `setup/` do `09` ou do `11` para criar e destruir os
+  - um token de leitura (`droplet:read`) para os exemplos;
+  - um token de setup, usado só pelos scripts de `setup/` do `09` ou do `10` para criar e destruir os
     Droplets de teste;
-  - um token de escrita (`droplet:read` e `droplet:update`) para o `15`
-- Uma chave do Tavily para o exemplo `12`
-- O Claude Code, para o segundo cliente do exemplo `13`
+  - um token de escrita (`droplet:read` e `droplet:update`) para o `14`
+- Uma chave do Tavily para o exemplo `11`
+- O Claude Code, para o segundo cliente do exemplo `12`
 
 > **Droplets de teste geram custo** enquanto existirem, mesmo desligados. Crie-os com o
-> `setup/` do `09` ou do `11` quando for estudar e destrua-os com o mesmo `setup/` ao terminar.
+> `setup/` do `09` ou do `10` quando for estudar e destrua-os com o mesmo `setup/` ao terminar.
 
 ## Como rodar qualquer exemplo
 
@@ -84,11 +82,10 @@ cd 07-assistente-plataforma-cli && uv run assistente-plataforma-cli "Liste os po
 cd 08-assistente-plataforma-chat && uv run streamlit run src/app.py
 cd 09-inventario-droplets   && uv run inventario-droplets "Quais Droplets estão em nyc1?"
 cd 10-inventario-droplets-testes && uv run pytest -v
-cd 11-inventario-droplets-colisao && uv run inventario-droplets-colisao "Qual a situação da web-01?"
-cd 12-pesquisa-web-devops   && uv run pesquisa-web-devops "Quais as tendências recentes de DevOps e cloud?"
-cd 13-mcp-server-operacao   && uv run agente-operacao
-cd 14-mcp-retorno-escopo    && uv run agente-operacao
-cd 15-mcp-escrita-controlada && uv run agente-operacao
+cd 11-pesquisa-web-devops   && uv run pesquisa-web-devops "Quais as tendências recentes de DevOps e cloud?"
+cd 12-mcp-server-operacao   && uv run agente-operacao
+cd 13-mcp-retorno-escopo    && uv run agente-operacao
+cd 14-mcp-escrita-controlada && uv run agente-operacao
 ```
 
 Cada pasta tem um `README.md` próprio, com a explicação completa daquele exemplo. Comece por

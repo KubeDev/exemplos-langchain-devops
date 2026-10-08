@@ -4,7 +4,7 @@ Leia o `README.md` antes de alterar este exemplo. Ele registra a demonstração 
 
 ## Natureza do projeto
 
-Exemplo didático `13` da série `langchain-devops-examples`. A lição é: **a mesma capacidade,
+Exemplo didático `12` da série `langchain-devops-examples`. A lição é: **a mesma capacidade,
 publicada uma vez num MCP server, serve dois clientes** (um agente LangChain e o Claude Code).
 
 O exemplo é autocontido. O código será lido em aula e projetado numa tela. Quando simplicidade e
@@ -41,8 +41,8 @@ testes de dados locais rodam offline; o de `listar_droplets` é pulado sem `DIGI
 
 ## Fronteiras curriculares
 
-- Não declare escopo no retorno, não pagine e não ajuste nível de detalhe: é o exemplo `14`.
-- Não adicione ferramenta de escrita nem amplie o escopo do token: é o exemplo `15`.
+- Não declare escopo no retorno, não pagine e não ajuste nível de detalhe: é o exemplo `13`.
+- Não adicione ferramenta de escrita nem amplie o escopo do token: é o exemplo `14`.
 - Não suba o server por HTTP nem faça deploy.
 - Não adicione autenticação, middleware, retry, cache, memória ou streaming.
 

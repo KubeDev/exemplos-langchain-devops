@@ -43,9 +43,10 @@ vence a simplicidade.
 - Não ative `strict` no provider.
 - A ferramenta é só de leitura e o token do exemplo (`DIGITALOCEAN_TOKEN`) tem só
   `droplet:read`. Escrita (`shutdown`) é assunto de um exemplo posterior.
-- Os scripts de `setup/` são preparação de cenário, não parte da lição. São o único código
-  que cria ou apaga recursos, usam outro token (`DIGITALOCEAN_TOKEN_SETUP`) e o destruir só
-  toca em Droplets com a tag `inventario-droplets`, em todas as regiões.
+- Os scripts de `setup/` são preparação de cenário, não parte da lição. Fora deles, só o
+  setup e o teardown da suíte de testes criam ou apagam recursos. Os dois usam outro token
+  (`DIGITALOCEAN_TOKEN_SETUP`), e o destruir só toca em Droplets com a tag
+  `inventario-droplets`, em todas as regiões.
 - O laboratório cobre os critérios de cada filtro (um Droplet entra, outro fica de fora):
   `web-01` (`nyc1`, 2 GB, `active`), `worker-01` (`nyc1`, 1 GB, `active`) e `batch-01`
   (`sfo3`, 1 GB, `off`). Um Droplet por nome: nomes únicos são premissa de exemplos
@@ -60,9 +61,13 @@ Este é o único exemplo da série com testes. A pasta `tests/` nasce em aula, c
 codificação a partir de um prompt.
 
 - Os testes invocam a ferramenta direto, sem modelo e sem agente.
-- Integração contra a conta DigitalOcean real, com o `DIGITALOCEAN_TOKEN` só de leitura; sem mock
-  nem cliente simulado. O resultado esperado vem dos Droplets com a tag `inventario-droplets`; a
-  conta pode ter outros.
+- Integração contra a conta DigitalOcean real, sem mock nem cliente simulado. A ferramenta usa o
+  `DIGITALOCEAN_TOKEN`, só de leitura.
+- A suíte cria o próprio cenário: o setup cria os Droplets antes dos casos e o teardown os apaga
+  ao final, mesmo com teste falhando. Os dois usam o `DIGITALOCEAN_TOKEN_SETUP` e não reaproveitam
+  os scripts de `setup/`.
+- Os Droplets da suíte levam a tag `inventario-droplets-testes`. O teardown apaga só essa tag, e o
+  resultado esperado olha só para ela, porque a conta pode ter outros Droplets.
 - `pytest` fica no grupo `dev`, adicionado com `uv add --dev`. Rode com `uv run pytest`.
 - Teste que falha não justifica mudar `src/` ou `setup/`: reporte a causa.
 

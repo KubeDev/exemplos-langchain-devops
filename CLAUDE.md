@@ -32,8 +32,7 @@ abrangente de erro, abstrações "para quando crescer". Nenhuma entra sem pedido
 | `07-assistente-plataforma-cli` | execução single shot com argumento, contexto, canais e códigos de saída |
 | `08-assistente-plataforma-chat` | conversa com histórico de sessão e resposta progressiva em Streamlit |
 | `09-inventario-droplets` | a mesma ferramenta declarada de duas formas (docstring e Pydantic) e o esquema que o modelo recebe de cada uma |
-| `10-inventario-droplets-testes` | a ferramenta testada sem modelo: invocação direta, pedido de chamada e validação na execução |
-| `11-pesquisa-web-devops` | ferramenta pronta (Tavily) entra com um pacote e uma chave; o esquema é do pacote e a consulta sai do ambiente |
+| `10-pesquisa-web-devops` | ferramenta pronta (Tavily) entra com um pacote e uma chave; o esquema é do pacote e a consulta sai do ambiente |
 
 **Não antecipe a aula seguinte.** O recurso ausente num exemplo geralmente é o assunto do
 próximo, e a ausência é o gancho. Antes de adicionar algo, verifique se ele não é a lição de
@@ -83,14 +82,15 @@ configuração. Se dois exemplos precisam do mesmo código, ele é **duplicado**
 - `uv.lock` e `.python-version` são commitados: a aula precisa ser reproduzível.
 
 Python `>=3.12` e LangChain permanecem alinhados. A integração de provider é deliberadamente
-diferente: os exemplos `01` e `02` usam Gemini; os exemplos `03` a `09` e `11` continuam com
-Anthropic. O `10` não usa modelo. Preserve essa diferença até existir uma decisão explícita de migrar os exemplos
+diferente: os exemplos `01` e `02` usam Gemini; os exemplos `03` a `10` continuam com
+Anthropic. Preserve essa diferença até existir uma decisão explícita de migrar os exemplos
 posteriores.
 
 ## Layout interno
 
-Código em `src/` em todos os exemplos; o `10` tem também `tests/`.
-O `09` e o `10` têm `setup/`, com os scripts que criam e destroem os Droplets de teste. O `01` roda diretamente com `uv run src/app.py`; os
+Código em `src/` em todos os exemplos; o `09` é a exceção que recebe `tests/`, criada em aula por um
+agente de codificação (ver o `CLAUDE.md` dele).
+O `09` tem `setup/`, com os scripts que criam e destroem os Droplets de teste. O `01` roda diretamente com `uv run src/app.py`; os
 exemplos que expõem comando declaram `[project.scripts]` no `pyproject.toml`.
 
 ## Modelos e parâmetros
@@ -116,8 +116,7 @@ Credenciais **nunca** são gravadas no repositório. As variáveis de cada exemp
 | `01`, `02` | `GOOGLE_API_KEY` |
 | `03` a `08` | `ANTHROPIC_API_KEY` |
 | `09` | `ANTHROPIC_API_KEY`, `DIGITALOCEAN_TOKEN` (`droplet:read`) e `DIGITALOCEAN_TOKEN_SETUP` (só para os scripts de `setup/`) |
-| `10` | `DIGITALOCEAN_TOKEN` (`droplet:read`); sem chave de modelo |
-| `11` | `ANTHROPIC_API_KEY` e `TAVILY_API_KEY` |
+| `10` | `ANTHROPIC_API_KEY` e `TAVILY_API_KEY` |
 
 Os tokens DigitalOcean usam escopo customizado, nunca acesso total. Cada exemplo tem
 `.env.example` com placeholder e `.env` no `.gitignore`. Ao validar, use a chave apenas no

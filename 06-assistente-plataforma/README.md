@@ -122,7 +122,6 @@ read-only evita mutações, mas não transforma todo dado legível em dado segur
 ```text
 src/app.py                   descoberta das tools e execução do agente
 src/tools.py                 configuração do MCP server HTTP (URL e token)
-PLANO_TESTE.md               validação manual da demonstração
 scripts/subir-mcp-kubernetes inicialização do server HTTP separado
 .env.example                 chave da API, modelo, endpoint e token
 pyproject.toml               dependências e comando `assistente-plataforma`

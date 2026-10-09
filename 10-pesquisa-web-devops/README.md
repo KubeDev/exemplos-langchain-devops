@@ -1,6 +1,6 @@
-# 12 — Ferramenta pronta: busca na web com Tavily
+# 10 · Ferramenta pronta: busca na web com Tavily
 
-Nos exemplos `09` e `10`, toda ferramenta foi escrita à mão: a função, a docstring, o esquema.
+No exemplo `09`, a ferramenta foi escrita à mão: a função, a docstring, o esquema.
 Este exemplo faz o contrário. A ferramenta vem pronta de um pacote de integração do ecossistema
 LangChain, e o agente pesquisa sobre DevOps e cloud na web sem uma linha de ferramenta escrita
 aqui.
@@ -76,6 +76,5 @@ uv run pesquisa-web-devops "Quais as tendências recentes de DevOps e cloud?"
 ```text
 src/app.py        agente com a ferramenta pronta de busca
 .env.example      chaves da Anthropic e do Tavily, e o modelo
-PLANO_TESTE.md    validação manual e critérios de aceite da demo
 pyproject.toml    dependências e comando `pesquisa-web-devops`
 ```

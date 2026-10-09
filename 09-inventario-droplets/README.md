@@ -136,7 +136,8 @@ uv run inventario-droplets "Quais Droplets ativos têm pelo menos 2 GB de memór
 
 - Não valida argumentos na chamada nem mostra o que acontece com valor inválido.
 - Não abre nem instrumenta manualmente o ciclo de tool calling.
-- Não testa a ferramenta sem a DigitalOcean.
+- Não traz testes prontos: a pasta `tests/` é criada em aula por um agente de codificação, contra a
+  conta real e sem cliente simulado.
 - Não pagina a listagem: lê só a primeira página da API.
 - Não ativa `strict` no provider.
 
@@ -149,7 +150,6 @@ src/droplets.py                     a consulta à DigitalOcean, comum às duas f
 src/ferramentas/docstring.py        forma 1
 src/ferramentas/modelo_pydantic.py  forma 2
 .env.example                        chave da API, modelo e tokens da DigitalOcean
-PLANO_TESTE.md                      validação manual e preparação da conta
 setup/criar_droplets.py             cria os Droplets de teste
 setup/destruir_droplets.py          apaga os Droplets de teste
 pyproject.toml                      dependências e comandos `inventario-droplets` e `inspecionar`

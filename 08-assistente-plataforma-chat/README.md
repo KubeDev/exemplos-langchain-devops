@@ -105,5 +105,4 @@ src/app.py                   interface e construção do agente
 src/chat.py                  filtro e streaming de texto para a UI
 src/tools.py                 configuração do endpoint MCP
 scripts/subir-mcp-kubernetes server HTTP read-only separado
-PLANO_TESTE.md               validação técnica e roteiro manual
 ```

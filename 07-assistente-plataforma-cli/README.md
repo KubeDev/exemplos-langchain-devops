@@ -114,5 +114,4 @@ próprio Typer, sem tratamento no projeto.
 src/app.py                   contrato da CLI com Typer e execução única do agente
 src/tools.py                 configuração do endpoint MCP
 scripts/subir-mcp-kubernetes inicialização do server HTTP separado
-PLANO_TESTE.md               verificações manuais
 ```

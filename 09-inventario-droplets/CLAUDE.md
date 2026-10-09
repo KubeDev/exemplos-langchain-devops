@@ -31,12 +31,11 @@ vence a simplicidade.
 ## Fronteiras curriculares
 
 - Não adicione validação explícita, `try/except` de `ValidationError` nem script de valores
-  inválidos. Validação na chamada é assunto do exemplo de testes.
+  inválidos na ferramenta.
 - Não use `bind_tools` nem abra `tool_calls`/`ToolMessage`.
-- Não adicione testes nem cliente simulado da DigitalOcean: é assunto posterior.
 - A API não filtra por região, status nem memória: `consultar_droplets` lista e filtra na
-  aplicação. Argumento fora da regra devolve `[]` sem erro na forma docstring; isso é material do exemplo
-  de testes e da aula de retorno, não corrija aqui.
+  aplicação. Argumento fora da regra devolve `[]` sem erro na forma docstring; isso é material da
+  aula de retorno, não corrija aqui.
 - A tag `inventario-droplets` é recorte do laboratório (setup), não filtro da ferramenta.
 - O retorno é um dict por Droplet com `id`, `nome`, `status`, `regiao`, `tamanho`, `vcpus`,
   `memoria_mb`, `disco_gb`, `ip_publico`, `tags` e `criado_em` (função `resumir`). Sem
@@ -52,8 +51,20 @@ vence a simplicidade.
   (`sfo3`, 1 GB, `off`). Um Droplet por nome: nomes únicos são premissa de exemplos
   posteriores. O criar não recria nome existente com a tag e corrige o estado; desliga com
   `shutdown` e cai para `power_off` só se o shutdown não concluir. Mudou a tabela do
-  `setup/criar_droplets.py`, atualize as tabelas de critérios do README e do PLANO_TESTE.
+  `setup/criar_droplets.py`, atualize a tabela de critérios do README.
 - Não adicione retry, cache, paginação, middleware ou tratamento abrangente de erro.
+
+## Testes: a exceção da série
+
+Este é o único exemplo da série com testes. A pasta `tests/` nasce em aula, criada por um agente de
+codificação a partir de um prompt.
+
+- Os testes invocam a ferramenta direto, sem modelo e sem agente.
+- Integração contra a conta DigitalOcean real, com o `DIGITALOCEAN_TOKEN` só de leitura; sem mock
+  nem cliente simulado. O resultado esperado vem dos Droplets com a tag `inventario-droplets`; a
+  conta pode ter outros.
+- `pytest` fica no grupo `dev`, adicionado com `uv add --dev`. Rode com `uv run pytest`.
+- Teste que falha não justifica mudar `src/` ou `setup/`: reporte a causa.
 
 ## Ambiente e pacotes
 

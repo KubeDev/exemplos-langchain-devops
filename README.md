@@ -21,6 +21,7 @@ demonstra sua ideia — o que falta num exemplo costuma ser o assunto do próxim
 | 08 | [`08-assistente-plataforma-chat`](08-assistente-plataforma-chat) | Conversar com o assistente e acompanhar a resposta | Histórico de sessão e retorno progressivo em Streamlit |
 | 09 | [`09-inventario-droplets`](09-inventario-droplets) | Consultar os Droplets de uma conta DigitalOcean | A mesma ferramenta declarada de duas formas (docstring e Pydantic) e o esquema que o modelo recebe de cada uma |
 | 10 | [`10-pesquisa-web-devops`](10-pesquisa-web-devops) | Pesquisar tendências de DevOps e cloud na web | Ferramenta pronta de pacote de integração (Tavily): o esquema é do pacote e a consulta sai do seu ambiente |
+| 11 | [`11-inventario-droplets-mcp`](11-inventario-droplets-mcp) | Consultar e ligar/desligar recursos de uma conta DigitalOcean | O agente não declara ferramenta: descobre o catálogo inteiro de um MCP server próprio, inclusive ferramentas de escrita |
 
 A ordem importa. O `02` coloca a chamada isolada do `01` num loop, passa a compor a entrada
 por template e mostra que o modelo esquece; o `03` resolve isso com memória explícita, num
@@ -32,14 +33,15 @@ conversa, memória de sessão e retorno progressivo; o `09` sai do cluster para 
 DigitalOcean e olha a ferramenta por dentro: as formas de declará-la e o esquema que cada uma
 envia ao modelo, e é também o projeto em que um agente de codificação cria os testes da
 ferramenta, sem modelo, no lugar da aplicação que executa o pedido; e o `10` deixa de escrever
-a ferramenta e usa uma pronta do ecossistema.
+a ferramenta e usa uma pronta do ecossistema; e o `11` volta à conta DigitalOcean, agora
+com todas as ferramentas descobertas de um MCP server próprio.
 
 ## Pré-requisitos
 
 - [uv](https://docs.astral.sh/uv/) — gerencia Python e dependências
 - Python 3.12 (o `uv` instala sozinho, se faltar)
 - Uma chave da Gemini Developer API para os exemplos `01` e `02`
-- Uma chave da API da Anthropic para os exemplos `03` a `10`
+- Uma chave da API da Anthropic para os exemplos `03` a `11`
 - Node.js, `npx`, `kubectl` e um cluster de estudo para os exemplos `06` a `08`
 - Uma conta DigitalOcean para o exemplo `09`, com tokens de escopo
   customizado:
@@ -47,6 +49,7 @@ a ferramenta e usa uma pronta do ecossistema.
   - um token de setup, usado só pelos scripts de `setup/` do `09` para criar e destruir os
     Droplets de teste.
 - Uma chave do Tavily para o exemplo `10`
+- O MCP server DigitalOcean rodando em `http://localhost:8000/mcp` para o exemplo `11`
 
 > **Droplets de teste geram custo** enquanto existirem, mesmo desligados. Crie-os com o
 > `setup/` do `09` quando for estudar e destrua-os com o mesmo `setup/` ao terminar.
@@ -74,6 +77,7 @@ cd 07-assistente-plataforma-cli && uv run assistente-plataforma-cli "Liste os po
 cd 08-assistente-plataforma-chat && uv run streamlit run src/app.py
 cd 09-inventario-droplets   && uv run inventario-droplets "Quais Droplets estão em nyc1?"
 cd 10-pesquisa-web-devops   && uv run pesquisa-web-devops "Quais as tendências recentes de DevOps e cloud?"
+cd 11-inventario-droplets-mcp && uv run inventario-droplets-mcp "Quais Droplets estão ativos?"
 ```
 
 Cada pasta tem um `README.md` próprio, com a explicação completa daquele exemplo. Comece por

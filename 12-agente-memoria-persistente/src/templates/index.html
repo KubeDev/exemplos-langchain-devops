@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Memória da conversa</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Memória da conversa</h1>
+      <p>Converse sobre qualquer assunto · Backend: {{ backend_label }}</p>
+    </header>
+
+    <section class="session-controls" aria-label="Sessões">
+      <form action="{{ url_for('chat') }}" method="get">
+        <label for="thread_id">Sessões existentes</label>
+        <select id="thread_id" name="thread_id" {{ 'disabled' if not threads else '' }}>
+          {% if not threads %}
+            <option value="" selected>Nenhuma sessão salva</option>
+          {% elif thread_id not in threads %}
+            <option value="" selected disabled>Escolha uma sessão salva</option>
+          {% endif %}
+          {% for thread in threads %}
+            <option value="{{ thread }}" {{ 'selected' if thread == thread_id else '' }}>{{ thread }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit" {{ 'disabled' if not threads else '' }}>Carregar</button>
+      </form>
+
+      <form action="{{ url_for('chat') }}" method="post">
+        <button type="submit" name="action" value="new">Nova sessão</button>
+      </form>
+    </section>
+
+    <p class="thread-label">Thread ID: <code>{{ thread_id }}</code></p>
+    {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+
+    <section class="messages" aria-label="Histórico da conversa">
+      {% for message in messages %}
+        <article class="message {{ message.role }}">
+          <strong>{{ 'Você' if message.role == 'user' else 'Assistente' }}</strong>
+          <p>{{ message.content }}</p>
+        </article>
+      {% else %}
+        <p class="empty">Esta thread ainda não tem mensagens.</p>
+      {% endfor %}
+    </section>
+
+    <form class="prompt-form" action="{{ url_for('chat') }}" method="post">
+      <input type="hidden" name="thread_id" value="{{ thread_id }}">
+      <label for="prompt">Mensagem</label>
+      <textarea id="prompt" name="prompt" rows="3" placeholder="Escreva sua mensagem" required></textarea>
+      <button type="submit" name="action" value="send">Enviar</button>
+    </form>
+  </main>
+</body>
+</html>

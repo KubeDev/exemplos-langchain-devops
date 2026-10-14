@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: aula
+      POSTGRES_PASSWORD: aula
+      POSTGRES_DB: vetores
+    ports:
+      - "127.0.0.1:55434:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aula -d vetores"]
+      interval: 2s
+      timeout: 2s
+      retries: 15
+
+volumes:
+  postgres_data:

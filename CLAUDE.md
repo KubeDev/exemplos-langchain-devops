@@ -36,6 +36,7 @@ abrangente de erro, abstrações "para quando crescer". Nenhuma entra sem pedido
 | `11-inventario-droplets-mcp` | o agente não declara ferramenta: descobre todo o catálogo de um MCP server próprio (DigitalOcean), inclusive escrita |
 | `12-agente-memoria-persistente` | o mesmo chat usa checkpointer em memória ou PostgreSQL, escolhido por variável de ambiente, e compara a retomada após restart |
 | `13-consultor-arquitetura-cloud` | o chat usa checkpointer e Store no PostgreSQL: histórico por thread e projetos por usuário, consultados sob demanda |
+| `14-busca-vetorial-pgvector` | dois processos CLI: indexar PDF/Markdown com OpenAI e buscar no pgvector com `k` e distância, sem gerar resposta |
 
 **Não antecipe a aula seguinte.** O recurso ausente num exemplo geralmente é o assunto do
 próximo, e a ausência é o gancho. Antes de adicionar algo, verifique se ele não é a lição de
@@ -86,8 +87,8 @@ configuração. Se dois exemplos precisam do mesmo código, ele é **duplicado**
 
 Python `>=3.12` e LangChain permanecem alinhados. A integração de provider é deliberadamente
 diferente: os exemplos `01` e `02` usam Gemini; os exemplos `03` a `13` continuam com
-Anthropic. Preserve essa diferença até existir uma decisão explícita de migrar os exemplos
-posteriores.
+Anthropic. O `14` usa OpenAI somente para embeddings. Preserve essas diferenças até existir
+uma decisão explícita de migrar os exemplos.
 
 ## Layout interno
 
@@ -123,6 +124,7 @@ Credenciais **nunca** são gravadas no repositório. As variáveis de cada exemp
 | `11` | `ANTHROPIC_API_KEY` e `DIGITALOCEAN_TOKEN_SETUP` (só para os scripts de `setup/`); o token da DigitalOcean do agente fica no MCP server |
 | `12` | `ANTHROPIC_API_KEY`; `CHECKPOINTER_BACKEND=postgres` usa `DATABASE_URL` para o banco local do Compose |
 | `13` | `ANTHROPIC_API_KEY` e `DATABASE_URL` para checkpointer e Store no PostgreSQL local |
+| `14` | `OPENAI_API_KEY` e `DATABASE_URL` para embeddings e busca no PostgreSQL com pgvector |
 
 Os tokens DigitalOcean usam escopo customizado, nunca acesso total. Cada exemplo tem
 `.env.example` com placeholder e `.env` no `.gitignore`. Ao validar, use a chave apenas no

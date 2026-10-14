@@ -25,6 +25,7 @@ demonstra sua ideia — o que falta num exemplo costuma ser o assunto do próxim
 | 12 | [`12-agente-memoria-persistente`](12-agente-memoria-persistente) | Comparar a conversa antes e depois de reiniciar o chat | Checkpointer por thread em memória ou PostgreSQL, escolhido por variável de ambiente |
 | 13 | [`13-consultor-arquitetura-cloud`](13-consultor-arquitetura-cloud) | Retomar conversas e consultar decisões de um projeto Cloud | Checkpointer por thread e Store por usuário e projeto, ambos no PostgreSQL |
 | 14 | [`14-busca-vetorial-pgvector`](14-busca-vetorial-pgvector) | Encontrar documentos operacionais por similaridade | Embeddings OpenAI, pgvector e busca com `k` e distância, sem gerar resposta |
+| 15 | [`15-chunking-dados-operacionais`](15-chunking-dados-operacionais) | Dividir documentação, logs e tickets para a busca | Estratégia de chunk pela natureza do dado, tamanho medido, sobreposição e avaliação com perguntas de fragmento esperado |
 
 A ordem importa. O `02` coloca a chamada isolada do `01` num loop, passa a compor a entrada
 por template e mostra que o modelo esquece; o `03` resolve isso com memória explícita, num
@@ -40,7 +41,8 @@ a ferramenta e usa uma pronta do ecossistema; o `11` volta à conta DigitalOcean
 com todas as ferramentas descobertas de um MCP server próprio; e o `12` compara o mesmo
 chat com checkpoints em memória e no PostgreSQL após reiniciar a aplicação; o `13` acrescenta
 um Store para dados do projeto que atravessam threads; o `14` indexa PDF e Markdown em
-um banco vetorial e recupera o texto diretamente, antes de conectá-lo ao agente.
+um banco vetorial e recupera o texto diretamente, antes de conectá-lo ao agente; o `15` troca
+o arquivo inteiro por chunks escolhidos pela natureza de cada dado e mede o efeito.
 
 ## Pré-requisitos
 
@@ -48,8 +50,8 @@ um banco vetorial e recupera o texto diretamente, antes de conectá-lo ao agente
 - Python 3.12 (o `uv` instala sozinho, se faltar)
 - Uma chave da Gemini Developer API para os exemplos `01` e `02`
 - Uma chave da API da Anthropic para os exemplos `03` a `13`
-- Uma chave da API da OpenAI para os embeddings do exemplo `14`
-- Docker com Compose para o PostgreSQL dos exemplos `12` a `14`
+- Uma chave da API da OpenAI para os embeddings dos exemplos `14` e `15`
+- Docker com Compose para o PostgreSQL dos exemplos `12` a `15`
 - Node.js, `npx`, `kubectl` e um cluster de estudo para os exemplos `06` a `08`
 - Uma conta DigitalOcean para o exemplo `09`, com tokens de escopo
   customizado:
@@ -90,6 +92,8 @@ cd 12-agente-memoria-persistente && uv run flask --app src.web run --port 8501
 cd 13-consultor-arquitetura-cloud && uv run flask --app src.web run --port 8502
 cd 14-busca-vetorial-pgvector && uv run indexar
 cd 14-busca-vetorial-pgvector && uv run buscar "fila parada após rotação de credencial" --k 3
+cd 15-chunking-dados-operacionais && uv run chunks dados/RB-381-payments-worker.md --estrategia secao --tamanho 3500
+cd 15-chunking-dados-operacionais && uv run avaliar
 ```
 
 Cada pasta tem um `README.md` próprio, com a explicação completa daquele exemplo. Comece por

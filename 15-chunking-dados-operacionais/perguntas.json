@@ -1,0 +1,37 @@
+[
+  {
+    "pergunta": "A fila de cobrança parou depois da rotação da credencial do broker. Como reiniciar os workers do payments-worker com segurança?",
+    "dado": "runbook",
+    "fragmentos": ["separe os que iniciaram antes da rotação", "Sem as duas aprovações registradas, não prossiga"]
+  },
+  {
+    "pergunta": "O que aconteceu no payments-worker logo antes de os resultados de cobrança deixarem de ser publicados?",
+    "dado": "log",
+    "fragmentos": ["ACCESS_REFUSED (usuário svc-payments-worker), tentativa 1/5", "falha ao publicar resultado"]
+  },
+  {
+    "pergunta": "Por que a catalog-api começou a devolver erro 500 ao resolver ofertas depois da implantação?",
+    "dado": "log",
+    "fragmentos": ["Mapa de regiões comerciais vazio", "CAT-5031 Falha ao resolver oferta"]
+  },
+  {
+    "pergunta": "O que o image-processor registrou antes das falhas de escrita no volume temporário?",
+    "dado": "log",
+    "fragmentos": ["espaço livre em /scratch abaixo da reserva", "No space left on device"]
+  },
+  {
+    "pergunta": "Quanto tempo o circuit breaker de preços da catalog-api fica aberto antes de testar o estado meio aberto?",
+    "dado": "referência",
+    "fragmentos": ["PRICING_CB_WAIT_OPEN_S", "Tempo com o circuito aberto antes de testar meio aberto"]
+  },
+  {
+    "pergunta": "Qual aumento de réplicas foi aprovado para a catalog-api na campanha de outubro?",
+    "dado": "ticket",
+    "fragmentos": ["Aprovado maxReplicas 20 e pool 17"]
+  },
+  {
+    "pergunta": "No incidente de volume cheio do image-processor, o que a equipe descartou como causa?",
+    "dado": "post-mortem",
+    "fragmentos": ["Um pico de imagens maiores acelerou a ocupação", "Também foi descartada uma falha geral de rede"]
+  }
+]

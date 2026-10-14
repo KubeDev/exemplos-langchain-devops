@@ -68,12 +68,19 @@ def main() -> None:
 
     print(f"Pergunta: {args.pergunta}")
     print(f"Modelo: {EMBEDDING_MODEL} | k: {args.k} | métrica: distância de cosseno (menor = mais próximo)")
+    caracteres = sum(len(documento.page_content) for documento, _ in resultados)
+    print(f"Recuperados: {len(resultados)} unidades | {caracteres} caracteres de texto")
     if not resultados:
         print("Nenhum documento encontrado.")
     for posicao, (documento, distancia) in enumerate(resultados, start=1):
         origem = documento.metadata["source"]
         pagina = documento.metadata.get("page")
-        local = f"{origem}, página {pagina}" if pagina else origem
+        paginas = documento.metadata.get("pages")
+        local = origem
+        if pagina:
+            local = f"{origem}, página {pagina}"
+        elif paginas:
+            local = f"{origem}, PDF inteiro ({paginas} páginas)"
         print(f"\n{posicao}. Distância: {distancia:.4f} | Origem: {local}")
         print(documento.page_content.strip())
 

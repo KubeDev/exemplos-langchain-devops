@@ -231,6 +231,7 @@ name = "chunking-dados-operacionais"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "langchain-core" },
     { name = "langchain-openai" },
     { name = "langchain-postgres" },
     { name = "langchain-text-splitters" },
@@ -240,6 +241,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "langchain-core", specifier = ">=1.6.10" },
     { name = "langchain-openai", specifier = ">=1.7.2" },
     { name = "langchain-postgres", specifier = ">=0.0.19" },
     { name = "langchain-text-splitters", specifier = ">=1.1.3" },

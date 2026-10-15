@@ -37,7 +37,7 @@ abrangente de erro, abstrações "para quando crescer". Nenhuma entra sem pedido
 | `12-agente-memoria-persistente` | o mesmo chat usa checkpointer em memória ou PostgreSQL, escolhido por variável de ambiente, e compara a retomada após restart |
 | `13-consultor-arquitetura-cloud` | o chat usa checkpointer e Store no PostgreSQL: histórico por thread e projetos por usuário, consultados sob demanda |
 | `14-busca-vetorial-pgvector` | dois processos CLI: indexar PDF/Markdown com OpenAI e buscar no pgvector com `k` e distância, sem gerar resposta |
-| `15-chunking-dados-operacionais` | estratégia de chunk pela natureza do dado (seção, janela de log, ticket), tamanho medido e avaliação de duas configurações com perguntas de fragmento esperado |
+| `15-chunking-dados-operacionais` | estratégia de chunk pela natureza do dado (por tamanho, por seção, janela de log), sobreposição e tamanho medido; demos sem API e indexação e busca no pgvector |
 
 **Não antecipe a aula seguinte.** O recurso ausente num exemplo geralmente é o assunto do
 próximo, e a ausência é o gancho. Antes de adicionar algo, verifique se ele não é a lição de

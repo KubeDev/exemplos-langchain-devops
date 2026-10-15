@@ -1,8 +1,9 @@
 # 15 — Chunking de dados operacionais
 
-Este exemplo divide documentação, logs e tickets de três serviços fictícios em chunks, indexa
-duas configurações de chunk no PostgreSQL com pgvector e compara as duas com um conjunto de
-perguntas de fragmento esperado. Nenhum resultado é enviado a um modelo de geração.
+Este exemplo divide a documentação e os logs de três serviços fictícios em chunks, escolhendo a
+estratégia pela natureza de cada dado, gera os embeddings, grava no PostgreSQL com pgvector e
+busca por similaridade. Os comandos `runbook` e `log` mostram os cortes no terminal sem chamar a API.
+Nenhum resultado é enviado a um modelo de geração.
 
 Todos os dados são fictícios e não representam uma operação real.
 
@@ -17,7 +18,8 @@ docker compose up -d --wait
 ```
 
 Preencha `OPENAI_API_KEY` no `.env`. A porta local do banco é `55435`. A indexação chama a API
-de embeddings da OpenAI e tem custo por tokens de entrada.
+de embeddings da OpenAI e tem custo por tokens de entrada; `runbook` e `log` não precisam de
+chave nem de banco.
 
 ## A base
 
@@ -26,52 +28,47 @@ de embeddings da OpenAI e tem custo por tokens de entrada.
 | Runbook, arquitetura, referência | `dados/RB-*.md`, `dados/ARQ-*.md`, `dados/REF-*.md` | texto com títulos Markdown |
 | Post-mortem | `dados/PM-*.pdf` | texto extraído de PDF, sem estrutura |
 | Log de aplicação | `dados/logs/*.jsonl` | um evento JSON por linha |
-| Ticket | `dados/tickets.json` | registro com campos e histórico de comentários |
+
+## As estratégias
+
+| Estratégia | Função | Onde corta | Sobreposição |
+|---|---|---|---|
+| Por tamanho | `dividir_por_tamanho()` | a cada `tamanho` caracteres, preferindo parágrafo, linha e palavra | caracteres repetidos do fim do chunk anterior |
+| Por seção | `dividir_por_secao()` | nos títulos Markdown; título, serviço e tipo vão no texto do chunk | não usa |
+| Janela de tempo | `janelas_de_log()` | intervalo do relógio, só WARN e ERROR | segundos repetidos do fim da janela anterior |
+
+A divisão por tamanho é o que a documentação do LangChain chama de recursive character splitting.
+Para cortar num caractere de separação específico, informe `separators`.
 
 ## Ver os chunks sem gerar embedding
 
 ```bash
-uv run chunks dados/RB-381-payments-worker.md --estrategia inteiro
-uv run chunks dados/RB-381-payments-worker.md --estrategia tamanho --tamanho 1000 --contendo "aprovação explícita"
-uv run chunks dados/RB-381-payments-worker.md --estrategia secao --tamanho 3500 --contendo "aprovação explícita"
-uv run chunks dados/logs/payments-worker.jsonl --estrategia janela --segundos 15 --contendo "14:04:1"
-uv run chunks dados/logs/payments-worker.jsonl --estrategia janela --segundos 15 --sobreposicao 5 --contendo "14:04:1"
-uv run chunks dados/tickets.json --estrategia ticket --tamanho 1500
+uv run runbook
+uv run log
 ```
 
-O comando imprime cada chunk com tamanho, posição, seção ou janela, e termina com a quantidade
-de chunks e o tamanho mínimo, mediano e máximo. `--contendo` filtra os chunks exibidos; o
-resumo continua considerando todos.
+`runbook` divide o RB-381 por tamanho e por seção e mostra o chunk do passo 7, o que pede
+aprovação explícita. `log` divide o log do payments-worker em janelas e mostra as do início do
+incidente. Os dois rodam sem chave e sem banco. Os parâmetros são constantes no topo de cada arquivo:
+troque `SOBREPOSICAO` para 200 em `runbook.py`, ou para 5 em `log.py`, e rode de novo.
 
-| Estratégia | Função em `dividir.py` | Para quê |
-|---|---|---|
-| `inteiro` | nenhuma | o arquivo como uma unidade, como na Aula 06 |
-| `tamanho` | `dividir_por_tamanho()` | recursivo por separador até caber no tamanho |
-| `secao` | `dividir_por_secao()` | corta nos títulos; título, serviço e tipo vão no texto do chunk |
-| `janela` | `janelas_de_log()` | eventos WARN e ERROR de um serviço em janelas de tempo |
-| `ticket` | `dividir_tickets()` | um ticket por chunk; campos no metadado |
-
-## Indexar as duas configurações
+## Indexar e buscar
 
 ```bash
-uv run indexar --config a
-uv run indexar --config b
+uv run indexar
+uv run buscar "A fila de cobrança parou depois da rotação da credencial do broker. Como reiniciar os workers do payments-worker com segurança?" --k 3
 ```
 
-`configuracao_a()` trata tudo como texto: recursivo com 1000 caracteres e sobreposição de 150,
-inclusive para o JSON dos logs e dos tickets. `configuracao_b()` escolhe a estratégia pela
-natureza do dado; o tamanho de 3500 nos documentos saiu da medição das seções da base. Cada
-configuração tem sua coleção (`chunks_a`, `chunks_b`) e cada execução reconstrói a coleção.
+`indexar` usa `dividir_base()`: seção nos documentos Markdown, por tamanho nos post-mortems em PDF
+(1000 com sobreposição de 200, ponto de partida) e janela de 60 segundos com sobreposição de 20
+nos logs (hipótese a testar). Mostra os chunks por tipo com o maior de cada um e os caracteres
+enviados ao modelo de embedding, e reconstrói a coleção `chunks` a cada execução. O maior chunk é a
+medição: a seção não tem limite de tamanho porque a maior delas fica muito abaixo do limite do
+modelo. `buscar` imprime os `k` chunks mais próximos com origem e distância.
 
-## Buscar e avaliar
+## Um arquivo, uma leitura
 
-```bash
-uv run buscar "Como reiniciar os workers do payments-worker com segurança?" --config b --k 3
-uv run avaliar
-```
-
-`perguntas.json` traz as perguntas, o tipo de dado e os fragmentos que precisam aparecer juntos
-num mesmo chunk. `avaliar` mede duas coisas para cada configuração: se a resposta existe inteira
-em algum chunk do índice (efeito do chunking) e se esse chunk volta entre os 4 mais próximos da
-pergunta (efeito da busca). Também soma os caracteres recuperados, que é o texto que iria para o
-contexto de um agente.
+Cada comando é um arquivo que se lê sozinho, de cima a baixo, sem importar nada de outro arquivo
+do projeto. Por isso as funções de divisão aparecem duas vezes: em `runbook.py` e `log.py`, para a
+demo, e em `indexar.py`, para a base inteira. A repetição é de propósito. Ao mudar uma estratégia,
+mude nos dois lugares.

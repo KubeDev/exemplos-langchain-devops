@@ -1,13 +1,11 @@
 """Divide a base pela natureza de cada dado, gera embeddings e reconstrói a coleção.
 
-As funções de divisão são as mesmas de runbook.py e log.py, copiadas de propósito: cada arquivo se
+As funções de divisão são as mesmas de gerar_chunks.py, copiadas de propósito: cada arquivo se
 lê sozinho, sem navegar entre arquivos. Ao mudar uma estratégia, mude nos dois lugares.
 """
 
-import json
 import os
 from collections import Counter
-from datetime import UTC, datetime
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -27,7 +25,7 @@ EMBEDDING_DIMENSIONS = 1536
 load_dotenv(ROOT / ".env")
 
 # ---------------------------------------------------------------------------
-# Documentos: por tamanho e por seção (as mesmas funções de runbook.py)
+# Documentos: recursivo e por seção (as mesmas funções de gerar_chunks.py)
 # ---------------------------------------------------------------------------
 
 # O nome do arquivo diz o tipo e o serviço: RB-381-payments-worker.md é um runbook do payments-worker.
@@ -38,8 +36,10 @@ SERVICOS = ["catalog-api", "payments-worker", "image-processor"]
 def metadados(arquivo: Path) -> dict:
     """Monta o metadado do documento a partir do nome do arquivo."""
     tipo = TIPOS[arquivo.name.split("-")[0]]
-    servico = [nome for nome in SERVICOS if nome in arquivo.name][0]
-    return {"source": arquivo.name, "tipo": tipo, "servico": servico}
+    for servico in SERVICOS:
+        if servico in arquivo.name:
+            return {"source": arquivo.name, "tipo": tipo, "servico": servico}
+    raise ValueError(f"Serviço desconhecido no nome do arquivo: {arquivo.name}")
 
 
 def carregar_markdown(arquivo: Path) -> Document:
@@ -53,88 +53,33 @@ def carregar_pdf(arquivo: Path) -> Document:
     return Document(page_content=texto, metadata=metadados(arquivo))
 
 
-def dividir_por_tamanho(documento: Document, tamanho: int, sobreposicao: int) -> list[Document]:
-    """Por tamanho: corta o texto em pedaços de até `tamanho` caracteres."""
-    # Prefere cortar entre parágrafos, depois entre linhas, depois entre palavras.
-    # Para usar outro caractere de separação, informe `separators`.
+def dividir_recursivo(documento: Document, tamanho: int, sobreposicao: int) -> list[Document]:
+    """Recursivo: tenta o parágrafo; se não couber, a linha; depois a palavra."""
+    # Respeita o tamanho; corta na palavra só quando um parágrafo passa do tamanho.
     splitter = RecursiveCharacterTextSplitter(chunk_size=tamanho, chunk_overlap=sobreposicao)
     return splitter.split_documents([documento])
 
 
 def dividir_por_secao(documento: Document) -> list[Document]:
-    """Por seção: corta nos títulos Markdown e põe o título no texto do chunk."""
+    """Seção: corta nos títulos Markdown e põe o título no texto do chunk."""
     # Sem limite de tamanho: nesta base a maior seção tem cerca de 5 mil caracteres.
-    # Se uma seção passar do limite do modelo de embedding, divida essa seção por tamanho.
+    # Se uma seção passar do limite do modelo de embedding, divida essa seção pelo recursivo.
     titulos = [("#", "h1"), ("##", "h2"), ("###", "h3")]
+    # Este splitter só aceita texto: o metadado do documento é recolocado logo abaixo.
     secoes = MarkdownHeaderTextSplitter(headers_to_split_on=titulos).split_text(documento.page_content)
 
+    servico = documento.metadata["servico"]
+    tipo = documento.metadata["tipo"]
     chunks = []
     for secao in secoes:
         # Os títulos acima da seção, ex.: "RB-381 - Fila parada... > Procedimento de estabilização"
-        caminho = " > ".join(secao.metadata[nivel] for _, nivel in titulos if nivel in secao.metadata)
+        caminho = " > ".join(secao.metadata.values())
         # Um "passo 4" sozinho não diz de qual procedimento é: o título vai junto no texto.
         # Ex.: "[payments-worker | runbook] RB-381 - ... > Procedimento de estabilização"
-        texto = f"[{documento.metadata['servico']} | {documento.metadata['tipo']}] {caminho}\n\n{secao.page_content}"
+        texto = f"[{servico} | {tipo}] {caminho}\n\n{secao.page_content}"
         # O metadado do documento, mais a seção.
-        metadata = {**documento.metadata, "secao": caminho}
-        chunks.append(Document(page_content=texto, metadata=metadata))
-    return chunks
-
-
-# ---------------------------------------------------------------------------
-# Log: janela de tempo (as mesmas funções de log.py)
-# ---------------------------------------------------------------------------
-
-
-def relogio(segundos: int) -> datetime:
-    """Converte segundos desde 1970 de volta em data e hora."""
-    return datetime.fromtimestamp(segundos, UTC)
-
-
-def renderizar_evento(evento: dict) -> str:
-    """Transforma o JSON do evento numa linha legível: só o que tem significado vai para o embedding."""
-    # [11:23] fica só com HH:MM:SS.mmm do timestamp ISO
-    linha = f"{evento['timestamp'][11:23]} {evento['level']} {evento['pod']} {evento['message']}"
-    if evento.get("exception"):
-        linha += "\n" + evento["exception"]
-    return linha
-
-
-def janelas_de_log(arquivo: Path, segundos: int, sobreposicao: int) -> list[Document]:
-    """Janela de tempo: junta os eventos que aconteceram no mesmo intervalo."""
-    servico = arquivo.stem  # um arquivo de log por serviço: a janela nunca mistura serviços
-
-    eventos = []
-    for linha in arquivo.read_text(encoding="utf-8").splitlines():
-        evento = json.loads(linha)
-        # O que indexar: INFO e DEBUG são volume, não evidência. Ficam no sistema de logs.
-        if evento["level"] in ("WARN", "ERROR"):
-            evento["segundo"] = datetime.fromisoformat(evento["timestamp"]).timestamp()
-            eventos.append(evento)
-
-    primeiro = int(eventos[0]["segundo"])
-    ultimo = int(eventos[-1]["segundo"])
-    # A primeira janela começa num horário redondo: com janela de 15, 14:04:12 vira 14:04:00.
-    primeiro = primeiro - primeiro % segundos
-
-    chunks = []
-    # Sem sobreposição, cada janela começa onde a anterior terminou.
-    # Com 15 e 5, uma janela nova começa a cada 10 segundos.
-    passo = segundos - sobreposicao
-    for inicio in range(primeiro, ultimo + 1, passo):
-        fim = inicio + segundos
-        na_janela = [evento for evento in eventos if inicio <= evento["segundo"] < fim]
-        if not na_janela:
-            continue
-        texto = f"[{servico} | log] {relogio(inicio):%H:%M:%S} a {relogio(fim):%H:%M:%S}\n\n"
-        texto += "\n".join(renderizar_evento(evento) for evento in na_janela)
-        metadata = {
-            "source": arquivo.name,
-            "tipo": "log",
-            "servico": servico,
-            "inicio": relogio(inicio).isoformat(),
-            "fim": relogio(fim).isoformat(),
-        }
+        metadata = dict(documento.metadata)
+        metadata["secao"] = caminho
         chunks.append(Document(page_content=texto, metadata=metadata))
     return chunks
 
@@ -152,10 +97,7 @@ def dividir_base() -> list[Document]:
         chunks += dividir_por_secao(carregar_markdown(arquivo))
     # O PDF perde os títulos na extração. 1000 e 200 são ponto de partida, não medição.
     for arquivo in sorted(DATA_DIR.glob("*.pdf")):
-        chunks += dividir_por_tamanho(carregar_pdf(arquivo), tamanho=1000, sobreposicao=200)
-    # Janela e sobreposição do log são hipótese: só um teste de busca diz se pagam.
-    for arquivo in sorted(DATA_DIR.glob("logs/*.jsonl")):
-        chunks += janelas_de_log(arquivo, segundos=60, sobreposicao=20)
+        chunks += dividir_recursivo(carregar_pdf(arquivo), tamanho=1000, sobreposicao=200)
     return chunks
 
 
@@ -167,7 +109,7 @@ def main() -> None:
     for tipo, quantidade in sorted(por_tipo.items()):
         # O maior chunk de cada tipo é a medição: ele precisa caber no limite do modelo de embedding.
         maior = max(len(chunk.page_content) for chunk in chunks if chunk.metadata["tipo"] == tipo)
-        print(f"{tipo:>12}: {quantidade} chunks | maior com {maior} caracteres")
+        print(f"{tipo}: {quantidade} chunks | maior com {maior} caracteres")
     caracteres = sum(len(chunk.page_content) for chunk in chunks)
     print(f"Total: {len(chunks)} chunks | {caracteres} caracteres enviados ao modelo de embedding")
 

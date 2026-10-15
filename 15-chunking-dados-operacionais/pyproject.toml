@@ -1,7 +1,7 @@
 [project]
 name = "chunking-dados-operacionais"
 version = "0.1.0"
-description = "Estrategias de chunking para dados operacionais: documentos e logs"
+description = "Estrategias de chunking para documentos operacionais"
 requires-python = ">=3.12"
 dependencies = [
     "langchain-core>=1.6.10",
@@ -13,8 +13,7 @@ dependencies = [
 ]
 
 [project.scripts]
-runbook = "chunking_dados_operacionais.runbook:main"
-log = "chunking_dados_operacionais.log:main"
+gerar-chunks = "chunking_dados_operacionais.gerar_chunks:main"
 indexar = "chunking_dados_operacionais.indexar:main"
 buscar = "chunking_dados_operacionais.buscar:main"
 

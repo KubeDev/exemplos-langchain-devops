@@ -25,7 +25,7 @@ demonstra sua ideia — o que falta num exemplo costuma ser o assunto do próxim
 | 12 | [`12-agente-memoria-persistente`](12-agente-memoria-persistente) | Comparar a conversa antes e depois de reiniciar o chat | Checkpointer por thread em memória ou PostgreSQL, escolhido por variável de ambiente |
 | 13 | [`13-consultor-arquitetura-cloud`](13-consultor-arquitetura-cloud) | Retomar conversas e consultar decisões de um projeto Cloud | Checkpointer por thread e Store por usuário e projeto, ambos no PostgreSQL |
 | 14 | [`14-busca-vetorial-pgvector`](14-busca-vetorial-pgvector) | Encontrar documentos operacionais por similaridade | Embeddings OpenAI, pgvector e busca com `k` e distância, sem gerar resposta |
-| 15 | [`15-chunking-dados-operacionais`](15-chunking-dados-operacionais) | Dividir documentação e logs para a busca | Estratégia de chunk pela natureza do dado, sobreposição e tamanho medido, com os chunks indexados no pgvector e buscados por similaridade |
+| 15 | [`15-chunking-dados-operacionais`](15-chunking-dados-operacionais) | Dividir a documentação para a busca | Estratégia de chunk pela natureza do dado, sobreposição e tamanho medido, com os chunks indexados no pgvector e buscados por similaridade |
 
 A ordem importa. O `02` coloca a chamada isolada do `01` num loop, passa a compor a entrada
 por template e mostra que o modelo esquece; o `03` resolve isso com memória explícita, num
@@ -92,7 +92,7 @@ cd 12-agente-memoria-persistente && uv run flask --app src.web run --port 8501
 cd 13-consultor-arquitetura-cloud && uv run flask --app src.web run --port 8502
 cd 14-busca-vetorial-pgvector && uv run indexar
 cd 14-busca-vetorial-pgvector && uv run buscar "fila parada após rotação de credencial" --k 3
-cd 15-chunking-dados-operacionais && uv run runbook
+cd 15-chunking-dados-operacionais && uv run gerar-chunks
 cd 15-chunking-dados-operacionais && uv run indexar
 ```
 

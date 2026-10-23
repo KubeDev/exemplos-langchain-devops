@@ -1,3 +1,8 @@
 .DS_Store
 **/.claude/settings.local.json
 lista.md
+.env
+**/__pycache__
+**/*.pyc
+**/*.pyo
+**/*.pyd

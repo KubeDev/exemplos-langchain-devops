@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Consultor de arquitetura Cloud</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Consultor de arquitetura Cloud</h1>
+      <p>Checkpointer e Store no PostgreSQL · Projetos fictícios para estudo</p>
+    </header>
+
+    <section class="session-controls" aria-label="Perfil e conversas">
+      <form action="{{ url_for('chat') }}" method="get">
+        <label for="user_id">Perfil</label>
+        <select id="user_id" name="user_id">
+          {% for id, name in users.items() %}
+            <option value="{{ id }}" {{ 'selected' if id == user_id else '' }}>{{ name }}</option>
+          {% endfor %}
+        </select>
+        <button type="submit">Trocar</button>
+      </form>
+      <form action="{{ url_for('chat') }}" method="get">
+        <input type="hidden" name="user_id" value="{{ user_id }}">
+        <label for="thread_id">Conversas salvas</label>
+        <select id="thread_id" name="thread_id" {{ 'disabled' if not threads else '' }}>
+          {% for thread in threads %}
+            <option value="{{ thread }}" {{ 'selected' if thread == thread_id else '' }}>{{ thread }}</option>
+          {% else %}
+            <option value="">Nenhuma conversa salva</option>
+          {% endfor %}
+        </select>
+        <button type="submit" {{ 'disabled' if not threads else '' }}>Carregar</button>
+      </form>
+      <form action="{{ url_for('chat') }}" method="post">
+        <input type="hidden" name="user_id" value="{{ user_id }}">
+        <button type="submit" name="action" value="new">Nova conversa</button>
+      </form>
+    </section>
+
+    <p class="thread-label">Thread: <code>{{ thread_id }}</code></p>
+    {% if error %}<p class="error" role="alert">{{ error }}</p>{% endif %}
+
+    <section class="messages" aria-label="Histórico da conversa">
+      {% for message in messages %}
+        <article class="message {{ message.role }}">
+          <strong>{{ message.label }}</strong>
+          <p>{{ message.content }}</p>
+        </article>
+      {% else %}
+        <article class="message assistant">
+          <strong>Assistente</strong>
+          <p>Vamos começar um projeto novo ou continuar um existente? Posso listar seus projetos.</p>
+        </article>
+      {% endfor %}
+    </section>
+
+    <form class="prompt-form" action="{{ url_for('chat') }}" method="post">
+      <input type="hidden" name="user_id" value="{{ user_id }}">
+      <input type="hidden" name="thread_id" value="{{ thread_id }}">
+      <label for="prompt">Mensagem</label>
+      <textarea id="prompt" name="prompt" rows="3" placeholder="Quero criar um projeto chamado Plataforma Aurora" required></textarea>
+      <button type="submit" name="action" value="send">Enviar</button>
+    </form>
+  </main>
+</body>
+</html>

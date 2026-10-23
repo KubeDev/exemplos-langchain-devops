@@ -34,6 +34,11 @@ abrangente de erro, abstrações "para quando crescer". Nenhuma entra sem pedido
 | `09-inventario-droplets` | a mesma ferramenta declarada de duas formas (docstring e Pydantic) e o esquema que o modelo recebe de cada uma |
 | `10-pesquisa-web-devops` | ferramenta pronta (Tavily) entra com um pacote e uma chave; o esquema é do pacote e a consulta sai do ambiente |
 | `11-inventario-droplets-mcp` | o agente não declara ferramenta: descobre todo o catálogo de um MCP server próprio (DigitalOcean), inclusive escrita |
+| `12-agente-memoria-persistente` | o mesmo chat usa checkpointer em memória ou PostgreSQL, escolhido por variável de ambiente, e compara a retomada após restart |
+| `13-consultor-arquitetura-cloud` | o chat usa checkpointer e Store no PostgreSQL: histórico por thread e projetos por usuário, consultados sob demanda |
+| `14-busca-vetorial-pgvector` | dois processos CLI: indexar PDF/Markdown com OpenAI e buscar no pgvector com `k` e distância, sem gerar resposta |
+| `15-chunking-dados-operacionais` | recursivo em dois pontos de partida (1000/200 e 2000/400) e seção, escolhidos pela natureza do documento, sobreposição e tamanho medido; demo sem API e indexação e busca no pgvector |
+| `16-reindexacao-incremental` | indexação incremental por hash e ID estável (novo, alterado, removido, igual) numa base com versões v1 e v2, e reindexação total no lugar ou numa coleção nova ao lado, trocada pelo `.env`; embeddings locais pelo Ollama |
 
 **Não antecipe a aula seguinte.** O recurso ausente num exemplo geralmente é o assunto do
 próximo, e a ausência é o gancho. Antes de adicionar algo, verifique se ele não é a lição de
@@ -83,9 +88,9 @@ configuração. Se dois exemplos precisam do mesmo código, ele é **duplicado**
 - `uv.lock` e `.python-version` são commitados: a aula precisa ser reproduzível.
 
 Python `>=3.12` e LangChain permanecem alinhados. A integração de provider é deliberadamente
-diferente: os exemplos `01` e `02` usam Gemini; os exemplos `03` a `11` continuam com
-Anthropic. Preserve essa diferença até existir uma decisão explícita de migrar os exemplos
-posteriores.
+diferente: os exemplos `01` e `02` usam Gemini; os exemplos `03` a `13` continuam com
+Anthropic. No `14` e no `15`, a OpenAI entra somente para embeddings; o `16` usa embeddings locais pelo Ollama. Preserve essas diferenças até existir
+uma decisão explícita de migrar os exemplos.
 
 ## Layout interno
 
@@ -119,6 +124,10 @@ Credenciais **nunca** são gravadas no repositório. As variáveis de cada exemp
 | `09` | `ANTHROPIC_API_KEY`, `DIGITALOCEAN_TOKEN` (`droplet:read`) e `DIGITALOCEAN_TOKEN_SETUP` (só para os scripts de `setup/`) |
 | `10` | `ANTHROPIC_API_KEY` e `TAVILY_API_KEY` |
 | `11` | `ANTHROPIC_API_KEY` e `DIGITALOCEAN_TOKEN_SETUP` (só para os scripts de `setup/`); o token da DigitalOcean do agente fica no MCP server |
+| `12` | `ANTHROPIC_API_KEY`; `CHECKPOINTER_BACKEND=postgres` usa `DATABASE_URL` para o banco local do Compose |
+| `13` | `ANTHROPIC_API_KEY` e `DATABASE_URL` para checkpointer e Store no PostgreSQL local |
+| `14`, `15` | `OPENAI_API_KEY` e `DATABASE_URL` para embeddings e busca no PostgreSQL com pgvector |
+| `16` | `OLLAMA_URL`, `DATABASE_URL` e `COLECAO`, a coleção ativa do pgvector |
 
 Os tokens DigitalOcean usam escopo customizado, nunca acesso total. Cada exemplo tem
 `.env.example` com placeholder e `.env` no `.gitignore`. Ao validar, use a chave apenas no

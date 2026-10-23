@@ -1,0 +1,19 @@
+[project]
+name = "busca-vetorial-pgvector"
+version = "0.1.0"
+description = "Indexacao e busca vetorial de documentos operacionais com LangChain e pgvector"
+requires-python = ">=3.12"
+dependencies = [
+    "langchain-openai>=1.7.1",
+    "langchain-postgres>=0.0.19",
+    "pypdf>=6.20.1",
+    "python-dotenv>=1.2.4",
+]
+
+[project.scripts]
+indexar = "busca_vetorial_pgvector.indexar:main"
+buscar = "busca_vetorial_pgvector.buscar:main"
+
+[build-system]
+requires = ["uv_build>=0.11.22,<0.12.0"]
+build-backend = "uv_build"

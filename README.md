@@ -26,6 +26,7 @@ demonstra sua ideia — o que falta num exemplo costuma ser o assunto do próxim
 | 13 | [`13-consultor-arquitetura-cloud`](13-consultor-arquitetura-cloud) | Retomar conversas e consultar decisões de um projeto Cloud | Checkpointer por thread e Store por usuário e projeto, ambos no PostgreSQL |
 | 14 | [`14-busca-vetorial-pgvector`](14-busca-vetorial-pgvector) | Encontrar documentos operacionais por similaridade | Embeddings OpenAI, pgvector e busca com `k` e distância, sem gerar resposta |
 | 15 | [`15-chunking-dados-operacionais`](15-chunking-dados-operacionais) | Dividir a documentação para a busca | Estratégia de chunk pela natureza do dado, sobreposição e tamanho medido, com os chunks indexados no pgvector e buscados por similaridade |
+| 16 | [`16-reindexacao-incremental`](16-reindexacao-incremental) | Manter o índice em dia com uma base que muda | Indexação incremental por hash e ID estável numa base com versões v1 e v2, e reindexação total no lugar ou numa coleção nova, com embeddings locais pelo Ollama |
 
 A ordem importa. O `02` coloca a chamada isolada do `01` num loop, passa a compor a entrada
 por template e mostra que o modelo esquece; o `03` resolve isso com memória explícita, num
@@ -42,7 +43,9 @@ com todas as ferramentas descobertas de um MCP server próprio; e o `12` compara
 chat com checkpoints em memória e no PostgreSQL após reiniciar a aplicação; o `13` acrescenta
 um Store para dados do projeto que atravessam threads; o `14` indexa PDF e Markdown em
 um banco vetorial e recupera o texto diretamente, antes de conectá-lo ao agente; o `15` troca
-o arquivo inteiro por chunks escolhidos pela natureza de cada dado e busca nesses chunks.
+o arquivo inteiro por chunks escolhidos pela natureza de cada dado e busca nesses chunks; e o `16` deixa de
+regerar a coleção inteira a cada execução: grava só o que mudou e reindexa tudo, no lugar ou numa coleção nova,
+quando muda o que o hash não vê, como o modelo de embedding.
 
 ## Pré-requisitos
 
@@ -51,7 +54,8 @@ o arquivo inteiro por chunks escolhidos pela natureza de cada dado e busca nesse
 - Uma chave da Gemini Developer API para os exemplos `01` e `02`
 - Uma chave da API da Anthropic para os exemplos `03` a `13`
 - Uma chave da API da OpenAI para os embeddings dos exemplos `14` e `15`
-- Docker com Compose para o PostgreSQL dos exemplos `12` a `15`
+- O [Ollama](https://ollama.com) instalado para os embeddings locais do exemplo `16`
+- Docker com Compose para o PostgreSQL dos exemplos `12` a `16`
 - Node.js, `npx`, `kubectl` e um cluster de estudo para os exemplos `06` a `08`
 - Uma conta DigitalOcean para o exemplo `09`, com tokens de escopo
   customizado:

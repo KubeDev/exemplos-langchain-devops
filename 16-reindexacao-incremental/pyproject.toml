@@ -1,0 +1,21 @@
+[project]
+name = "reindexacao-incremental"
+version = "0.1.0"
+description = "Indexacao incremental e reindexacao total de uma base de documentos operacionais"
+requires-python = ">=3.12"
+dependencies = [
+    "langchain-core>=1.6.10",
+    "langchain-ollama>=1.1.0",
+    "langchain-postgres>=0.0.19",
+    "langchain-text-splitters>=1.1.3",
+    "python-dotenv>=1.2.4",
+]
+
+[project.scripts]
+indexar = "reindexacao_incremental.indexar:main"
+reindexar = "reindexacao_incremental.reindexar:main"
+buscar = "reindexacao_incremental.buscar:main"
+
+[build-system]
+requires = ["uv_build>=0.11.22,<0.12.0"]
+build-backend = "uv_build"

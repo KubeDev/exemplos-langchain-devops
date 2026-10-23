@@ -1,34 +1,30 @@
-"""Divide o runbook RB-381 com três estratégias e mostra um resumo de cada uma.
+"""Divide o runbook RB-381 com duas estratégias e mostra um resumo de cada uma.
 
 Só divide e mostra no terminal: não gera embedding nem grava no banco. Roda sem chave e sem banco.
-A ordem é a da aula: cada estratégia resolve o defeito da anterior.
+A ordem é a da aula: o recursivo nos dois pontos de partida, depois a seção.
 """
 
 from pathlib import Path
 
 from langchain_core.documents import Document
-from langchain_text_splitters import CharacterTextSplitter, MarkdownHeaderTextSplitter, RecursiveCharacterTextSplitter
+from langchain_text_splitters import MarkdownHeaderTextSplitter, RecursiveCharacterTextSplitter
 
-# Parâmetros da demo
-TAMANHO = 1000  # caracteres por chunk
-SOBREPOSICAO = 200  # caracteres que um chunk pode repetir do fim do anterior
+# Pontos de partida do recursivo, em caracteres; a sobreposição é 20% do tamanho.
+# Resposta curta (um valor, uma configuração): chunk menor, mais preciso.
+TAMANHO_CURTO = 1000
+SOBREPOSICAO_CURTO = 200
+# Resposta longa (um procedimento, uma linha do tempo): chunk maior, mais contexto.
+TAMANHO_LONGO = 2000
+SOBREPOSICAO_LONGO = 400
 
 ARQUIVO = Path(__file__).resolve().parents[2] / "dados" / "RB-381-payments-worker.md"
 
 
-def dividir_por_tamanho_fixo(documento: Document) -> list[Document]:
-    """1. Tamanho fixo: corta a cada TAMANHO caracteres, onde cair."""
-    # Respeita o tamanho, mas corta no meio da palavra e da frase.
-    # separator="" corta entre quaisquer dois caracteres; sem ele, o padrão é "\n\n", o parágrafo.
-    splitter = CharacterTextSplitter(separator="", chunk_size=TAMANHO, chunk_overlap=SOBREPOSICAO)
-    return splitter.split_documents([documento])
-
-
-def dividir_recursivo(documento: Document) -> list[Document]:
-    """2. Recursivo: tenta o parágrafo; se não couber, a linha; depois a palavra."""
+def dividir_recursivo(documento: Document, tamanho: int, sobreposicao: int) -> list[Document]:
+    """Recursivo: tenta o parágrafo; se não couber, a linha; depois a palavra."""
     # Respeita o tamanho; corta na palavra só quando um parágrafo passa do tamanho.
     # É o que corta os post-mortems em PDF no indexar.
-    splitter = RecursiveCharacterTextSplitter(chunk_size=TAMANHO, chunk_overlap=SOBREPOSICAO)
+    splitter = RecursiveCharacterTextSplitter(chunk_size=tamanho, chunk_overlap=sobreposicao)
     return splitter.split_documents([documento])
 
 
@@ -87,8 +83,10 @@ def mostrar(titulo: str, chunks: list[Document]) -> None:
 def main() -> None:
     texto = ARQUIVO.read_text(encoding="utf-8")
     runbook = Document(page_content=texto, metadata={"source": ARQUIVO.name, "tipo": "runbook", "servico": "payments-worker"})
-    mostrar("1. Tamanho fixo", dividir_por_tamanho_fixo(runbook))
-    mostrar("2. Recursivo", dividir_recursivo(runbook))
+    mostrar(f"1. Recursivo {TAMANHO_CURTO}/{SOBREPOSICAO_CURTO}",
+            dividir_recursivo(runbook, TAMANHO_CURTO, SOBREPOSICAO_CURTO))
+    mostrar(f"2. Recursivo {TAMANHO_LONGO}/{SOBREPOSICAO_LONGO}",
+            dividir_recursivo(runbook, TAMANHO_LONGO, SOBREPOSICAO_LONGO))
     mostrar("3. Seção", dividir_por_secao(runbook))
 
 

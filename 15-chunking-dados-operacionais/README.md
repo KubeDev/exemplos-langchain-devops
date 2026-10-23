@@ -1,6 +1,6 @@
 # 15 — Chunking de documentos operacionais
 
-Este exemplo compara três estratégias de divisão de texto num runbook, depois divide a
+Este exemplo compara duas estratégias de divisão de texto num runbook, depois divide a
 documentação de três serviços fictícios com a estratégia de cada tipo de documento, gera os
 embeddings, grava no PostgreSQL com pgvector e busca por similaridade. Nenhum resultado é enviado a
 um modelo de geração.
@@ -33,14 +33,23 @@ ferramenta do agente, e não recuperado por similaridade.
 
 ## As estratégias
 
-As três seguem as famílias da [página de text splitters do LangChain](https://docs.langchain.com/oss/python/integrations/splitters).
-Cada uma resolve o defeito da anterior.
+As duas seguem as famílias da [página de text splitters do LangChain](https://docs.langchain.com/oss/python/integrations/splitters).
+O recursivo é o splitter que a documentação recomenda para texto genérico; a seção resolve o que ele
+não resolve, o título longe do procedimento.
 
 | Estratégia | Função | Splitter | Sobreposição |
 |---|---|---|---|
-| Tamanho fixo | `dividir_por_tamanho_fixo()` | `CharacterTextSplitter(separator="")` | repete os últimos caracteres do chunk anterior |
 | Recursivo | `dividir_recursivo()` | `RecursiveCharacterTextSplitter` | em geral repete unidades inteiras do fim do chunk anterior, às vezes nada |
 | Seção | `dividir_por_secao()` | `MarkdownHeaderTextSplitter` | não usa |
+
+O recursivo tem dois pontos de partida, escolhidos pelo tamanho da resposta, com sobreposição de 20%:
+
+| Ponto de partida | Quando | Exemplo |
+|---|---|---|
+| 1000 caracteres, 200 de sobreposição | a resposta é um fato curto: um valor, uma configuração | referência, ticket |
+| 2000 caracteres, 400 de sobreposição | a resposta é um trecho longo: um procedimento, uma linha do tempo | runbook, post-mortem |
+
+São pontos de partida, não medição: a busca na própria base confirma ou corrige.
 
 O limite do modelo de embedding é contado em tokens; os mesmos splitters podem medir o tamanho em
 tokens em vez de caracteres.
@@ -51,10 +60,10 @@ tokens em vez de caracteres.
 uv run gerar-chunks
 ```
 
-Divide o RB-381 com as três estratégias, na ordem, com tamanho 1000 e sobreposição 200, e imprime
-uma linha por estratégia: quantos chunks saíram, o menor, o maior, o total de caracteres e quantos
-caracteres foram repetidos pela sobreposição. No tamanho fixo, o menor chunk é o resto do fim do
-documento; no recursivo, um trecho curto, e na seção, a menor seção. Os repetidos medem o custo da
+Divide o RB-381 com o recursivo nos dois pontos de partida e depois por seção, e imprime uma linha
+por divisão: quantos chunks saíram, o menor, o maior, o total de caracteres e quantos caracteres
+foram repetidos pela sobreposição. No recursivo, o menor chunk é um trecho curto; na seção, a menor
+seção. Os repetidos medem o custo da
 sobreposição, não a qualidade do corte. Os parâmetros são constantes no topo de `gerar_chunks.py`.
 
 ## Indexar e buscar
@@ -65,7 +74,7 @@ uv run buscar "A fila de cobrança parou depois da rotação da credencial do br
 ```
 
 `indexar` usa `dividir_base()`: seção nos documentos Markdown e recursivo nos post-mortems em PDF
-(1000 com sobreposição de 200, ponto de partida). Mostra os chunks por tipo com o maior de cada um e
+(2000 com sobreposição de 400, o ponto de partida de resposta longa). Mostra os chunks por tipo com o maior de cada um e
 os caracteres enviados ao modelo de embedding, e reconstrói a coleção `chunks` a cada execução. O
 maior chunk é a medição: a seção não tem limite de tamanho porque a maior delas fica muito abaixo do
 limite do modelo. `buscar` imprime os `k` chunks mais próximos com origem e distância.

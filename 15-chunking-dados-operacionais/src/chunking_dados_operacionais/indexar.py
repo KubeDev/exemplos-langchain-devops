@@ -95,9 +95,10 @@ def dividir_base() -> list[Document]:
     # Markdown tem títulos: cada seção vira um chunk.
     for arquivo in sorted(DATA_DIR.glob("*.md")):
         chunks += dividir_por_secao(carregar_markdown(arquivo))
-    # O PDF perde os títulos na extração. 1000 e 200 são ponto de partida, não medição.
+    # O PDF perde os títulos na extração: recursivo. Linha do tempo e causa são resposta longa,
+    # por isso 2000 e 400, o ponto de partida longo; é hipótese, não medição.
     for arquivo in sorted(DATA_DIR.glob("*.pdf")):
-        chunks += dividir_recursivo(carregar_pdf(arquivo), tamanho=1000, sobreposicao=200)
+        chunks += dividir_recursivo(carregar_pdf(arquivo), tamanho=2000, sobreposicao=400)
     return chunks
 
 

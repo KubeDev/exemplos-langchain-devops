@@ -3,11 +3,11 @@
 Serve para a mudança que não está nos arquivos, como a troca do modelo de embedding: o hash
 continua igual e o indexar não reprocessaria nada.
 
-- COLECAO de uma coleção que já existe: apaga e regera no lugar. Sem argumento, a base
-  inteira; com nomes de arquivo, só esses documentos.
-- COLECAO de uma coleção nova: gera a base inteira ao lado da anterior, que continua intacta.
-  Para gerar sem trocar a ativa, passe a variável só para o comando:
-  COLECAO=base_v2 uv run reindexar. A troca é a COLECAO no .env, e o rollback é voltar a linha.
+- COLECAO de uma coleção que já existe: apaga e regera no lugar. Com uma pasta, como dados/v1,
+  a base inteira; com arquivos, só esses documentos.
+- COLECAO de uma coleção nova: gera a base inteira de uma pasta, ao lado da anterior, que continua
+  intacta. Para gerar sem trocar a ativa, passe a variável só para o comando:
+  COLECAO=base_v2 uv run reindexar dados/v2. A troca é a COLECAO no .env, e o rollback é voltar a linha.
 
 A divisão em chunks é a mesma de indexar.py, copiada de propósito: cada arquivo se lê
 sozinho, sem navegar entre arquivos. Ao mudar a divisão, mude nos dois lugares.
@@ -27,7 +27,6 @@ from langchain_postgres import PGVector
 from langchain_text_splitters import MarkdownHeaderTextSplitter
 
 ROOT = Path(__file__).resolve().parents[2]
-DATA_DIR = ROOT / "dados"
 EMBEDDING_MODEL = "qwen3-embedding:0.6b"
 EMBEDDING_DIMENSIONS = 1024
 
@@ -121,25 +120,29 @@ def registrar_modelo(url: str) -> None:
             )
 
 
+def selecionar(caminhos: list[str]) -> tuple[list[Path], bool]:
+    """Uma pasta é a fonte inteira; arquivos soltos são só esses documentos."""
+    if len(caminhos) == 1 and Path(caminhos[0]).is_dir():
+        return sorted(Path(caminhos[0]).glob("*.md")), True
+    arquivos = [Path(caminho) for caminho in caminhos]
+    for arquivo in arquivos:
+        if not arquivo.is_file():
+            raise SystemExit(f"{arquivo} não é um arquivo. Passe uma pasta só, como dados/v1, ou arquivos .md.")
+    return arquivos, False
+
+
 def main() -> None:
     """Gera de novo os chunks dos documentos, com ou sem mudança nos arquivos."""
     parser = argparse.ArgumentParser(description="Reindexação total na coleção da COLECAO")
-    parser.add_argument("arquivos", nargs="*", help="documentos a regerar; sem nada, a base inteira")
+    parser.add_argument("caminhos", nargs="+", help="uma pasta, como dados/v1, ou arquivos .md")
     args = parser.parse_args()
 
     url = os.environ["DATABASE_URL"]
+    selecionados, pasta_inteira = selecionar(args.caminhos)
     existe = colecao_existe(url)
-    if args.arquivos and not existe:
+    if not pasta_inteira and not existe:
         # Coleção nova pela metade não serve para a troca: ela nasce com a base inteira.
-        raise SystemExit(f"A coleção {COLECAO} não existe. Uma coleção nova é gerada inteira, sem argumentos.")
-
-    if args.arquivos:
-        selecionados = [DATA_DIR / Path(nome).name for nome in args.arquivos]
-        for arquivo in selecionados:
-            if not arquivo.exists():
-                raise SystemExit(f"{arquivo.name} não está em dados/.")
-    else:
-        selecionados = sorted(DATA_DIR.glob("*.md"))
+        raise SystemExit(f"A coleção {COLECAO} não existe. Uma coleção nova é gerada de uma pasta inteira, como dados/v2.")
 
     # Os embeddings vêm antes de apagar: se o modelo falhar, a coleção continua como estava.
     modelo = OllamaEmbeddings(model=EMBEDDING_MODEL, base_url=os.environ["OLLAMA_URL"])
@@ -168,14 +171,14 @@ def main() -> None:
 
     apagados = 0
     if existe:
-        # Apagar e regerar: sem argumento, sai tudo o que a coleção tem, até documento que saiu da pasta.
+        # Apagar e regerar: com a pasta, sai tudo o que a coleção tem, até documento que não está nela.
         no_indice = ids_no_indice(url)
-        nomes = no_indice.keys() if not args.arquivos else [arquivo.name for arquivo in selecionados]
+        nomes = no_indice.keys() if pasta_inteira else [arquivo.name for arquivo in selecionados]
         antigos = [id_chunk for nome in nomes for id_chunk in no_indice.get(nome, [])]
         if antigos:
             banco.delete(ids=antigos, collection_only=True)
         apagados = len(antigos)
-        if not args.arquivos:
+        if pasta_inteira:
             # A coleção existente guarda o modelo da criação; regerada inteira, ela passa a registrar o atual.
             registrar_modelo(url)
 

@@ -1,7 +1,8 @@
 """Indexação incremental: reprocessa só o documento que mudou e remove o que saiu da pasta.
 
-Sem argumento, compara a pasta dados/ inteira com a coleção ativa. Com nomes de arquivo,
-compara só esses documentos e não remove nada.
+Com uma pasta, como dados/v1, compara a fonte inteira com a coleção ativa e remove o que saiu
+dela. Com arquivos, compara só esses documentos e não remove nada. O nome do arquivo é o
+identificador do documento: dados/v2/RB-274-catalog-api.md atualiza o RB-274 que veio da v1.
 
 A divisão em chunks é a mesma de reindexar.py, copiada de propósito: cada arquivo se lê
 sozinho, sem navegar entre arquivos. Ao mudar a divisão, mude nos dois lugares.
@@ -20,7 +21,6 @@ from langchain_postgres import PGVector
 from langchain_text_splitters import MarkdownHeaderTextSplitter
 
 ROOT = Path(__file__).resolve().parents[2]
-DATA_DIR = ROOT / "dados"
 EMBEDDING_MODEL = "qwen3-embedding:0.6b"
 EMBEDDING_DIMENSIONS = 1024
 
@@ -98,10 +98,21 @@ def estado_no_indice(url: str) -> dict[str, dict]:
     return documentos
 
 
+def selecionar(caminhos: list[str]) -> tuple[list[Path], bool]:
+    """Uma pasta é a fonte inteira; arquivos soltos são só esses documentos."""
+    if len(caminhos) == 1 and Path(caminhos[0]).is_dir():
+        return sorted(Path(caminhos[0]).glob("*.md")), True
+    arquivos = [Path(caminho) for caminho in caminhos]
+    for arquivo in arquivos:
+        if not arquivo.is_file():
+            raise SystemExit(f"{arquivo} não é um arquivo. Passe uma pasta só, como dados/v1, ou arquivos .md.")
+    return arquivos, False
+
+
 def main() -> None:
     """Compara os documentos com a coleção ativa e grava só a diferença."""
-    parser = argparse.ArgumentParser(description="Indexação incremental da pasta dados/")
-    parser.add_argument("arquivos", nargs="*", help="documentos a comparar; sem nada, a pasta inteira")
+    parser = argparse.ArgumentParser(description="Indexação incremental de uma versão da base")
+    parser.add_argument("caminhos", nargs="+", help="uma pasta, como dados/v1, ou arquivos .md")
     args = parser.parse_args()
 
     url = os.environ["DATABASE_URL"]
@@ -116,14 +127,7 @@ def main() -> None:
         use_jsonb=True,
     )
 
-    if args.arquivos:
-        # Aceita o nome ou o caminho: dados/RB-274-catalog-api.md vira RB-274-catalog-api.md.
-        selecionados = [DATA_DIR / Path(nome).name for nome in args.arquivos]
-        for arquivo in selecionados:
-            if not arquivo.exists():
-                raise SystemExit(f"{arquivo.name} não está em dados/.")
-    else:
-        selecionados = sorted(DATA_DIR.glob("*.md"))
+    selecionados, pasta_inteira = selecionar(args.caminhos)
 
     no_indice = estado_no_indice(url)
     novos = alterados = iguais = removidos = gravados = 0
@@ -157,8 +161,8 @@ def main() -> None:
         gravados += len(chunks)
         print(f"{situacao}: {arquivo.name} | {len(chunks)} chunks")
 
-    # Obsoleto: está no índice, mas o arquivo saiu da pasta. Só a pasta inteira responde isso.
-    if not args.arquivos:
+    # Obsoleto: está no índice, mas o arquivo não está na pasta. Só a pasta inteira responde isso.
+    if pasta_inteira:
         nomes_na_pasta = {arquivo.name for arquivo in selecionados}
         for source, anterior in no_indice.items():
             if source not in nomes_na_pasta:

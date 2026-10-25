@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block titulo %}Chat{% endblock %}
+{% block conteudo %}
+    <header>
+      <h1>Agente de onboarding</h1>
+      <p>Busca: <strong>{{ 'fixa (2-Step)' if modo == 'fixa' else 'ferramenta (Agentic)' }}</strong> · k = {{ k }} · Projetos kube-news e encontros-tech</p>
+    </header>
+
+    <section class="session-controls" aria-label="Sessões">
+      <form action="{{ url_for('pagina_chat') }}" method="get">
+        <label for="thread_id">Sessões salvas</label>
+        <select id="thread_id" name="thread_id" {{ 'disabled' if not sessoes else '' }}>
+          {% for sessao in sessoes %}
+            <option value="{{ sessao }}" {{ 'selected' if sessao == thread_id else '' }}>{{ sessao }}</option>
+          {% else %}
+            <option value="">Nenhuma sessão salva</option>
+          {% endfor %}
+        </select>
+        <button type="submit" {{ 'disabled' if not sessoes else '' }}>Carregar</button>
+      </form>
+      <form action="{{ url_for('pagina_chat') }}" method="post">
+        <button type="submit" name="acao" value="nova">Nova sessão</button>
+      </form>
+    </section>
+
+    <p class="thread-label">Sessão: <code>{{ thread_id }}</code></p>
+
+    <section class="messages" aria-label="Histórico da sessão">
+      {% for mensagem in mensagens %}
+        <article class="message {{ mensagem.papel }}">
+          <strong>{{ mensagem.rotulo }}</strong>
+          {% if mensagem.texto %}<p>{{ mensagem.texto }}</p>{% endif %}
+          {% if mensagem.detalhe %}
+            <details>
+              <summary>Trechos gravados nesta mensagem ({{ mensagem.detalhe|length }} caracteres)</summary>
+              <pre>{{ mensagem.detalhe }}</pre>
+            </details>
+          {% endif %}
+        </article>
+      {% else %}
+        <article class="message assistant">
+          <strong>Assistente</strong>
+          <p>Pergunte sobre o kube-news ou o encontros-tech: como rodar, o que fazer diante de um erro ou se um problema já aconteceu.</p>
+        </article>
+      {% endfor %}
+    </section>
+
+    <form class="prompt-form" action="{{ url_for('pagina_chat') }}" method="post">
+      <input type="hidden" name="thread_id" value="{{ thread_id }}">
+      <label for="pergunta">Pergunta</label>
+      <textarea id="pergunta" name="pergunta" rows="3" placeholder="A aplicação não conecta no banco. O que eu faço?" required></textarea>
+      <button type="submit" name="acao" value="enviar">Enviar</button>
+    </form>
+{% endblock %}

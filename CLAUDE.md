@@ -39,6 +39,7 @@ abrangente de erro, abstrações "para quando crescer". Nenhuma entra sem pedido
 | `14-busca-vetorial-pgvector` | dois processos CLI: indexar PDF/Markdown com OpenAI e buscar no pgvector com `k` e distância, sem gerar resposta |
 | `15-chunking-dados-operacionais` | recursivo em dois pontos de partida (1000/200 e 2000/400) e seção, escolhidos pela natureza do documento, sobreposição e tamanho medido; demo sem API e indexação e busca no pgvector |
 | `16-reindexacao-incremental` | indexação incremental por hash e ID estável (novo, alterado, removido, igual) numa base com versões v1 e v2, e reindexação total no lugar ou numa coleção nova ao lado, trocada pelo `.env`; embeddings locais pelo Ollama |
+| `17-agente-onboarding` | retriever no agente como etapa fixa (2-Step) ou ferramenta (Agentic) com filtro por metadados montado pelo agente; ingestão e chat web, sessões no checkpointer PostgreSQL; chat Anthropic e embeddings Ollama |
 
 **Não antecipe a aula seguinte.** O recurso ausente num exemplo geralmente é o assunto do
 próximo, e a ausência é o gancho. Antes de adicionar algo, verifique se ele não é a lição de
@@ -89,7 +90,7 @@ configuração. Se dois exemplos precisam do mesmo código, ele é **duplicado**
 
 Python `>=3.12` e LangChain permanecem alinhados. A integração de provider é deliberadamente
 diferente: os exemplos `01` e `02` usam Gemini; os exemplos `03` a `13` continuam com
-Anthropic. No `14` e no `15`, a OpenAI entra somente para embeddings; o `16` usa embeddings locais pelo Ollama. Preserve essas diferenças até existir
+Anthropic. No `14` e no `15`, a OpenAI entra somente para embeddings; o `16` usa embeddings locais pelo Ollama; o `17` usa chat Anthropic com embeddings locais pelo Ollama. Preserve essas diferenças até existir
 uma decisão explícita de migrar os exemplos.
 
 ## Layout interno
@@ -128,6 +129,7 @@ Credenciais **nunca** são gravadas no repositório. As variáveis de cada exemp
 | `13` | `ANTHROPIC_API_KEY` e `DATABASE_URL` para checkpointer e Store no PostgreSQL local |
 | `14`, `15` | `OPENAI_API_KEY` e `DATABASE_URL` para embeddings e busca no PostgreSQL com pgvector |
 | `16` | `OLLAMA_URL`, `DATABASE_URL` e `COLECAO`, a coleção ativa do pgvector |
+| `17` | `ANTHROPIC_API_KEY`, `MODELO`, `OLLAMA_URL`, `DATABASE_URL`, `COLECAO`, `MODO_BUSCA` e `K` |
 
 Os tokens DigitalOcean usam escopo customizado, nunca acesso total. Cada exemplo tem
 `.env.example` com placeholder e `.env` no `.gitignore`. Ao validar, use a chave apenas no

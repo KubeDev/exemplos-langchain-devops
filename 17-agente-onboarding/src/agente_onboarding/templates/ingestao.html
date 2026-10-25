@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block titulo %}Ingestão{% endblock %}
+{% block conteudo %}
+    <header>
+      <h1>Ingestão da base de onboarding</h1>
+      <p>Envie documentos Markdown com <code>projeto</code> e <code>tipo</code> no frontmatter. Reenviar um arquivo com o mesmo nome atualiza o documento.</p>
+    </header>
+
+    <form class="upload-form" action="{{ url_for('pagina_ingestao') }}" method="post" enctype="multipart/form-data">
+      <div>
+        <label for="arquivos">Documentos</label>
+        <input id="arquivos" name="arquivos" type="file" accept=".md" multiple required>
+      </div>
+      <button type="submit">Enviar para o índice</button>
+    </form>
+
+    {% if resultados %}
+      <ul class="resultados" aria-label="Resultado do envio">
+        {% for resultado in resultados %}<li>{{ resultado }}</li>{% endfor %}
+      </ul>
+    {% endif %}
+
+    <h2>No índice ({{ documentos|length }} documentos)</h2>
+    <table>
+      <thead><tr><th>Documento</th><th>Projeto</th><th>Tipo</th><th>Chunks</th></tr></thead>
+      <tbody>
+        {% for nome, documento in documentos.items() %}
+          <tr><td>{{ nome }}</td><td>{{ documento.projeto }}</td><td>{{ documento.tipo }}</td><td>{{ documento.ids|length }}</td></tr>
+        {% else %}
+          <tr><td colspan="4">Índice vazio.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+{% endblock %}

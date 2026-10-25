@@ -1,0 +1,33 @@
+:root { font-family: system-ui, sans-serif; color: #17212b; background: #f4f6f8; }
+body { margin: 0; }
+main { max-width: 900px; margin: 2rem auto; padding: 0 1rem 3rem; }
+h1 { margin-bottom: .2rem; }
+header p, .thread-label { color: #536170; }
+button { border: 1px solid #8392a1; border-radius: 6px; padding: .55rem .8rem; background: white; color: #17212b; cursor: pointer; }
+.session-controls { display: flex; flex-wrap: wrap; align-items: end; gap: .7rem; margin-top: 1.5rem; }
+.session-controls form { display: flex; flex-wrap: wrap; align-items: end; gap: .5rem; }
+label { display: block; font-weight: 600; }
+select, textarea { border: 1px solid #8392a1; border-radius: 6px; padding: .55rem; font: inherit; background: white; }
+select { max-width: min(100%, 370px); }
+.thread-label { overflow-wrap: anywhere; }
+.messages { min-height: 220px; background: white; border: 1px solid #d2dbe3; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+.message { border-radius: 7px; padding: .75rem 1rem; margin: .7rem 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.message p { margin: .35rem 0 0; }
+.message.user { background: #e5f0ff; }
+.message.assistant { background: #eef1f3; }
+.message.tool { background: #fff4d8; border-left: 4px solid #d19b26; font-size: .9rem; }
+.error { color: #8e2020; background: #ffe9e9; border-radius: 6px; padding: .7rem; }
+.prompt-form { display: grid; gap: .5rem; }
+textarea { width: 100%; box-sizing: border-box; }
+.prompt-form button { justify-self: start; }
+details { margin-top: .5rem; font-size: .85rem; }
+details summary { cursor: pointer; color: #536170; }
+details pre { white-space: pre-wrap; overflow-wrap: anywhere; background: #f7f9fb; border: 1px solid #d2dbe3; border-radius: 6px; padding: .6rem; }
+table { width: 100%; border-collapse: collapse; background: white; border: 1px solid #d2dbe3; border-radius: 8px; margin: 1rem 0; font-size: .9rem; }
+th, td { text-align: left; padding: .45rem .7rem; border-bottom: 1px solid #e3e9ee; }
+.resultados { background: white; border: 1px solid #d2dbe3; border-radius: 8px; padding: .5rem 1rem; }
+.resultados li { margin: .3rem 0; font-family: ui-monospace, monospace; font-size: .9rem; }
+.upload-form { display: flex; flex-wrap: wrap; align-items: end; gap: .7rem; margin: 1.5rem 0; }
+.menu { display: flex; gap: .4rem; margin-bottom: 1rem; border-bottom: 1px solid #d2dbe3; }
+.menu a { padding: .5rem .9rem; color: #536170; text-decoration: none; border-bottom: 3px solid transparent; }
+.menu a.ativo { color: #17212b; font-weight: 600; border-bottom-color: #3b6fb6; }

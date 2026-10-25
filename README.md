@@ -27,6 +27,7 @@ demonstra sua ideia — o que falta num exemplo costuma ser o assunto do próxim
 | 14 | [`14-busca-vetorial-pgvector`](14-busca-vetorial-pgvector) | Encontrar documentos operacionais por similaridade | Embeddings OpenAI, pgvector e busca com `k` e distância, sem gerar resposta |
 | 15 | [`15-chunking-dados-operacionais`](15-chunking-dados-operacionais) | Dividir a documentação para a busca | Estratégia de chunk pela natureza do dado, sobreposição e tamanho medido, com os chunks indexados no pgvector e buscados por similaridade |
 | 16 | [`16-reindexacao-incremental`](16-reindexacao-incremental) | Manter o índice em dia com uma base que muda | Indexação incremental por hash e ID estável numa base com versões v1 e v2, e reindexação total no lugar ou numa coleção nova, com embeddings locais pelo Ollama |
+| 17 | [`17-agente-onboarding`](17-agente-onboarding) | Achar o procedimento certo do projeto certo numa base de onboarding | Retriever no agente como etapa fixa (2-Step) ou como ferramenta (Agentic), com filtro por metadados montado pelo agente, ingestão e chat web com sessões no PostgreSQL |
 
 A ordem importa. O `02` coloca a chamada isolada do `01` num loop, passa a compor a entrada
 por template e mostra que o modelo esquece; o `03` resolve isso com memória explícita, num
@@ -45,17 +46,18 @@ um Store para dados do projeto que atravessam threads; o `14` indexa PDF e Markd
 um banco vetorial e recupera o texto diretamente, antes de conectá-lo ao agente; o `15` troca
 o arquivo inteiro por chunks escolhidos pela natureza de cada dado e busca nesses chunks; e o `16` deixa de
 regerar a coleção inteira a cada execução: grava só o que mudou e reindexa tudo, no lugar ou numa coleção nova,
-quando muda o que o hash não vê, como o modelo de embedding.
+quando muda o que o hash não vê, como o modelo de embedding; e o `17` liga a base ao agente: a busca vira etapa fixa ou ferramenta, e o agente
+monta o filtro de metadado e pergunta o projeto quando falta, numa conversa com sessões.
 
 ## Pré-requisitos
 
 - [uv](https://docs.astral.sh/uv/) — gerencia Python e dependências
 - Python 3.12 (o `uv` instala sozinho, se faltar)
 - Uma chave da Gemini Developer API para os exemplos `01` e `02`
-- Uma chave da API da Anthropic para os exemplos `03` a `13`
+- Uma chave da API da Anthropic para os exemplos `03` a `13` e `17`
 - Uma chave da API da OpenAI para os embeddings dos exemplos `14` e `15`
-- O [Ollama](https://ollama.com) instalado para os embeddings locais do exemplo `16`
-- Docker com Compose para o PostgreSQL dos exemplos `12` a `16`
+- O [Ollama](https://ollama.com) instalado para os embeddings locais dos exemplos `16` e `17`
+- Docker com Compose para o PostgreSQL dos exemplos `12` a `17`
 - Node.js, `npx`, `kubectl` e um cluster de estudo para os exemplos `06` a `08`
 - Uma conta DigitalOcean para o exemplo `09`, com tokens de escopo
   customizado:

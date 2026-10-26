@@ -61,13 +61,9 @@ def carregar_pdf(arquivo: Path) -> Document:
     return Document(page_content=texto, metadata=metadados(arquivo))
 
 
-# ---------------------------------------------------------------------------
-# A base inteira: a estratégia segue a natureza de cada dado
-# ---------------------------------------------------------------------------
-
-
-def dividir_base() -> list[Document]:
-    """Divide todos os dados da pasta dados/ com a estratégia de cada tipo."""
+def main() -> None:
+    """Divide a base pela natureza de cada dado e indexa os chunks numa coleção do pgvector."""
+    # A base inteira: a estratégia segue a natureza de cada dado.
     chunks = []
     # Markdown tem títulos: cada seção vira um chunk.
     for arquivo in sorted(DATA_DIR.glob("*.md")):
@@ -76,12 +72,6 @@ def dividir_base() -> list[Document]:
     # por isso o ponto de partida longo (2000/400); é hipótese, não medição.
     for arquivo in sorted(DATA_DIR.glob("*.pdf")):
         chunks += dividir_recursivo(carregar_pdf(arquivo), TAMANHO_LONGO, SOBREPOSICAO_LONGO)
-    return chunks
-
-
-def main() -> None:
-    """Indexa todos os chunks da base numa coleção do pgvector."""
-    chunks = dividir_base()
 
     por_tipo = Counter(chunk.metadata["tipo"] for chunk in chunks)
     for tipo, quantidade in sorted(por_tipo.items()):

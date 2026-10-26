@@ -74,7 +74,7 @@ uv run indexar
 uv run buscar "A fila de cobrança parou depois da rotação da credencial do broker. Como reiniciar os workers do payments-worker com segurança?" --k 3
 ```
 
-`indexar` usa `dividir_base()`: seção nos documentos Markdown e recursivo nos post-mortems em PDF
+`indexar` usa seção nos documentos Markdown e recursivo nos post-mortems em PDF
 (2000 com sobreposição de 400, o ponto de partida de resposta longa). Mostra os chunks por tipo com o maior de cada um e
 os caracteres enviados ao modelo de embedding, e reconstrói a coleção `chunks` a cada execução. O
 maior chunk é a medição: a seção não tem limite de tamanho porque a maior delas fica muito abaixo do

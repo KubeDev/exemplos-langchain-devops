@@ -25,7 +25,7 @@ operacionais, seguindo as famílias da página de text splitters do LangChain.
 - A seção não tem limite de tamanho; o comentário em `dividir_por_secao()` explica quando teria.
   A medição é o maior chunk por tipo, impresso por `indexar`.
 - Log não entra na base: na aula ele é consulta a sistema por ferramenta, não chunk.
-- `dividir_base()`, em `indexar.py`, aplica a estratégia de cada tipo de dado; `indexar` grava uma
+- O `main` de `indexar.py` aplica a estratégia de cada tipo de dado; `indexar` grava uma
   coleção só (`chunks`). Comparar dois índices com um teste de busca pertence à Aula 08.
 - `gerar-chunks` roda sem chave e sem banco; `indexar` e `buscar` precisam do `.env` e do Compose.
 - Use `uv`; mantenha a chave da API somente no `.env`, fora do Git.

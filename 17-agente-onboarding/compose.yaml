@@ -15,5 +15,15 @@ services:
       timeout: 2s
       retries: 15
 
+  pgweb:
+    image: sosedoff/pgweb:0.17.0
+    environment:
+      DATABASE_URL: postgres://aula:aula@postgres:5432/onboarding?sslmode=disable
+    ports:
+      - "127.0.0.1:58437:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   postgres_data:

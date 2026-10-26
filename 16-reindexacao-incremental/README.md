@@ -21,7 +21,8 @@ ollama pull qwen3-embedding:0.6b
 
 Os embeddings são gerados localmente pelo `qwen3-embedding:0.6b` (1024 dimensões), sem chave de
 API e sem custo por token. A porta local do banco é `55436` e o endereço do Ollama é o `OLLAMA_URL`
-do `.env`. A coleção ativa é a `COLECAO` do `.env` (`base_v1` no início).
+do `.env`. A coleção ativa é a `COLECAO` do `.env` (`base_v1` no início). O Compose também sobe o
+pgweb em <http://localhost:58436>, já conectado ao banco, para ver os chunks e as coleções.
 
 ## A base e as versões
 
@@ -67,6 +68,27 @@ uv run buscar "Posso usar port-forward para testar os pods da catalog-api?"   # 
 uv run indexar dados/v2/RB-274-catalog-api.md
 uv run buscar "Posso usar port-forward para testar os pods da catalog-api?"   # a v2
 uv run indexar dados/v1                                                       # o RB-274 volta para a v1
+```
+
+## Ver o que foi gravado
+
+Abra <http://localhost:58436>. Na aba *Query*, o ID, o hash e a versão de cada chunk:
+
+```sql
+SELECT id, cmetadata->>'hash' AS hash, left(document, 60) AS inicio
+FROM langchain_pg_embedding
+ORDER BY id;
+```
+
+Rode depois de cada `indexar`: o documento alterado troca de hash e de texto, os iguais
+continuam como estavam. Para ver as coleções lado a lado, depois do `reindexar` numa coleção
+nova:
+
+```sql
+SELECT c.name AS colecao, c.cmetadata->>'model' AS modelo, count(*) AS chunks
+FROM langchain_pg_embedding e
+JOIN langchain_pg_collection c ON c.uuid = e.collection_id
+GROUP BY c.name, modelo;
 ```
 
 ## Reindexação total

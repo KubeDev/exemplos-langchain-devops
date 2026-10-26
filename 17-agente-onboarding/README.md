@@ -35,7 +35,7 @@ Use Python 3.12, `uv`, Docker, o [Ollama](https://ollama.com) e uma chave da API
 ```bash
 cp .env.example .env            # preencha ANTHROPIC_API_KEY
 uv sync --locked
-docker compose up -d --wait     # PostgreSQL com pgvector em 127.0.0.1:55437
+docker compose up -d --wait     # PostgreSQL com pgvector em 127.0.0.1:55437 e pgweb em http://localhost:58437
 ollama pull qwen3-embedding:0.6b
 ```
 
@@ -62,7 +62,14 @@ do ambiente vale mais que a do `.env`: `MODO_BUSCA=fixa uv run web`.
 ## Percurso da aula
 
 1. **Ingestão.** Envie a base e veja a tabela com projeto, tipo e chunks de cada documento. Reenvie um arquivo: ele
-   aparece como `atualizado`, com os chunks antigos trocados pelos novos.
+   aparece como `atualizado`, com os chunks antigos trocados pelos novos. No pgweb
+   (<http://localhost:58437>), a aba *Query* mostra os metadados que o filtro da busca usa:
+   ```sql
+   SELECT cmetadata->>'source' AS origem, cmetadata->>'projeto' AS projeto,
+          cmetadata->>'tipo' AS tipo, cmetadata->>'secao' AS secao
+   FROM langchain_pg_embedding ORDER BY projeto, origem;
+   ```
+   As tabelas `checkpoint*` ao lado são as sessões do chat.
 2. **Busca fixa.** Com `MODO_BUSCA=fixa`, pergunte `A aplicação não conecta no banco. O que eu faço?`. A busca não
    tem filtro, porque ninguém escolhe o projeto antes dela. Veja no terminal de onde vieram os trechos e abra
    "Trechos gravados nesta mensagem": eles ficam na thread.
@@ -85,4 +92,4 @@ aplicado, quais fontes vieram e o que ficou gravado na sessão.
 - `src/agente_onboarding/web.py`: **a interface**. As duas páginas, as sessões e a leitura do histórico no
   checkpointer; `templates/` e `static/` são o HTML e o CSS;
 - `dados/`: a base de documentos;
-- `compose.yaml`: PostgreSQL com pgvector, usado pelo índice e pelo checkpointer.
+- `compose.yaml`: PostgreSQL com pgvector, usado pelo índice e pelo checkpointer, e pgweb para consultar o banco.

@@ -19,7 +19,8 @@ docker compose up -d --wait
 
 Preencha `OPENAI_API_KEY` no `.env`. A porta local do banco é `55435`. A indexação chama a API
 de embeddings da OpenAI e tem custo por tokens de entrada; `gerar-chunks` não precisa de chave nem
-de banco.
+de banco. O Compose também sobe o pgweb em <http://localhost:58435>, já conectado ao banco, para
+ver os chunks gravados.
 
 ## A base
 
@@ -78,6 +79,24 @@ uv run buscar "A fila de cobrança parou depois da rotação da credencial do br
 os caracteres enviados ao modelo de embedding, e reconstrói a coleção `chunks` a cada execução. O
 maior chunk é a medição: a seção não tem limite de tamanho porque a maior delas fica muito abaixo do
 limite do modelo. `buscar` imprime os `k` chunks mais próximos com origem e distância.
+
+## Ver o que foi gravado
+
+Abra <http://localhost:58435>. A tabela `langchain_pg_embedding` tem uma linha por chunk, com
+texto, metadados e vetor. Na aba *Query*:
+
+```sql
+SELECT cmetadata->>'source'       AS origem,
+       cmetadata->>'tipo'         AS tipo,
+       cmetadata->>'secao'        AS secao,
+       length(document)           AS caracteres,
+       vector_dims(embedding)     AS dimensoes
+FROM langchain_pg_embedding
+ORDER BY origem, caracteres DESC;
+```
+
+Os chunks de Markdown trazem a `secao`; os de PDF, do recursivo, ficam sem ela. A coluna
+`caracteres` é a mesma medição que o `indexar` imprime.
 
 ## Um arquivo, uma leitura
 

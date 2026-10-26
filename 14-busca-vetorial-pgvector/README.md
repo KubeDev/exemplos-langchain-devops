@@ -17,7 +17,8 @@ docker compose up -d --wait
 
 Preencha `OPENAI_API_KEY` no `.env`. A porta local do banco é `55434`; o volume do Compose
 preserva os dados depois que os processos Python terminam. A indexação chama a API de
-embeddings da OpenAI e tem custo por tokens de entrada.
+embeddings da OpenAI e tem custo por tokens de entrada. O Compose também sobe o pgweb em
+<http://localhost:58434>, já conectado ao banco, para ver o que foi gravado.
 
 ## Indexar
 
@@ -30,6 +31,25 @@ para reunir o texto das três páginas de cada PDF com `pypdf`. Cada função de
 `Document` por arquivo. O fluxo comum gera embeddings com `text-embedding-3-small` em
 1536 dimensões e os persiste. A primeira indexação produz **seis unidades recuperáveis**:
 três Markdown e três PDFs inteiros. Cada execução substitui a coleção anterior.
+
+## Ver o que foi gravado
+
+Abra <http://localhost:58434>. A tabela `langchain_pg_collection` tem a coleção com o modelo
+e a dimensão registrados; a `langchain_pg_embedding` tem uma linha por `Document`, com texto,
+metadados e vetor. Na aba *Query*:
+
+```sql
+SELECT name, cmetadata FROM langchain_pg_collection;
+
+SELECT cmetadata->>'source'       AS origem,
+       length(document)           AS caracteres,
+       vector_dims(embedding)     AS dimensoes,
+       left(embedding::text, 80)  AS inicio_do_vetor
+FROM langchain_pg_embedding;
+```
+
+São 6 linhas na primeira indexação e 12 depois da troca de `carregar_pdf()`. Cada vetor tem
+1536 números, calculados só a partir do texto da linha.
 
 ## O que é um `Document` aqui
 
@@ -73,7 +93,7 @@ configuração de busca divergir, ele interrompe a consulta e orienta a reconstr
 - `dados/`: três runbooks `.md` e três post-mortems `.pdf` fictícios;
 - `src/busca_vetorial_pgvector/indexar.py`: extração, embedding LangChain e persistência;
 - `src/busca_vetorial_pgvector/buscar.py`: compatibilidade, `k` e resultados;
-- `compose.yaml`: PostgreSQL com pgvector e volume persistente.
+- `compose.yaml`: PostgreSQL com pgvector, volume persistente e pgweb.
 
 O exemplo termina na recuperação. Estratégias de chunking, indexação incremental e uso
 dos trechos pelo agente são assuntos das aulas seguintes.

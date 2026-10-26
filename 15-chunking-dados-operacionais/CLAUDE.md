@@ -5,11 +5,12 @@ Leia o `README.md` e o `CLAUDE.md` da raiz do repositório antes de alterar o pr
 Este é o exemplo da Aula 07 de Memória e RAG: estratégias de chunking e sobreposição para documentos
 operacionais, seguindo as famílias da página de text splitters do LangChain.
 
-- O público tem pouco Python. Cada arquivo é lido em aula de cima a baixo e não importa nada de
-  outro arquivo do projeto: `gerar_chunks.py` (recursivo e seção, demo no RB-381), `indexar.py`
-  e `buscar.py`. O recursivo, a seção e as constantes de configuração são repetidos de propósito; o
-  autor aceitou a duplicação em troca de não navegar entre arquivos. Não crie módulo compartilhado
-  (`config.py`, `dividir.py`). Ao mudar uma estratégia, mude em `indexar.py` e em `gerar_chunks.py`.
+- O público tem pouco Python. Cada arquivo é lido em aula de cima a baixo: `gerar_chunks.py`
+  (recursivo e seção, demo no RB-381), `indexar.py` e `buscar.py`. As estratégias de divisão e os
+  pontos de partida vivem só em `gerar_chunks.py`; o `indexar.py` os importa e aplica na base
+  inteira, para a turma ver que a indexação usa exatamente o que a demo mostrou. Ao mudar uma
+  estratégia, mude em `gerar_chunks.py`. As constantes de embedding e coleção continuam repetidas
+  em `indexar.py` e `buscar.py`, de propósito. Não crie módulo compartilhado (`config.py`, `dividir.py`).
 - Uma função por estratégia, sem classe, registry ou configuração genérica; parâmetros da demo
   como constantes no topo. O `main` de `gerar_chunks.py` chama, na ordem da aula, o recursivo
   em 1000/200, o recursivo em 2000/400 e a seção. O tamanho fixo (`CharacterTextSplitter`) saiu de

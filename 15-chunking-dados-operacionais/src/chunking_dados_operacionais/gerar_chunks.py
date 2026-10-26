@@ -2,6 +2,7 @@
 
 Só divide e mostra no terminal: não gera embedding nem grava no banco. Roda sem chave e sem banco.
 A ordem é a da aula: o recursivo nos dois pontos de partida, depois a seção.
+As funções de divisão daqui são as mesmas que o indexar.py aplica na base inteira.
 """
 
 from pathlib import Path
@@ -29,7 +30,7 @@ def dividir_recursivo(documento: Document, tamanho: int, sobreposicao: int) -> l
 
 
 def dividir_por_secao(documento: Document) -> list[Document]:
-    """3. Seção: corta nos títulos Markdown e põe o título no texto do chunk."""
+    """Seção: corta nos títulos Markdown e põe o título no texto do chunk."""
     # Sem limite de tamanho: nesta base a maior seção tem cerca de 5 mil caracteres.
     # Se uma seção passar do limite do modelo de embedding, divida essa seção pelo recursivo.
     titulos = [("#", "h1"), ("##", "h2"), ("###", "h3")]

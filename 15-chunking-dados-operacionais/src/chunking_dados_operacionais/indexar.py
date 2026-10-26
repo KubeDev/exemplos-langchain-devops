@@ -1,7 +1,7 @@
 """Divide a base pela natureza de cada dado, gera embeddings e reconstrói a coleção.
 
-As funções de divisão são as mesmas de gerar_chunks.py, copiadas de propósito: cada arquivo se
-lê sozinho, sem navegar entre arquivos. Ao mudar uma estratégia, mude nos dois lugares.
+As estratégias de divisão vêm de gerar_chunks.py: o mesmo recursivo e a mesma seção da demo,
+agora aplicados à base inteira.
 """
 
 import os
@@ -12,8 +12,14 @@ from dotenv import load_dotenv
 from langchain_core.documents import Document
 from langchain_openai import OpenAIEmbeddings
 from langchain_postgres import PGVector
-from langchain_text_splitters import MarkdownHeaderTextSplitter, RecursiveCharacterTextSplitter
 from pypdf import PdfReader
+
+from chunking_dados_operacionais.gerar_chunks import (
+    SOBREPOSICAO_LONGO,
+    TAMANHO_LONGO,
+    dividir_por_secao,
+    dividir_recursivo,
+)
 
 ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = ROOT / "dados"
@@ -27,7 +33,7 @@ EMBEDDING_DIMENSIONS = 1536
 load_dotenv(ROOT / ".env")
 
 # ---------------------------------------------------------------------------
-# Documentos: recursivo e por seção (as mesmas funções de gerar_chunks.py)
+# Documentos: leitura do arquivo e metadado tirado do nome
 # ---------------------------------------------------------------------------
 
 # O nome do arquivo diz o tipo e o serviço: RB-381-payments-worker.md é um runbook do payments-worker.
@@ -55,37 +61,6 @@ def carregar_pdf(arquivo: Path) -> Document:
     return Document(page_content=texto, metadata=metadados(arquivo))
 
 
-def dividir_recursivo(documento: Document, tamanho: int, sobreposicao: int) -> list[Document]:
-    """Recursivo: tenta o parágrafo; se não couber, a linha; depois a palavra."""
-    # Respeita o tamanho; corta na palavra só quando um parágrafo passa do tamanho.
-    splitter = RecursiveCharacterTextSplitter(chunk_size=tamanho, chunk_overlap=sobreposicao)
-    return splitter.split_documents([documento])
-
-
-def dividir_por_secao(documento: Document) -> list[Document]:
-    """Seção: corta nos títulos Markdown e põe o título no texto do chunk."""
-    # Sem limite de tamanho: nesta base a maior seção tem cerca de 5 mil caracteres.
-    # Se uma seção passar do limite do modelo de embedding, divida essa seção pelo recursivo.
-    titulos = [("#", "h1"), ("##", "h2"), ("###", "h3")]
-    # Este splitter só aceita texto: o metadado do documento é recolocado logo abaixo.
-    secoes = MarkdownHeaderTextSplitter(headers_to_split_on=titulos).split_text(documento.page_content)
-
-    servico = documento.metadata["servico"]
-    tipo = documento.metadata["tipo"]
-    chunks = []
-    for secao in secoes:
-        # Os títulos acima da seção, ex.: "RB-381 - Fila parada... > Procedimento de estabilização"
-        caminho = " > ".join(secao.metadata.values())
-        # Um "passo 4" sozinho não diz de qual procedimento é: o título vai junto no texto.
-        # Ex.: "[payments-worker | runbook] RB-381 - ... > Procedimento de estabilização"
-        texto = f"[{servico} | {tipo}] {caminho}\n\n{secao.page_content}"
-        # O metadado do documento, mais a seção.
-        metadata = dict(documento.metadata)
-        metadata["secao"] = caminho
-        chunks.append(Document(page_content=texto, metadata=metadata))
-    return chunks
-
-
 # ---------------------------------------------------------------------------
 # A base inteira: a estratégia segue a natureza de cada dado
 # ---------------------------------------------------------------------------
@@ -98,9 +73,9 @@ def dividir_base() -> list[Document]:
     for arquivo in sorted(DATA_DIR.glob("*.md")):
         chunks += dividir_por_secao(carregar_markdown(arquivo))
     # O PDF perde os títulos na extração: recursivo. Linha do tempo e causa são resposta longa,
-    # por isso 2000 e 400, o ponto de partida longo; é hipótese, não medição.
+    # por isso o ponto de partida longo (2000/400); é hipótese, não medição.
     for arquivo in sorted(DATA_DIR.glob("*.pdf")):
-        chunks += dividir_recursivo(carregar_pdf(arquivo), tamanho=2000, sobreposicao=400)
+        chunks += dividir_recursivo(carregar_pdf(arquivo), TAMANHO_LONGO, SOBREPOSICAO_LONGO)
     return chunks
 
 

@@ -100,7 +100,8 @@ Os chunks de Markdown trazem a `secao`; os de PDF, do recursivo, ficam sem ela. 
 
 ## Um arquivo, uma leitura
 
-Cada comando é um arquivo que se lê sozinho, de cima a baixo, sem importar nada de outro arquivo
-do projeto. Por isso o recursivo e a seção aparecem duas vezes: em `gerar_chunks.py`, para a demo,
-e em `indexar.py`, para a base inteira. A repetição é de propósito. Ao mudar uma dessas estratégias,
-mude nos dois lugares.
+Cada comando é um arquivo que se lê de cima a baixo. O recursivo e a seção ficam em
+`gerar_chunks.py`, onde a demo os mostra no RB-381; o `indexar.py` importa essas mesmas funções e
+as aplica na base inteira. Assim a indexação usa exatamente as estratégias que a demo mediu, e
+mudar uma estratégia é mudar um lugar só. As constantes de embedding e da coleção aparecem em
+`indexar.py` e em `buscar.py`, de propósito: são dois processos, e cada um se lê sozinho.

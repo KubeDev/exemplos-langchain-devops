@@ -24,6 +24,8 @@ load_dotenv(ROOT / ".env")
 COLECAO = os.environ["COLECAO"]
 
 EMBEDDING_MODEL = "qwen3-embedding:0.6b"
+# Tamanho do vetor que o modelo gera (está na documentação dele). O pgvector precisa
+# desse número para criar a coluna vector(N); trocar de modelo exige reindexar.
 EMBEDDING_DIMENSIONS = 1024
 
 # Valores aceitos no frontmatter. Documento com outro valor é recusado.

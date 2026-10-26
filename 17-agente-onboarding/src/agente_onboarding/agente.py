@@ -31,6 +31,8 @@ K = int(os.environ["K"])
 
 # O mesmo modelo de embedding da ingestão: pergunta e trechos precisam estar no mesmo espaço.
 EMBEDDING_MODEL = "qwen3-embedding:0.6b"
+# Tamanho do vetor que o modelo gera (está na documentação dele). O pgvector precisa
+# desse número para criar a coluna vector(N); trocar de modelo exige reindexar.
 EMBEDDING_DIMENSIONS = 1024
 
 # Na busca fixa, a pergunta e os trechos viajam na mesma mensagem, separados por este marcador.

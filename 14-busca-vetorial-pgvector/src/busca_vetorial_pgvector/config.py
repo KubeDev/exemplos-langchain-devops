@@ -10,6 +10,8 @@ ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = ROOT / "dados"
 COLLECTION = "documentos-operacionais-aula-06"
 EMBEDDING_MODEL = "text-embedding-3-small"
+# Tamanho do vetor que o modelo gera (está na documentação dele). O pgvector precisa
+# desse número para criar a coluna vector(N); trocar de modelo exige reindexar.
 EMBEDDING_DIMENSIONS = 1536
 
 

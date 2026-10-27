@@ -4,7 +4,7 @@
 e a preparação do que cada página mostra. O que a aula ensina está em outros dois arquivos:
 
 - ingestao.py: o documento vira chunks com metadado e é gravado no índice;
-- agente.py: o agente consome o índice, com a busca fixa ou com a busca como ferramenta.
+- agente.py: o agente consome o índice, com a busca fixa antes do modelo.
 
 Num sistema real, ingestão e chat seriam aplicações separadas. Aqui ficam juntas para alternar
 entre as duas na mesma interface.
@@ -15,12 +15,12 @@ from datetime import datetime
 
 import psycopg
 from flask import Flask, redirect, render_template, request, url_for
-from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.checkpoint.postgres import PostgresSaver
 
 # Importar os dois módulos já carrega o .env.
-from agente_onboarding.agente import K, MARCADOR, MODO_BUSCA, responder
+from agente_onboarding.agente import K, MARCADOR, responder
 from agente_onboarding.ingestao import documentos_no_indice, gravar
 
 app = Flask(__name__)
@@ -69,13 +69,7 @@ def historico(checkpointer: BaseCheckpointSaver, thread_id: str) -> list[dict]:
             pergunta, _, trechos = mensagem.text.partition(MARCADOR)
             mensagens.append({"papel": "user", "rotulo": "Você", "texto": pergunta, "detalhe": trechos})
         elif isinstance(mensagem, AIMessage):
-            for chamada in mensagem.tool_calls:
-                argumentos = ", ".join(f"{chave}={valor!r}" for chave, valor in chamada["args"].items())
-                mensagens.append({"papel": "tool", "rotulo": "Agente chamou", "texto": f"{chamada['name']}({argumentos})"})
-            if mensagem.text:
-                mensagens.append({"papel": "assistant", "rotulo": "Assistente", "texto": mensagem.text})
-        elif isinstance(mensagem, ToolMessage):
-            mensagens.append({"papel": "tool", "rotulo": "Trechos devolvidos pela ferramenta", "texto": "", "detalhe": mensagem.text})
+            mensagens.append({"papel": "assistant", "rotulo": "Assistente", "texto": mensagem.text})
     return mensagens
 
 
@@ -99,7 +93,6 @@ def pagina_chat():
         thread_id = request.args.get("thread_id") or (sessoes[0] if sessoes else nova_sessao())
         return render_template(
             "chat.html",
-            modo=MODO_BUSCA,
             k=K,
             sessoes=sessoes,
             thread_id=thread_id,

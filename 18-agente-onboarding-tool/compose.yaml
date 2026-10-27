@@ -1,0 +1,29 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg17
+    environment:
+      POSTGRES_USER: aula
+      POSTGRES_PASSWORD: aula
+      POSTGRES_DB: onboarding
+    ports:
+      - "127.0.0.1:55438:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U aula -d onboarding"]
+      interval: 2s
+      timeout: 2s
+      retries: 15
+
+  pgweb:
+    image: sosedoff/pgweb:0.17.0
+    environment:
+      DATABASE_URL: postgres://aula:aula@postgres:5432/onboarding?sslmode=disable
+    ports:
+      - "127.0.0.1:58438:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:

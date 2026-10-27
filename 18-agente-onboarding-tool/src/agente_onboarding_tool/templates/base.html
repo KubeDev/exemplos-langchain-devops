@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block titulo %}{% endblock %} · Agente de onboarding</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <main>
+    <nav class="menu" aria-label="Páginas">
+      <a href="{{ url_for('pagina_chat') }}" class="{{ 'ativo' if request.endpoint == 'pagina_chat' else '' }}">Chat</a>
+      <a href="{{ url_for('pagina_ingestao') }}" class="{{ 'ativo' if request.endpoint == 'pagina_ingestao' else '' }}">Ingestão</a>
+    </nav>
+    {% block conteudo %}{% endblock %}
+  </main>
+</body>
+</html>

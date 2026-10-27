@@ -1,13 +1,12 @@
-"""Reindexação total: gera de novo, sem olhar o hash, os chunks da coleção apontada pela COLECAO.
+"""Reindexação total: gera de novo, sem olhar o hash, a base inteira na coleção apontada pela COLECAO.
 
 Serve para a mudança que não está nos arquivos, como a troca do modelo de embedding: o hash
 continua igual e o indexar não reprocessaria nada.
 
-- COLECAO de uma coleção que já existe: apaga e regera no lugar. Com uma pasta, como dados/v1,
-  a base inteira; com arquivos, só esses documentos.
-- COLECAO de uma coleção nova: gera a base inteira de uma pasta, ao lado da anterior, que continua
-  intacta. Para gerar sem trocar a ativa, passe a variável só para o comando:
-  COLECAO=base_v2 uv run reindexar dados/v2. A troca é a COLECAO no .env, e o rollback é voltar a linha.
+- COLECAO de uma coleção que já existe: apaga a coleção e cria de novo, com a base inteira da pasta.
+- COLECAO de uma coleção nova: cria a coleção ao lado da anterior, que continua intacta. Para gerar
+  sem trocar a ativa, passe a variável só para o comando: COLECAO=base_v2 uv run reindexar dados/v2.
+  A troca é a COLECAO no .env, e o rollback é voltar a linha.
 
 A divisão em chunks é a mesma de indexar.py, copiada de propósito: cada arquivo se lê
 sozinho, sem navegar entre arquivos. Ao mudar a divisão, mude nos dois lugares.
@@ -15,7 +14,6 @@ sozinho, sem navegar entre arquivos. Ao mudar a divisão, mude nos dois lugares.
 
 import argparse
 import hashlib
-import json
 import os
 from pathlib import Path
 
@@ -91,66 +89,25 @@ def colecao_existe(url: str) -> bool:
         return False
 
 
-def ids_no_indice(url: str) -> dict[str, list[str]]:
-    """Lê do banco os IDs dos chunks gravados na coleção, por documento."""
-    with psycopg.connect(url) as conexao:
-        with conexao.cursor() as cursor:
-            cursor.execute(
-                """
-                SELECT e.id, e.cmetadata->>'source'
-                FROM langchain_pg_embedding e
-                JOIN langchain_pg_collection c ON e.collection_id = c.uuid
-                WHERE c.name = %s
-                """,
-                (COLECAO,),
-            )
-            linhas = cursor.fetchall()
-
-    documentos = {}
-    for id_chunk, source in linhas:
-        documentos.setdefault(source, []).append(id_chunk)
-    return documentos
-
-
-def registrar_modelo(url: str) -> None:
-    """Grava na coleção o modelo e as dimensões que geraram os vetores."""
-    with psycopg.connect(url) as conexao:
-        with conexao.cursor() as cursor:
-            cursor.execute(
-                "UPDATE langchain_pg_collection SET cmetadata = %s WHERE name = %s",
-                (json.dumps({"model": EMBEDDING_MODEL, "dimensions": EMBEDDING_DIMENSIONS}), COLECAO),
-            )
-
-
-def selecionar(caminhos: list[str]) -> tuple[list[Path], bool]:
-    """Uma pasta é a fonte inteira; arquivos soltos são só esses documentos."""
-    if len(caminhos) == 1 and Path(caminhos[0]).is_dir():
-        return sorted(Path(caminhos[0]).glob("*.md")), True
-    arquivos = [Path(caminho) for caminho in caminhos]
-    for arquivo in arquivos:
-        if not arquivo.is_file():
-            raise SystemExit(f"{arquivo} não é um arquivo. Passe uma pasta só, como dados/v1, ou arquivos .md.")
-    return arquivos, False
-
-
 def main() -> None:
-    """Gera de novo os chunks dos documentos, com ou sem mudança nos arquivos."""
+    """Gera de novo a base inteira da pasta, com ou sem mudança nos arquivos."""
     parser = argparse.ArgumentParser(description="Reindexação total na coleção da COLECAO")
-    parser.add_argument("caminhos", nargs="+", help="uma pasta, como dados/v1, ou arquivos .md")
+    parser.add_argument("pasta", help="a pasta da versão, como dados/v1")
     args = parser.parse_args()
 
+    pasta = Path(args.pasta)
+    if not pasta.is_dir():
+        raise SystemExit(f"{pasta} não é uma pasta. Passe a pasta da versão, como dados/v1.")
+
     url = os.environ["DATABASE_URL"]
-    selecionados, pasta_inteira = selecionar(args.caminhos)
     existe = colecao_existe(url)
-    if not pasta_inteira and not existe:
-        # Coleção nova pela metade não serve para a troca: ela nasce com a base inteira.
-        raise SystemExit(f"A coleção {COLECAO} não existe. Uma coleção nova é gerada de uma pasta inteira, como dados/v2.")
 
     # Os embeddings vêm antes de apagar: se o modelo falhar, a coleção continua como estava.
     modelo = OllamaEmbeddings(model=EMBEDDING_MODEL, base_url=os.environ["OLLAMA_URL"])
+    arquivos = sorted(pasta.glob("*.md"))
     chunks = []
     ids = []
-    for arquivo in selecionados:
+    for arquivo in arquivos:
         hash_atual = hash_do_arquivo(arquivo)
         do_arquivo = dividir(arquivo)
         # Mesmo ID e mesmo hash do indexar: depois da reindexação, o incremental continua de onde parou.
@@ -171,18 +128,11 @@ def main() -> None:
         use_jsonb=True,
     )
 
-    apagados = 0
     if existe:
-        # Apagar e regerar: com a pasta, sai tudo o que a coleção tem, até documento que não está nela.
-        no_indice = ids_no_indice(url)
-        nomes = no_indice.keys() if pasta_inteira else [arquivo.name for arquivo in selecionados]
-        antigos = [id_chunk for nome in nomes for id_chunk in no_indice.get(nome, [])]
-        if antigos:
-            banco.delete(ids=antigos, collection_only=True)
-        apagados = len(antigos)
-        if pasta_inteira:
-            # A coleção existente guarda o modelo da criação; regerada inteira, ela passa a registrar o atual.
-            registrar_modelo(url)
+        # Apagar a coleção leva todos os chunks dela, até de documento que saiu da pasta.
+        # Criada de novo, ela registra o modelo atual no cmetadata.
+        banco.delete_collection()
+        banco.create_collection()
 
     banco.add_embeddings(
         texts=[chunk.page_content for chunk in chunks],
@@ -190,11 +140,8 @@ def main() -> None:
         metadatas=[chunk.metadata for chunk in chunks],
         ids=ids,
     )
-    situacao = "existente, regerada no lugar" if existe else "nova, ao lado das outras"
-    print(
-        f"Coleção {COLECAO} ({situacao}) | documentos {len(selecionados)} | "
-        f"{apagados} chunks apagados | {len(chunks)} chunks gravados"
-    )
+    situacao = "existente, apagada e criada de novo" if existe else "nova, ao lado das outras"
+    print(f"Coleção {COLECAO} ({situacao}) | documentos {len(arquivos)} | {len(chunks)} chunks gravados")
 
 
 if __name__ == "__main__":

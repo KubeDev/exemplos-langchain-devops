@@ -12,7 +12,7 @@ pela indexação incremental e pela reindexação total.
   módulo compartilhado.
 - A base é pequena de propósito: os mesmos quatro Markdown em `dados/v1/` e `dados/v2/`, cada v2 com
   uma mudança operacional que aparece na busca. Não existe pasta de fonte separada nem cópia da v1:
-  o `reindexar` recebe a pasta da versão ou arquivos, e o `indexar` recebe um arquivo. O nome do arquivo é o identificador estável;
+  o `reindexar` recebe a pasta da versão, e o `indexar` recebe um arquivo. O nome do arquivo é o identificador estável;
   não ponha a versão no nome.
 - Um chunk por seção Markdown, com o título no texto do chunk. Sem PDF e sem constante de
   estratégia: a mudança fora da fonte da aula é a troca do modelo, falada, não executada.
@@ -26,12 +26,12 @@ pela indexação incremental e pela reindexação total.
   igual). A consulta ao banco filtra pelo `source` do documento. Não remove nada: o documento que
   saiu da fonte sai no `reindexar` da pasta. A carga inicial é o `reindexar dados/v1`. Não volte a
   aceitar pasta nem vários arquivos no `indexar`.
-- `reindexar <pasta | arquivos>` grava na `COLECAO`: coleção existente é apagada e regerada no lugar
-  (inteira com a pasta, ou só os arquivos passados); coleção nova nasce de uma pasta inteira, e com
-  arquivos o comando recusa. Gera os embeddings antes de apagar; regerada inteira, a coleção
-  existente passa a registrar o modelo atual no `cmetadata` (o `get_or_create` do LangChain não
-  atualiza). A coleção nova é gerada com `COLECAO=base_v2 uv run reindexar dados/v2`, sem tocar o
-  `.env`; a troca é a `COLECAO` no `.env`, depois da comparação, e o rollback é voltar a linha. Não
+- `reindexar <pasta>` grava a base inteira na `COLECAO`: coleção existente é apagada com
+  `delete_collection()` (os chunks saem junto, pela FK em cascata) e criada de novo com
+  `create_collection()`, já com o modelo atual no `cmetadata`; coleção nova é criada ao lado. Gera
+  os embeddings antes de apagar. Não volte a aceitar arquivos soltos: reindexar um documento é o
+  `indexar`. A lição é que a coleção nova ao lado é melhor que regerar no lugar para a troca. A
+  coleção nova é gerada com `COLECAO=base_v2 uv run reindexar dados/v2`, sem tocar o `.env`; a troca é a `COLECAO` no `.env`, depois da comparação, e o rollback é voltar a linha. Não
   acrescente alias, tabela-ponteiro nem renomeação de coleção.
 - A coluna `embedding` é `vector(1024)` para a tabela inteira, e os nomes das tabelas são fixos no
   `PGVector`: um modelo com outra dimensão exige outro banco ou outro vector store com tabela

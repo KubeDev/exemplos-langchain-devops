@@ -75,8 +75,8 @@ uv run indexar dados/v1/RB-274-catalog-api.md                                 # 
 ```
 
 Um documento por vez não diz o que saiu da fonte: o `indexar` não remove nada. Documento que deixou
-de existir sai quando a base inteira é regerada com o `reindexar` da pasta, que apaga tudo o que a
-coleção tem antes de gravar.
+de existir sai quando a base inteira é regerada com o `reindexar` da pasta, que apaga a coleção
+antes de gravar.
 
 ## Ver o que foi gravado
 
@@ -105,15 +105,18 @@ O hash protege a fonte, não a forma de transformá-la em vetor. Se o modelo de 
 arquivos continuam iguais e o `indexar` não reprocessa nada. O `reindexar` gera de novo sem olhar o
 hash, na coleção apontada pela `COLECAO`:
 
-| `COLECAO` aponta para | `uv run reindexar dados/v1` | `uv run reindexar <arquivo>` |
-|---|---|---|
-| uma coleção que já existe | apaga e regera a base inteira no lugar e registra o modelo atual na coleção | apaga e regera só esses documentos, como um documento com índice suspeito |
-| uma coleção nova | gera a base inteira ao lado da anterior, que continua intacta | recusa: coleção nova nasce de uma pasta inteira |
+| `COLECAO` aponta para | `uv run reindexar dados/v1` |
+|---|---|
+| uma coleção que já existe | apaga a coleção e cria de novo com a base inteira da pasta, registrando o modelo atual |
+| uma coleção nova | cria a coleção com a base inteira ao lado da anterior, que continua intacta |
 
-Os embeddings são gerados antes de apagar: se o modelo falhar, a coleção continua como estava. Troca
-de modelo é sempre a base inteira: regerar um documento só deixaria modelos misturados na coleção.
-Apagar e regerar serve para base pequena e janela aceitável. A coleção nova ao lado serve quando a
-base é grande, o agente está em produção ou a mudança precisa ser comparada antes de valer.
+O `reindexar` recebe sempre uma pasta: a reindexação é da base inteira. Um documento só é o
+`indexar`. Os embeddings são gerados antes de apagar: se o modelo falhar, a coleção continua como
+estava. Apagar a coleção leva todos os chunks dela, inclusive de documento que saiu da pasta.
+
+Apagar e criar de novo no lugar deixa a coleção vazia enquanto grava, e não há como comparar antes
+nem voltar atrás. A coleção nova ao lado não tem esses problemas: a ativa continua respondendo, as
+duas são comparadas e a troca é uma linha no `.env`.
 
 ## Coleção nova, comparação, troca e volta
 
@@ -135,9 +138,9 @@ cabe numa coleção nova ao lado: exige outro banco ou outro vector store, com t
 O `buscar` confere o modelo de embedding registrado na coleção e recusa a consulta com outro
 modelo: é a mensagem que pede a reindexação quando o modelo muda.
 
-A leitura do que está gravado é a única parte específica do pgvector: o `indexar` e o `reindexar`
-leem IDs e metadado por SQL. Gravar com ID e apagar por ID são operações do vector store do
-LangChain.
+A leitura do que está gravado é a única parte específica do pgvector: o `indexar` lê IDs e
+metadado, e o `reindexar` confere se a coleção existe, por SQL. Gravar com ID, apagar por ID e apagar
+e criar a coleção são operações do vector store do LangChain.
 
 ## Um arquivo, uma leitura
 

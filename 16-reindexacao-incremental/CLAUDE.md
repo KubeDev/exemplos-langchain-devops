@@ -8,11 +8,11 @@ pela indexação incremental e pela reindexação total.
 - O público é DevOps/cloud, com pouco Python. Cada arquivo é lido em aula de cima a baixo e não
   importa nada de outro arquivo do projeto: `indexar.py` (incremental), `reindexar.py` (total) e
   `buscar.py`. As duas implementações ficam separadas de propósito, para o aluno ver a diferença no
-  código. A divisão em chunks e a seleção dos caminhos se repetem nos dois primeiros; não crie
+  código. A divisão em chunks e o hash do arquivo se repetem nos dois primeiros; não crie
   módulo compartilhado.
 - A base é pequena de propósito: os mesmos quatro Markdown em `dados/v1/` e `dados/v2/`, cada v2 com
   uma mudança operacional que aparece na busca. Não existe pasta de fonte separada nem cópia da v1:
-  o comando recebe a pasta da versão ou os arquivos. O nome do arquivo é o identificador estável;
+  o `reindexar` recebe a pasta da versão ou arquivos, e o `indexar` recebe um arquivo. O nome do arquivo é o identificador estável;
   não ponha a versão no nome.
 - Um chunk por seção Markdown, com o título no texto do chunk. Sem PDF e sem constante de
   estratégia: a mudança fora da fonte da aula é a troca do modelo, falada, não executada.
@@ -22,8 +22,10 @@ pela indexação incremental e pela reindexação total.
   `<coleção>/<arquivo>#<n>`. Documento alterado tem todos os chunks apagados e regravados, sem
   depender de upsert. O ID leva a coleção porque o `id` de `langchain_pg_embedding` é único na
   tabela inteira. `delete` sempre com `collection_only=True`.
-- `indexar <pasta | arquivos>`: com uma pasta, a fonte inteira e a remoção do obsoleto; com
-  arquivos, só esses documentos e nenhuma remoção. O argumento é obrigatório.
+- `indexar <arquivo>`: um documento por execução, sem laço, lido de cima a baixo (novo, alterado ou
+  igual). A consulta ao banco filtra pelo `source` do documento. Não remove nada: o documento que
+  saiu da fonte sai no `reindexar` da pasta. A carga inicial é o `reindexar dados/v1`. Não volte a
+  aceitar pasta nem vários arquivos no `indexar`.
 - `reindexar <pasta | arquivos>` grava na `COLECAO`: coleção existente é apagada e regerada no lugar
   (inteira com a pasta, ou só os arquivos passados); coleção nova nasce de uma pasta inteira, e com
   arquivos o comando recusa. Gera os embeddings antes de apagar; regerada inteira, a coleção

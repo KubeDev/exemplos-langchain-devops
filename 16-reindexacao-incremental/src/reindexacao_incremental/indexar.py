@@ -1,8 +1,8 @@
-"""Indexação incremental: reprocessa só o documento que mudou e remove o que saiu da pasta.
+"""Indexação incremental: recebe um documento e só reprocessa se o conteúdo mudou.
 
-Com uma pasta, como dados/v1, compara a fonte inteira com a coleção ativa e remove o que saiu
-dela. Com arquivos, compara só esses documentos e não remove nada. O nome do arquivo é o
-identificador do documento: dados/v2/RB-274-catalog-api.md atualiza o RB-274 que veio da v1.
+Compara o arquivo com o que está na coleção ativa. O nome do arquivo é o identificador do
+documento: dados/v2/RB-274-catalog-api.md atualiza o RB-274 que veio da v1. A carga inicial,
+a base inteira de uma pasta, é do reindexar.
 
 A divisão em chunks é a mesma de reindexar.py, copiada de propósito: cada arquivo se lê
 sozinho, sem navegar entre arquivos. Ao mudar a divisão, mude nos dois lugares.
@@ -65,7 +65,7 @@ def dividir(arquivo: Path) -> list[Document]:
 
 
 # ---------------------------------------------------------------------------
-# O que mudou: a pasta comparada com o índice
+# O que mudou: o arquivo comparado com o índice
 # ---------------------------------------------------------------------------
 
 
@@ -74,51 +74,54 @@ def hash_do_arquivo(arquivo: Path) -> str:
     return hashlib.sha256(arquivo.read_bytes()).hexdigest()
 
 
-def estado_no_indice(url: str) -> dict[str, dict]:
-    """Lê do banco, por documento, o hash gravado e os IDs dos seus chunks."""
+def estado_no_indice(url: str, source: str) -> dict | None:
+    """Lê do banco o hash gravado e os IDs dos chunks do documento, ou None se ele não está lá."""
     try:
         with psycopg.connect(url) as conexao:
             with conexao.cursor() as cursor:
                 cursor.execute(
                     """
-                    SELECT e.id, e.cmetadata->>'source', e.cmetadata->>'hash'
+                    SELECT e.id, e.cmetadata->>'hash'
                     FROM langchain_pg_embedding e
                     JOIN langchain_pg_collection c ON e.collection_id = c.uuid
-                    WHERE c.name = %s
+                    WHERE c.name = %s AND e.cmetadata->>'source' = %s
                     """,
-                    (COLECAO,),
+                    (COLECAO, source),
                 )
                 linhas = cursor.fetchall()
     except psycopg.errors.UndefinedTable:
         # Banco vazio: as tabelas nascem na primeira gravação.
-        return {}
+        return None
 
-    documentos = {}
-    for id_chunk, source, hash_gravado in linhas:
-        documento = documentos.setdefault(source, {"hash": hash_gravado, "ids": []})
-        documento["ids"].append(id_chunk)
-    return documentos
-
-
-def selecionar(caminhos: list[str]) -> tuple[list[Path], bool]:
-    """Uma pasta é a fonte inteira; arquivos soltos são só esses documentos."""
-    if len(caminhos) == 1 and Path(caminhos[0]).is_dir():
-        return sorted(Path(caminhos[0]).glob("*.md")), True
-    arquivos = [Path(caminho) for caminho in caminhos]
-    for arquivo in arquivos:
-        if not arquivo.is_file():
-            raise SystemExit(f"{arquivo} não é um arquivo. Passe uma pasta só, como dados/v1, ou arquivos .md.")
-    return arquivos, False
+    if not linhas:
+        return None
+    # Todos os chunks do documento levam o mesmo hash: basta o da primeira linha.
+    return {"hash": linhas[0][1], "ids": [id_chunk for id_chunk, _ in linhas]}
 
 
 def main() -> None:
-    """Compara os documentos com a coleção ativa e grava só a diferença."""
-    parser = argparse.ArgumentParser(description="Indexação incremental de uma versão da base")
-    parser.add_argument("caminhos", nargs="+", help="uma pasta, como dados/v1, ou arquivos .md")
+    """Compara o documento com a coleção ativa e grava só se ele mudou."""
+    parser = argparse.ArgumentParser(description="Indexação incremental de um documento")
+    parser.add_argument("arquivo", help="o arquivo .md do documento, como dados/v2/RB-274-catalog-api.md")
     args = parser.parse_args()
 
+    arquivo = Path(args.arquivo)
+    if not arquivo.is_file():
+        raise SystemExit(f"{arquivo} não é um arquivo. Passe um .md, como dados/v2/RB-274-catalog-api.md.")
+
     url = os.environ["DATABASE_URL"]
+    hash_atual = hash_do_arquivo(arquivo)
+    anterior = estado_no_indice(url, arquivo.name)
+
+    # Mesmo hash: o conteúdo é o mesmo, nada a fazer e nenhuma chamada ao modelo.
+    if anterior and anterior["hash"] == hash_atual:
+        print(f"igual: {arquivo.name} | coleção {COLECAO}")
+        return
+
     modelo = OllamaEmbeddings(model=EMBEDDING_MODEL, base_url=os.environ["OLLAMA_URL"])
+    chunks = dividir(arquivo)
+    vetores = modelo.embed_documents([chunk.page_content for chunk in chunks])
+
     banco = PGVector(
         embeddings=modelo,
         # O LangChain usa o driver psycopg: a URL precisa dizer isso.
@@ -129,53 +132,21 @@ def main() -> None:
         use_jsonb=True,
     )
 
-    selecionados, pasta_inteira = selecionar(args.caminhos)
-
-    no_indice = estado_no_indice(url)
-    novos = alterados = iguais = removidos = gravados = 0
-
-    for arquivo in selecionados:
-        hash_atual = hash_do_arquivo(arquivo)
-        anterior = no_indice.get(arquivo.name)
-        # Mesmo hash: o conteúdo é o mesmo, nada a fazer e nenhuma chamada ao modelo.
-        if anterior and anterior["hash"] == hash_atual:
-            iguais += 1
-            continue
-
-        chunks = dividir(arquivo)
-        vetores = modelo.embed_documents([chunk.page_content for chunk in chunks])
-        if anterior:
-            # Alterado: saem todos os chunks antigos do documento, entram os novos.
-            banco.delete(ids=anterior["ids"], collection_only=True)
-            alterados += 1
-            situacao = "alterado"
-        else:
-            novos += 1
-            situacao = "novo"
-        banco.add_embeddings(
-            texts=[chunk.page_content for chunk in chunks],
-            embeddings=vetores,
-            # O hash vai junto: é ele que a próxima execução compara.
-            metadatas=[{**chunk.metadata, "hash": hash_atual} for chunk in chunks],
-            # ID estável: coleção, documento e posição do chunk no documento.
-            ids=[f"{COLECAO}/{arquivo.name}#{numero}" for numero in range(len(chunks))],
-        )
-        gravados += len(chunks)
-        print(f"{situacao}: {arquivo.name} | {len(chunks)} chunks")
-
-    # Obsoleto: está no índice, mas o arquivo não está na pasta. Só a pasta inteira responde isso.
-    if pasta_inteira:
-        nomes_na_pasta = {arquivo.name for arquivo in selecionados}
-        for source, anterior in no_indice.items():
-            if source not in nomes_na_pasta:
-                banco.delete(ids=anterior["ids"], collection_only=True)
-                removidos += 1
-                print(f"removido: {source} | {len(anterior['ids'])} chunks")
-
-    print(
-        f"Coleção {COLECAO} | novos {novos} | alterados {alterados} | removidos {removidos} | "
-        f"iguais {iguais} | {gravados} chunks gravados"
+    if anterior:
+        # Alterado: saem todos os chunks antigos do documento, entram os novos.
+        banco.delete(ids=anterior["ids"], collection_only=True)
+        situacao = "alterado"
+    else:
+        situacao = "novo"
+    banco.add_embeddings(
+        texts=[chunk.page_content for chunk in chunks],
+        embeddings=vetores,
+        # O hash vai junto: é ele que a próxima execução compara.
+        metadatas=[{**chunk.metadata, "hash": hash_atual} for chunk in chunks],
+        # ID estável: coleção, documento e posição do chunk no documento.
+        ids=[f"{COLECAO}/{arquivo.name}#{numero}" for numero in range(len(chunks))],
     )
+    print(f"{situacao}: {arquivo.name} | {len(chunks)} chunks | coleção {COLECAO}")
 
 
 if __name__ == "__main__":

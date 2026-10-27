@@ -1,9 +1,9 @@
 # 16 — Indexação incremental e reindexação total
 
 Este exemplo mantém um índice no pgvector sincronizado com uma base de documentos que muda de
-versão. O `indexar` compara cada documento com o que está no banco e grava só a diferença. Quando
-muda algo que não está nos arquivos, como o modelo de embedding, o `reindexar` gera de novo sem
-olhar o hash, na própria coleção ou numa coleção nova ao lado.
+versão. O `reindexar` gera a base inteira de uma pasta: é a carga inicial e é o caminho quando muda
+algo que não está nos arquivos, como o modelo de embedding, na própria coleção ou numa coleção nova
+ao lado. O `indexar` recebe um documento, compara com o que está no banco e só grava se ele mudou.
 
 Todos os dados são fictícios e não representam uma operação real.
 
@@ -35,20 +35,27 @@ pgweb em <http://localhost:58436>, já conectado ao banco, para ver os chunks e 
 | `RB-905-image-processor.md` | a limpeza do volume sai do `find -delete` e passa pelo `imgproc-admin purge` |
 | `ARQ-catalog-api.md` | o cache troca o Redis pelo Valkey, entra a pricing-api e a capacidade passa a ter HPA |
 
-Os comandos recebem o que indexar: uma pasta, que é a fonte inteira, ou arquivos soltos, que são só
-esses documentos. O nome do arquivo é o identificador estável do documento, e a versão está no
-conteúdo: `dados/v2/RB-274-catalog-api.md` atualiza o RB-274 que entrou pela `dados/v1`.
+O nome do arquivo é o identificador estável do documento, e a versão está no conteúdo:
+`dados/v2/RB-274-catalog-api.md` atualiza o RB-274 que entrou pela `dados/v1`.
 
 Cada documento vira um chunk por seção Markdown, com o título no texto do chunk.
+
+## Carga inicial
+
+```bash
+uv run reindexar dados/v1
+```
+
+A `base_v1` ainda não existe: o `reindexar` cria a coleção com a base inteira da pasta. Os detalhes
+estão em [Reindexação total](#reindexação-total).
 
 ## Indexação incremental
 
 ```bash
-uv run indexar dados/v1                             # a fonte inteira
-uv run indexar dados/v2/RB-274-catalog-api.md       # só esse documento
+uv run indexar dados/v2/RB-274-catalog-api.md
 ```
 
-Para cada documento, calcula o hash SHA-256 do arquivo e compara com o hash gravado no metadado dos
+Recebe um documento, calcula o hash SHA-256 do arquivo e compara com o hash gravado no metadado dos
 chunks daquele documento:
 
 | Situação | O que acontece |
@@ -56,19 +63,20 @@ chunks daquele documento:
 | Novo | divide, gera embedding e grava |
 | Alterado | apaga todos os chunks antigos do documento e grava os novos |
 | Igual | nada, e nenhuma chamada ao modelo |
-| Removido | está no índice e não está na pasta: os chunks são apagados |
 
-A remoção só acontece quando o argumento é uma pasta, porque só a fonte inteira diz o que saiu dela.
-O ID de cada chunk é `<coleção>/<arquivo>#<n>`. Rodar de novo sem mudar nada termina com todos os
-documentos iguais: o script é idempotente.
+O ID de cada chunk é `<coleção>/<arquivo>#<n>`. Rodar de novo com o mesmo arquivo termina em igual:
+o script é idempotente.
 
 ```bash
-uv run indexar dados/v1
 uv run buscar "Posso usar port-forward para testar os pods da catalog-api?"   # a v1
 uv run indexar dados/v2/RB-274-catalog-api.md
 uv run buscar "Posso usar port-forward para testar os pods da catalog-api?"   # a v2
-uv run indexar dados/v1                                                       # o RB-274 volta para a v1
+uv run indexar dados/v1/RB-274-catalog-api.md                                 # o RB-274 volta para a v1
 ```
+
+Um documento por vez não diz o que saiu da fonte: o `indexar` não remove nada. Documento que deixou
+de existir sai quando a base inteira é regerada com o `reindexar` da pasta, que apaga tudo o que a
+coleção tem antes de gravar.
 
 ## Ver o que foi gravado
 
@@ -80,7 +88,7 @@ FROM langchain_pg_embedding
 ORDER BY id;
 ```
 
-Rode depois de cada `indexar`: o documento alterado troca de hash e de texto, os iguais
+Rode depois de cada `indexar`: o documento alterado troca de hash e de texto, os outros
 continuam como estavam. Para ver as coleções lado a lado, depois do `reindexar` numa coleção
 nova:
 
@@ -134,5 +142,5 @@ LangChain.
 ## Um arquivo, uma leitura
 
 Cada comando é um arquivo que se lê sozinho, de cima a baixo, sem importar nada de outro arquivo do
-projeto. Por isso a divisão em chunks e a seleção dos caminhos aparecem em `indexar.py` e em
+projeto. Por isso a divisão em chunks e o hash do arquivo aparecem em `indexar.py` e em
 `reindexar.py`. A repetição é de propósito. Ao mudar uma delas, mude nos dois lugares.

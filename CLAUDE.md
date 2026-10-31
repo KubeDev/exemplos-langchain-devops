@@ -43,6 +43,7 @@ abrangente de erro, abstrações "para quando crescer". Nenhuma entra sem pedido
 | `18-agente-onboarding-tool` | a mesma base com o retriever como ferramenta (Agentic) e filtro por metadados montado pelo agente, que pergunta o projeto quando falta |
 | `19-limite-chamadas-agente` | limite de chamadas de modelo e de ferramenta sobre uma ferramenta simulada que nunca conclui: o de modelo encerra a execução, o de ferramenta bloqueia a chamada e o modelo responde |
 | `20-tratamento-erro-ferramenta` | erro de ferramenta tratado no agente sobre um shutdown simulado: o `ToolErrorMiddleware` devolve a exceção ao modelo, o `ToolRetryMiddleware` interno repete só o erro transitório, e o retry em escrita depende de a ferramenta ser idempotente |
+| `21-guardrail-dados-sensiveis` | guardrail de dados sensíveis com o `PIIMiddleware` sobre uma ferramenta simulada que devolve segredos de kube-news e encontros-tech: token mascarado na entrada, chave SSH e e-mail tratados no retorno da ferramenta, senha em hash só na resposta (o modelo já leu), `block` como variação |
 
 **Não antecipe a aula seguinte.** O recurso ausente num exemplo geralmente é o assunto do
 próximo, e a ausência é o gancho. Antes de adicionar algo, verifique se ele não é a lição de
@@ -93,7 +94,7 @@ configuração. Se dois exemplos precisam do mesmo código, ele é **duplicado**
 
 Python `>=3.12` e LangChain permanecem alinhados. A integração de provider é deliberadamente
 diferente: os exemplos `01` e `02` usam Gemini; os exemplos `03` a `13` continuam com
-Anthropic. No `14` e no `15`, a OpenAI entra somente para embeddings; o `16` usa embeddings locais pelo Ollama; o `17` e o `18` usam chat Anthropic com embeddings locais pelo Ollama; o `19` volta a só chat Anthropic. Preserve essas diferenças até existir
+Anthropic. No `14` e no `15`, a OpenAI entra somente para embeddings; o `16` usa embeddings locais pelo Ollama; o `17` e o `18` usam chat Anthropic com embeddings locais pelo Ollama; o `19` volta a só chat Anthropic, e o `20` e o `21` seguem assim. Preserve essas diferenças até existir
 uma decisão explícita de migrar os exemplos.
 
 ## Layout interno
@@ -133,7 +134,7 @@ Credenciais **nunca** são gravadas no repositório. As variáveis de cada exemp
 | `14`, `15` | `OPENAI_API_KEY` e `DATABASE_URL` para embeddings e busca no PostgreSQL com pgvector |
 | `16` | `OLLAMA_URL`, `DATABASE_URL` e `COLECAO`, a coleção ativa do pgvector |
 | `17`, `18` | `ANTHROPIC_API_KEY`, `MODELO`, `OLLAMA_URL`, `DATABASE_URL`, `COLECAO` e `K` |
-| `19` | `ANTHROPIC_API_KEY` e `MODELO` |
+| `19` a `21` | `ANTHROPIC_API_KEY` e `MODELO` |
 
 Os tokens DigitalOcean usam escopo customizado, nunca acesso total. Cada exemplo tem
 `.env.example` com placeholder e `.env` no `.gitignore`. Ao validar, use a chave apenas no

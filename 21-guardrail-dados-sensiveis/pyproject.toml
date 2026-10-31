@@ -1,0 +1,20 @@
+[project]
+name = "guardrail-dados-sensiveis"
+version = "0.1.0"
+description = "Exemplo didatico: PIIMiddleware mascarando token, chave SSH, e-mail e senha na entrada, no retorno de ferramenta e na resposta de um agente"
+requires-python = ">=3.12"
+dependencies = [
+    "langchain>=1.4.7",
+    "langchain-anthropic>=1.7.7",
+    "python-dotenv>=1.2.4",
+]
+
+[project.scripts]
+guardrail-pii = "src.app:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]

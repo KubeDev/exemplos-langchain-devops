@@ -42,6 +42,7 @@ abrangente de erro, abstrações "para quando crescer". Nenhuma entra sem pedido
 | `17-agente-onboarding` | retriever no agente como etapa fixa (2-Step): a aplicação busca sempre, sem filtro, antes do modelo; ingestão e chat web, sessões no checkpointer PostgreSQL; chat Anthropic e embeddings Ollama |
 | `18-agente-onboarding-tool` | a mesma base com o retriever como ferramenta (Agentic) e filtro por metadados montado pelo agente, que pergunta o projeto quando falta |
 | `19-limite-chamadas-agente` | limite de chamadas de modelo e de ferramenta sobre uma ferramenta simulada que nunca conclui: o de modelo encerra a execução, o de ferramenta bloqueia a chamada e o modelo responde |
+| `20-tratamento-erro-ferramenta` | erro de ferramenta tratado no agente sobre um shutdown simulado: o `ToolErrorMiddleware` devolve a exceção ao modelo, o `ToolRetryMiddleware` interno repete só o erro transitório, e o retry em escrita depende de a ferramenta ser idempotente |
 
 **Não antecipe a aula seguinte.** O recurso ausente num exemplo geralmente é o assunto do
 próximo, e a ausência é o gancho. Antes de adicionar algo, verifique se ele não é a lição de

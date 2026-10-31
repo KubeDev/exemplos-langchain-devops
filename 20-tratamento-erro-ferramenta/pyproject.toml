@@ -1,0 +1,21 @@
+[project]
+name = "tratamento-erro-ferramenta"
+version = "0.1.0"
+description = "Exemplo didatico: erro de ferramenta devolvido ao modelo e nova tentativa com recuo exponencial num agente que desliga um Droplet"
+requires-python = ">=3.12"
+dependencies = [
+    "langchain>=1.4.7",
+    "langchain-anthropic>=1.7.5",
+    "python-dotenv>=1.2.4",
+]
+
+[project.scripts]
+erro-ferramenta = "src.erro_ferramenta:main"
+retry-ferramenta = "src.retry_ferramenta:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]

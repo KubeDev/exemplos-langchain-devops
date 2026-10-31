@@ -30,6 +30,7 @@ demonstra sua ideia — o que falta num exemplo costuma ser o assunto do próxim
 | 17 | [`17-agente-onboarding`](17-agente-onboarding) | Achar o procedimento certo do projeto certo numa base de onboarding | Retriever no agente como etapa fixa (2-Step): a aplicação busca sempre, sem filtro, antes do modelo; ingestão e chat web com sessões no PostgreSQL |
 | 18 | [`18-agente-onboarding-tool`](18-agente-onboarding-tool) | Deixar o agente decidir a busca e o projeto | Retriever como ferramenta (Agentic), com filtro por metadados montado pelo agente, que pergunta o projeto quando falta |
 | 19 | [`19-limite-chamadas-agente`](19-limite-chamadas-agente) | Parar um agente que consulta um deploy que nunca termina | `ModelCallLimitMiddleware` encerra a execução; `ToolCallLimitMiddleware` bloqueia a chamada excedida e o modelo responde |
+| 20 | [`20-tratamento-erro-ferramenta`](20-tratamento-erro-ferramenta) | Manter o agente de pé quando a API que a ferramenta chama falha | `ToolErrorMiddleware` devolve a exceção ao modelo como mensagem; `ToolRetryMiddleware`, interno, repete só o erro transitório com recuo exponencial |
 
 A ordem importa. O `02` coloca a chamada isolada do `01` num loop, passa a compor a entrada
 por template e mostra que o modelo esquece; o `03` resolve isso com memória explícita, num
@@ -51,14 +52,15 @@ regerar a coleção inteira a cada execução: grava só o que mudou e reindexa 
 quando muda o que o hash não vê, como o modelo de embedding; e o `17` liga a base ao agente como etapa fixa: a aplicação busca sempre, sem filtro, numa conversa com
 sessões; e o `18` entrega a busca ao agente como ferramenta: ele monta o filtro de metadado e pergunta o projeto
 quando falta; e o `19` abre o capítulo de middleware: um teto de chamadas de modelo ou de ferramenta
-para o agente que repete a mesma consulta sem progresso.
+para o agente que repete a mesma consulta sem progresso; e o `20` trata o erro da ferramenta: a
+exceção vira mensagem que o modelo lê, e só o erro transitório ganha nova tentativa.
 
 ## Pré-requisitos
 
 - [uv](https://docs.astral.sh/uv/) — gerencia Python e dependências
 - Python 3.12 (o `uv` instala sozinho, se faltar)
 - Uma chave da Gemini Developer API para os exemplos `01` e `02`
-- Uma chave da API da Anthropic para os exemplos `03` a `13` e `17` a `19`
+- Uma chave da API da Anthropic para os exemplos `03` a `13` e `17` a `20`
 - Uma chave da API da OpenAI para os embeddings dos exemplos `14` e `15`
 - O [Ollama](https://ollama.com) instalado para os embeddings locais dos exemplos `16` a `18`
 - Docker com Compose para o PostgreSQL dos exemplos `12` a `18`
@@ -106,6 +108,8 @@ cd 15-chunking-dados-operacionais && uv run gerar-chunks
 cd 15-chunking-dados-operacionais && uv run indexar
 cd 19-limite-chamadas-agente && uv run limite-modelo dpl-4821
 cd 19-limite-chamadas-agente && uv run limite-ferramenta dpl-4821
+cd 20-tratamento-erro-ferramenta && uv run erro-ferramenta 498123456
+cd 20-tratamento-erro-ferramenta && uv run retry-ferramenta 498123456
 ```
 
 Cada pasta tem um `README.md` próprio, com a explicação completa daquele exemplo. Comece por

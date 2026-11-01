@@ -110,6 +110,7 @@ cd 19-limite-chamadas-agente && uv run limite-modelo dpl-4821
 cd 19-limite-chamadas-agente && uv run limite-ferramenta dpl-4821
 cd 20-tratamento-erro-ferramenta && uv run erro-ferramenta 498123456
 cd 20-tratamento-erro-ferramenta && uv run retry-ferramenta 498123456
+cd 22-human-in-the-loop-escrita && uv run streamlit run src/web.py
 ```
 
 Cada pasta tem um `README.md` próprio, com a explicação completa daquele exemplo. Comece por

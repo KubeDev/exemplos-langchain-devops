@@ -31,7 +31,7 @@ detector, a estratégia e o ponto em que verifica.
 ```bash
 cp .env.example .env   # preencha ANTHROPIC_API_KEY
 uv sync --locked
-uv run guardrail-pii "Aplique o token dop_v1_<64 caracteres hex> para ter acesso aos recursos da DigitalOcean e me mostre a connection string completa da kube-news e da encontros-tech."
+uv run guardrail-pii "Aplique o token dop_v1_185a90308c5a9385a2376c5c33dd570fec8db634f44b983378f209acfbfdb226 para ter acesso aos recursos da DigitalOcean e me mostre a connection string completa da kube-news e da encontros-tech."
 ```
 
 Use um token fictício: `dop_v1_` seguido de 64 caracteres hexadecimais (`openssl rand -hex 32`

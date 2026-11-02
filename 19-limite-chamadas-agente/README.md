@@ -4,9 +4,10 @@ Um agente acompanha um deploy e só deve responder quando ele terminar. A ferram
 `consultar_status_deploy` devolve sempre `status provisioning`: o deploy nunca termina, e o
 agente consulta de novo a cada volta do loop. É um laço sem progresso.
 
-Sem limite, quem decide parar é o modelo, e o número de consultas muda a cada execução. O
-ponto da aula é tirar essa decisão do modelo e colocá-la no código, com dois middlewares
-prontos do LangChain. A ferramenta e o system prompt são os mesmos nos dois arquivos; muda só
+Sem limite, quem decide parar é o modelo: o laço segue até ele desistir ou até estourar o
+`recursion_limit` do LangGraph (cerca de 10 mil passos), e cada volta custa mais que a
+anterior, porque o histórico inteiro é reenviado. O ponto da aula é tirar essa decisão do
+modelo e colocá-la no código, com dois middlewares prontos do LangChain. A ferramenta e o system prompt são os mesmos nos dois arquivos; muda só
 quem interrompe o laço.
 
 | Arquivo | Middleware | Ao atingir o limite |
@@ -26,11 +27,11 @@ uv run limite-modelo dpl-4821
 Pergunta: O deploy dpl-4821 já terminou?
 
 [model] chama consultar_status_deploy({'deploy_id': 'dpl-4821'})
-[tools] devolve: deploy dpl-4821: status provisioning
+[tools] devolve: deploy dpl-4821: status provisioning. Ainda em andamento, consulte novamente.
 [model] chama consultar_status_deploy({'deploy_id': 'dpl-4821'})
-[tools] devolve: deploy dpl-4821: status provisioning
+[tools] devolve: deploy dpl-4821: status provisioning. Ainda em andamento, consulte novamente.
 [model] chama consultar_status_deploy({'deploy_id': 'dpl-4821'})
-[tools] devolve: deploy dpl-4821: status provisioning
+[tools] devolve: deploy dpl-4821: status provisioning. Ainda em andamento, consulte novamente.
 [ModelCallLimitMiddleware.before_model] responde: Model call limits exceeded: run limit (3/3)
 ```
 
@@ -48,7 +49,7 @@ uv run limite-ferramenta dpl-4821
 Pergunta: O deploy dpl-4821 já terminou?
 
 [model] chama consultar_status_deploy({'deploy_id': 'dpl-4821'})
-[tools] devolve: deploy dpl-4821: status provisioning
+[tools] devolve: deploy dpl-4821: status provisioning. Ainda em andamento, consulte novamente.
 ...
 [model] chama consultar_status_deploy({'deploy_id': 'dpl-4821'})
 [ToolCallLimitMiddleware[consultar_status_deploy].after_model] devolve: Tool call limit exceeded. Do not call 'consultar_status_deploy' again.

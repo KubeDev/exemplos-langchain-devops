@@ -17,8 +17,8 @@ PERGUNTA = "O deploy {deploy_id} já terminou?"
 
 SYSTEM_PROMPT = """
 Você acompanha deploys da plataforma. Use a ferramenta consultar_status_deploy para saber
-o status de um deploy. Só responda ao usuário quando o deploy terminar, com status
-concluido ou falhou.
+o status de um deploy. Enquanto o status for provisioning, consulte de novo. Nunca responda
+ao usuário com o deploy em andamento: só responda quando o status for concluido ou falhou.
 """
 
 
@@ -29,7 +29,7 @@ def consultar_status_deploy(deploy_id: str) -> str:
     Args:
         deploy_id: Identificador do deploy, como dpl-4821.
     """
-    return f"deploy {deploy_id}: status provisioning"
+    return f"deploy {deploy_id}: status provisioning. Ainda em andamento, consulte novamente."
 
 
 model = ChatAnthropic(model=os.getenv("MODELO", "claude-haiku-5-5"))

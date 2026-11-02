@@ -10,7 +10,8 @@ deixa o modelo seguir).
 - **Dois arquivos autocontidos, quase iguais de propósito.** `limite_modelo.py` e
   `limite_ferramenta.py` duplicam a ferramenta, o prompt e o `mostrar()`; só o middleware
   muda. A turma compara os dois lado a lado. Não extraia código comum.
-- **A ferramenta é simulada e devolve sempre `provisioning`.** É o que garante o laço. Não a
+- **A ferramenta é simulada e devolve sempre `provisioning`,** pedindo para consultar de
+  novo, e o prompt manda não responder com o deploy em andamento. É o que mantém o laço. Não a
   troque por API real nem por MCP.
 - **Um middleware por arquivo, com os valores da demo.** Variações (`exit_behavior`, rodar sem
   middleware) são trocadas na tela pelo instrutor; não crie flag, `.env` nem modo para isso.

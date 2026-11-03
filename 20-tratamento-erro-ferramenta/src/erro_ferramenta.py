@@ -33,6 +33,7 @@ def desligar_droplet(droplet_id: str) -> str:
 
 
 def tratar_erro(erro: Exception, request) -> str | None:
+
     if isinstance(erro, PermissionError):
         return (
             "Falha de autenticação na DigitalOcean (PermissionError). Não tente de novo: "
@@ -48,7 +49,7 @@ agent = create_agent(
     tools=[desligar_droplet],
     system_prompt=SYSTEM_PROMPT,
     middleware=[
-        ToolErrorMiddleware(tratar_erro),
+        ToolErrorMiddleware(tools=["desligar_droplet"], on_error=tratar_erro),
     ],
 )
 

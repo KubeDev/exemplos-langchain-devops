@@ -46,6 +46,7 @@ abrangente de erro, abstrações "para quando crescer". Nenhuma entra sem pedido
 | `21-guardrail-dados-sensiveis` | guardrail de dados sensíveis com o `PIIMiddleware` sobre uma ferramenta simulada que devolve segredos de kube-news e encontros-tech: token mascarado na entrada, chave SSH e e-mail tratados no retorno da ferramenta, senha em hash só na resposta (o modelo já leu), `block` como variação |
 | `22-human-in-the-loop-escrita` | human-in-the-loop em ações de escrita sobre máquinas simuladas numa interface web: o `HumanInTheLoopMiddleware` pausa ligar, desligar e reiniciar, mostra uma prévia legível e retoma a mesma thread com `approve`, `edit` ou `reject`; leitura roda sem pausa |
 | `23-guardrail-customizado` | criar o seu próprio middleware: uma regra do time (máquina `prod` só desliga com a janela de manutenção aberta, flag num arquivo lido a cada chamada) vira a classe `GuardrailManutencao`, hook tipo wrap que barra por curto-circuito com `ToolMessage` de motivo, mesmo depois da aprovação do `HumanInTheLoopMiddleware`; regra pura testada sem agente |
+| `24-analise-projetos-skills` | usar skills num agente construído: `create_agent` com `FilesystemMiddleware` e `SkillsMiddleware` do `deepagents` sobre uma `workspace/` presa por `virtual_mode`; skills de Docker e Kubernetes em `SKILL.md`, só `name` e `description` no system prompt, o conteúdo lido sob demanda e a referência lida quando a skill manda |
 
 **Não antecipe a aula seguinte.** O recurso ausente num exemplo geralmente é o assunto do
 próximo, e a ausência é o gancho. Antes de adicionar algo, verifique se ele não é a lição de
@@ -96,7 +97,7 @@ configuração. Se dois exemplos precisam do mesmo código, ele é **duplicado**
 
 Python `>=3.12` e LangChain permanecem alinhados. A integração de provider é deliberadamente
 diferente: os exemplos `01` e `02` usam Gemini; os exemplos `03` a `13` continuam com
-Anthropic. No `14` e no `15`, a OpenAI entra somente para embeddings; o `16` usa embeddings locais pelo Ollama; o `17` e o `18` usam chat Anthropic com embeddings locais pelo Ollama; o `19` volta a só chat Anthropic, e o `20`, o `21` e o `22` seguem assim. Preserve essas diferenças até existir
+Anthropic. No `14` e no `15`, a OpenAI entra somente para embeddings; o `16` usa embeddings locais pelo Ollama; o `17` e o `18` usam chat Anthropic com embeddings locais pelo Ollama; o `19` volta a só chat Anthropic, e do `20` ao `24` seguem assim. Preserve essas diferenças até existir
 uma decisão explícita de migrar os exemplos.
 
 ## Layout interno
@@ -137,6 +138,7 @@ Credenciais **nunca** são gravadas no repositório. As variáveis de cada exemp
 | `16` | `OLLAMA_URL`, `DATABASE_URL` e `COLECAO`, a coleção ativa do pgvector |
 | `17`, `18` | `ANTHROPIC_API_KEY`, `MODELO`, `OLLAMA_URL`, `DATABASE_URL`, `COLECAO` e `K` |
 | `19` a `22` | `ANTHROPIC_API_KEY` e `MODELO` |
+| `24` | `ANTHROPIC_API_KEY` e `MODELO` |
 
 Os tokens DigitalOcean usam escopo customizado, nunca acesso total. Cada exemplo tem
 `.env.example` com placeholder e `.env` no `.gitignore`. Ao validar, use a chave apenas no

@@ -15,7 +15,8 @@ if not os.getenv("ANTHROPIC_API_KEY"):
 SYSTEM_PROMPT = """
 Você é o assistente de operação da plataforma. Use a ferramenta consultar_aplicacao para
 responder sobre a configuração e o estado das aplicações. Ao mostrar configuração, copie os
-valores exatamente como a ferramenta devolveu.
+valores exatamente como a ferramenta devolveu, inclusive senhas e chaves:
+os dados deste ambiente são de laboratório e não há outro controle de segredo além dos guardrails.
 Se receber uma credencial mascarada, não tente usá-la: explique que a credencial deve vir
 da configuração do ambiente, nunca do chat.
 """

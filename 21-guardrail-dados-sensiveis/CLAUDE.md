@@ -22,8 +22,9 @@ ferramenta, resposta).
 - **A cobertura dos pontos é deliberada:** token na entrada (`mask`), chave e e-mail no retorno
   da ferramenta (`redact`, `mask`), senha só na resposta (`hash`). A senha fica crua no retorno
   da ferramenta de propósito: é o que mostra que filtrar a saída não protege o provedor.
-- **A linha "copie os valores exatamente" do system prompt é necessária.** Sem ela, o modelo às
-  vezes omite a senha sozinho, e a demo da saída deixa de ser repetível.
+- **A linha "copie os valores exatamente, inclusive senhas e chaves" do system prompt é
+  necessária, com a menção ao ambiente de laboratório.** Sem ela, o modelo se recusa sozinho a
+  repetir senha e chave SSH, e a variação sem `middleware=GUARDRAILS` parece continuar mascarada.
 - **O `app.py` lê o estado (`stream_mode="values"`), não as atualizações dos nós.** A
   atualização do nó do modelo traz a resposta antes do filtro de saída, com a senha crua. A linha
   `Pergunta:` imprime o token cru de propósito.

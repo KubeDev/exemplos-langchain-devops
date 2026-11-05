@@ -1,0 +1,25 @@
+[project]
+name = "analise-projetos-skills"
+version = "0.1.0"
+description = "Exemplo didatico: agente que analisa projetos usa skills de Docker e Kubernetes carregadas sob demanda, com os middlewares de filesystem e de skills do deepagents"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "deepagents>=0.7.32",
+    "langchain>=1.4.7",
+    "langchain-anthropic>=1.7.7",
+    "python-dotenv>=1.2.4",
+]
+
+[project.scripts]
+analise-projetos-skills = "src.app:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src"]
+
+[dependency-groups]
+dev = []

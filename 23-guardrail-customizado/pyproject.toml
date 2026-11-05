@@ -1,17 +1,15 @@
 [project]
 name = "guardrail-customizado"
 version = "0.1.0"
-description = "Exemplo didatico: middleware proprio que barra o desligamento de maquina de prod fora da janela de manutencao, mesmo com aprovacao humana"
+description = "Exemplo didatico: middleware proprio que barra o desligamento de maquina de prod fora da janela de manutencao, mesmo com aprovacao humana numa interface web"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "langchain>=1.4.7",
     "langchain-anthropic>=1.7.7",
     "python-dotenv>=1.2.4",
+    "streamlit>=1.66.1",
 ]
-
-[project.scripts]
-guardrail-customizado = "src.app:main"
 
 [build-system]
 requires = ["hatchling"]

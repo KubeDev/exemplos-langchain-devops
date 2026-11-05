@@ -13,35 +13,35 @@ def janela_aberta(arquivo: str) -> bool:
         return False
 
 
-def verificar(tool_call: dict, tag: str, aberta: bool) -> str | None:
+def verificar(tool_call: dict, ambiente: str, aberta: bool) -> str | None:
     """A regra do time: devolve o motivo do bloqueio, ou None se a chamada pode seguir."""
     if tool_call["name"] != "desligar_maquinas" or aberta:
         return None
 
     protegidas = [
         nome for nome in tool_call["args"].get("nomes", [])
-        if tag in MAQUINAS.get(nome, {}).get("tags", [])
+        if MAQUINAS.get(nome, {}).get("ambiente") == ambiente
     ]
     if not protegidas:
         return None
 
     return (
-        f"Bloqueado pela política de manutenção: {', '.join(protegidas)} tem a tag {tag} "
+        f"Bloqueado pela política de manutenção: {', '.join(protegidas)} está em {ambiente} "
         "e a janela de manutenção está fechada. Execute só quando a janela estiver aberta."
     )
 
 
 class GuardrailManutencao(AgentMiddleware):
-    """Barra o desligamento de máquina com a tag protegida fora da janela de manutenção."""
+    """Barra o desligamento de máquina do ambiente protegido fora da janela de manutenção."""
 
-    def __init__(self, tag: str, arquivo: str):
+    def __init__(self, ambiente: str, arquivo: str):
         super().__init__()
-        self.tag = tag
+        self.ambiente = ambiente
         self.arquivo = arquivo
 
     def wrap_tool_call(self, request, handler):
         # O arquivo é lido a cada chamada: abrir ou fechar a janela vale sem reiniciar o app.
-        motivo = verificar(request.tool_call, self.tag, janela_aberta(self.arquivo))
+        motivo = verificar(request.tool_call, self.ambiente, janela_aberta(self.arquivo))
 
         if motivo:
             # Curto-circuito: o handler não é chamado, a ferramenta não executa.

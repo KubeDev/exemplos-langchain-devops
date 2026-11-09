@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block titulo %}Chat{% endblock %}
+{% block conteudo %}
+    <header>
+      <h1>Pesquisa com subagentes</h1>
+      <p>Orquestrador: <strong>{{ modelo }}</strong> · subagentes: <code>subagente_web</code> e <code>subagente_docs</code> · projetos kube-news e encontros-tech</p>
+    </header>
+
+    <section class="session-controls" aria-label="Sessões">
+      <form action="{{ url_for('pagina_chat') }}" method="get">
+        <label for="thread_id">Sessões salvas</label>
+        <select id="thread_id" name="thread_id" {{ 'disabled' if not sessoes else '' }}>
+          {% for sessao in sessoes %}
+            <option value="{{ sessao }}" {{ 'selected' if sessao == thread_id else '' }}>{{ sessao }}</option>
+          {% else %}
+            <option value="">Nenhuma sessão salva</option>
+          {% endfor %}
+        </select>
+        <button type="submit" {{ 'disabled' if not sessoes else '' }}>Carregar</button>
+      </form>
+      <form action="{{ url_for('pagina_chat') }}" method="post">
+        <button type="submit" name="acao" value="nova">Nova sessão</button>
+      </form>
+    </section>
+
+    <p class="thread-label">Sessão: <code>{{ thread_id }}</code></p>
+
+    <div class="colunas">
+      <section class="coluna" aria-label="Histórico do orquestrador">
+        <h2>Histórico do orquestrador</h2>
+        <p class="legenda">O que o orquestrador viu: a conversa, as chamadas e o que cada subagente devolveu.</p>
+        <div class="messages">
+          {% for mensagem in mensagens %}
+            <article class="message {{ mensagem.papel }}">
+              <strong>{{ mensagem.rotulo }}</strong>
+              {% if mensagem.texto %}<p>{{ mensagem.texto }}</p>{% endif %}
+              {% if mensagem.detalhe %}
+                <details>
+                  <summary>Retorno ({{ mensagem.detalhe|length }} caracteres)</summary>
+                  <pre>{{ mensagem.detalhe }}</pre>
+                </details>
+              {% endif %}
+            </article>
+          {% else %}
+            <article class="message assistant">
+              <strong>Orquestrador</strong>
+              <p>Pergunte sobre o kube-news ou o encontros-tech. Eu consulto a documentação do time e a internet.</p>
+            </article>
+          {% endfor %}
+        </div>
+      </section>
+
+      <section class="coluna bastidor" aria-label="Bastidor dos subagentes">
+        <h2>Bastidor dos subagentes</h2>
+        <p class="legenda">O que ficou do outro lado da fronteira. Nada disto está no histórico do orquestrador.</p>
+        {% for grupo in grupos %}
+          <div class="grupo">
+            <h3>Pergunta {{ loop.index }} · {{ '%.1f'|format(grupo.total) }} s</h3>
+            {% for chamada in grupo.chamadas %}
+              <div class="trilho"><div class="barra {{ chamada.subagente }}" style="margin-left: {{ chamada.esquerda }}%; width: {{ chamada.largura }}%"></div></div>
+              <article class="chamada {{ chamada.subagente }}">
+                <strong>{{ chamada.subagente }}</strong> <span class="modelo">{{ chamada.modelo }}</span>
+                <p class="horario">{{ chamada.inicio.strftime('%H:%M:%S.%f')[:-3] }} → {{ chamada.fim.strftime('%H:%M:%S.%f')[:-3] }} · {{ '%.1f'|format(chamada.duracao) }} s</p>
+                <p><em>Recebeu:</em> {{ chamada.entrada }}</p>
+                <p><em>Dentro dele:</em> {{ chamada.chamadas_modelo }} chamadas de modelo · {{ chamada.mensagens }} mensagens</p>
+                <p class="volume"><em>Leu</em> {{ chamada.caracteres_lidos }} caracteres · <em>devolveu</em> {{ chamada.caracteres_devolvidos }}</p>
+                <details>
+                  <summary>Buscas feitas ({{ chamada.buscas|length }})</summary>
+                  <ul>{% for busca in chamada.buscas %}<li><code>{{ busca }}</code></li>{% endfor %}</ul>
+                </details>
+              </article>
+            {% endfor %}
+          </div>
+        {% else %}
+          <p class="vazio">Nenhum subagente chamado nesta sessão desde que a aplicação subiu.</p>
+        {% endfor %}
+      </section>
+    </div>
+
+    <form class="prompt-form" action="{{ url_for('pagina_chat') }}" method="post">
+      <input type="hidden" name="thread_id" value="{{ thread_id }}">
+      <label for="pergunta">Pergunta</label>
+      <textarea id="pergunta" name="pergunta" rows="3" placeholder="Como a aplicação configura o SSL com o banco e o que a documentação oficial recomenda?" required></textarea>
+      <button type="submit" name="acao" value="enviar">Enviar</button>
+    </form>
+{% endblock %}

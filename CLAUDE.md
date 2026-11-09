@@ -47,6 +47,8 @@ abrangente de erro, abstrações "para quando crescer". Nenhuma entra sem pedido
 | `22-human-in-the-loop-escrita` | human-in-the-loop em ações de escrita sobre máquinas simuladas numa interface web: o `HumanInTheLoopMiddleware` pausa ligar, desligar e reiniciar, mostra uma prévia legível e retoma a mesma thread com `approve`, `edit` ou `reject`; leitura roda sem pausa |
 | `23-guardrail-customizado` | criar o seu próprio middleware sobre o mesmo cenário e a mesma interface web do `22`: uma regra do time (máquina do ambiente `prod` só desliga com a janela de manutenção aberta, flag num arquivo lido a cada chamada) vira a classe `GuardrailManutencao`, hook tipo wrap que barra por curto-circuito com `ToolMessage` de motivo, mesmo depois da aprovação do `HumanInTheLoopMiddleware`; regra pura testada sem agente |
 | `24-analise-projetos-skills` | usar skills num agente construído: `create_agent` com `FilesystemMiddleware` e `SkillsMiddleware` do `deepagents` sobre uma `workspace/` presa por `virtual_mode`; skills de Docker e Kubernetes em `SKILL.md`, só `name` e `description` no system prompt, o conteúdo lido sob demanda e a referência lida quando a skill manda |
+| `25-pesquisa-com-subagentes` | subagente como ferramenta: um orquestrador (Sonnet) delega a dois subagentes (Haiku), web (Tavily do `10`) e documentos internos (busca do `18`), cada um num arquivo com o schema, o agente de dentro e a `@tool` que o embrulha; os argumentos são a única entrada, o `response_format` define o que sobe, e as duas chamadas rodam em paralelo; interface web em duas colunas, histórico do orquestrador × bastidor dos subagentes |
+| `26-central-plataforma-handoff` | handoff por estado num agente só: a ferramenta de transferência devolve `Command(update=...)` gravando o `agente_ativo`, e um middleware `wrap_model_call` troca prompt e ferramentas pelo estado; a triagem atende com o campo vazio e só transfere; central da plataforma com FinOps e Capacidade sobre dados simulados, interface Streamlit com quem respondeu cada mensagem e a cadeia de transferências na barra lateral |
 
 **Não antecipe a aula seguinte.** O recurso ausente num exemplo geralmente é o assunto do
 próximo, e a ausência é o gancho. Antes de adicionar algo, verifique se ele não é a lição de
@@ -97,7 +99,7 @@ configuração. Se dois exemplos precisam do mesmo código, ele é **duplicado**
 
 Python `>=3.12` e LangChain permanecem alinhados. A integração de provider é deliberadamente
 diferente: os exemplos `01` e `02` usam Gemini; os exemplos `03` a `13` continuam com
-Anthropic. No `14` e no `15`, a OpenAI entra somente para embeddings; o `16` usa embeddings locais pelo Ollama; o `17` e o `18` usam chat Anthropic com embeddings locais pelo Ollama; o `19` volta a só chat Anthropic, e do `20` ao `24` seguem assim. Preserve essas diferenças até existir
+Anthropic. No `14` e no `15`, a OpenAI entra somente para embeddings; o `16` usa embeddings locais pelo Ollama; o `17` e o `18` usam chat Anthropic com embeddings locais pelo Ollama; o `19` volta a só chat Anthropic, e do `20` ao `24` seguem assim; o `25` usa chat Anthropic com embeddings locais pelo Ollama e busca na web pelo Tavily. Preserve essas diferenças até existir
 uma decisão explícita de migrar os exemplos.
 
 ## Layout interno
@@ -113,7 +115,7 @@ exemplos que expõem comando declaram `[project.scripts]` no `pyproject.toml`.
 conteúdo desta série e já quebrou execuções em providers que não aceitam esses parâmetros.
 
 O `01` fixa Gemini no código para tornar provider e modelo visíveis na primeira aula; o `02`
-repete a mesma configuração. Nos demais exemplos, preserve a configuração já existente.
+repete a mesma configuração. O `25` fixa no código um modelo por agente (Sonnet no orquestrador, Haiku nos subagentes). Nos demais exemplos, preserve a configuração já existente.
 
 ## Os logs são a interface da apresentação
 
@@ -139,6 +141,7 @@ Credenciais **nunca** são gravadas no repositório. As variáveis de cada exemp
 | `17`, `18` | `ANTHROPIC_API_KEY`, `MODELO`, `OLLAMA_URL`, `DATABASE_URL`, `COLECAO` e `K` |
 | `19` a `22` | `ANTHROPIC_API_KEY` e `MODELO` |
 | `24` | `ANTHROPIC_API_KEY` e `MODELO` |
+| `25` | `ANTHROPIC_API_KEY`, `TAVILY_API_KEY`, `OLLAMA_URL`, `DATABASE_URL`, `COLECAO` e `K` |
 
 Os tokens DigitalOcean usam escopo customizado, nunca acesso total. Cada exemplo tem
 `.env.example` com placeholder e `.env` no `.gitignore`. Ao validar, use a chave apenas no

@@ -5,7 +5,7 @@ description: Revisa e corrige manifestos do Kubernetes (Deployment, Service) pel
 
 # Padrão de publicação no Kubernetes do time
 
-Revise os manifestos em `/projeto-analisado/k8s/` contra cada item abaixo. Para cada item, diga se passa ou falha,
+Revise os manifestos em `k8s/` do projeto analisado contra cada item abaixo. Para cada item, diga se passa ou falha,
 cite o campo do manifesto e proponha a correção.
 
 ## Checklist
@@ -21,5 +21,5 @@ cite o campo do manifesto e proponha a correção.
 
 ## Ao corrigir
 
-Escreva o manifesto inteiro em `/projeto-analisado/k8s/`, nunca um trecho. Depois diga o
+Escreva o manifesto inteiro em `k8s/` do projeto analisado, nunca um trecho. Depois diga o
 que mudou, item por item do checklist.

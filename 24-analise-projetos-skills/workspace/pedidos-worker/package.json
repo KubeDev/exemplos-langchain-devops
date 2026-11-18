@@ -1,0 +1,16 @@
+{
+  "name": "pedidos-worker",
+  "version": "1.0.0",
+  "description": "Worker que processa a fila de pedidos",
+  "main": "worker.js",
+  "scripts": {
+    "start": "node worker.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9"
+  }
+}

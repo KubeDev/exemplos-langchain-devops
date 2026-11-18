@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: pedidos-worker
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: pedidos-worker
+  template:
+    metadata:
+      labels:
+        app: pedidos-worker
+    spec:
+      containers:
+        - name: pedidos-worker
+          image: registry.example.com/pedidos-worker:1.4.0
+          ports:
+            - containerPort: 8080
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi

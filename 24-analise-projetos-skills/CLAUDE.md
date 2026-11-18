@@ -15,8 +15,14 @@ são pastas com `SKILL.md`, lidas sob demanda.
   do exemplo: o agente leria o `.env`.
 - **Skills sem script.** São de análise e escrita de arquivo; não adicione `execute`, sandbox,
   `hadolint` ou `kubectl`.
-- **`workspace/projeto-analisado/` tem os problemas de propósito** (`latest`, root, sem multi-stage,
-  sem `.dockerignore`, sem probes e sem resources). Não corrija no repositório.
+- **Os projetos em `workspace/` têm os problemas de propósito.** `catalogo-api/`: `latest`,
+  root, sem multi-stage, sem `.dockerignore`, sem probes e sem resources. `pedidos-worker/`: root,
+  sem multi-stage, `npm install`, sem probes, sem limits e `targetPort` errado. Não corrija no
+  repositório.
+- **Interface web em Streamlit (`src/web.py`).** O seletor lista as subpastas de `workspace/`
+  (exceto `skills/`); projeto novo é pasta nova. Trocar de projeto abre thread nova. As skills não
+  citam pasta de projeto: falam em "projeto analisado". O passo a passo vem de
+  `stream(stream_mode="updates")`.
 - **Fora daqui:** `metadata.include_tools` (ferramentas liberadas pela skill), subagente, handoff,
   roteador, memória de longo prazo e o restante do harness do Deep Agents.
 - **Provider:** chat Anthropic (`MODELO`, padrão `claude-haiku-5-5`). Sem `temperature`.

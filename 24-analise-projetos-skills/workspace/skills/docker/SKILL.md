@@ -30,5 +30,5 @@ Leia esse arquivo antes de escrever qualquer um dos dois.
 
 ## Ao corrigir
 
-Escreva o arquivo inteiro em `/projeto-analisado/`, nunca um trecho. Depois diga o que
+Escreva o arquivo inteiro na pasta do projeto analisado, nunca um trecho. Depois diga o que
 mudou, item por item do checklist.

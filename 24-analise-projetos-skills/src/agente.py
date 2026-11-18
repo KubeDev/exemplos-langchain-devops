@@ -13,21 +13,25 @@ load_dotenv()
 if not os.getenv("ANTHROPIC_API_KEY"):
     raise SystemExit("Configure ANTHROPIC_API_KEY no arquivo .env antes de executar.")
 
-# A raiz que o agente enxerga: /projeto-analisado e /skills. Nada fora dela.
-WORKSPACE = FilesystemBackend(root_dir=Path(__file__).parent.parent / "workspace", virtual_mode=True)
+# A raiz que o agente enxerga: os projetos e /skills. Nada fora dela.
+RAIZ = Path(__file__).parent.parent / "workspace"
+WORKSPACE = FilesystemBackend(root_dir=RAIZ, virtual_mode=True)
 
-SYSTEM_PROMPT = """
-Você analisa o projeto que está em /projeto-analisado. Leia os arquivos antes de responder.
-"""
+# Os projetos que a interface oferece: toda pasta de workspace/ que não é a de skills.
+PROJETOS = sorted(p.name for p in RAIZ.iterdir() if p.is_dir() and p.name != "skills")
+SKILLS = sorted(p.name for p in (RAIZ / "skills").iterdir() if p.is_dir())
 
 model = ChatAnthropic(model=os.getenv("MODELO", "claude-haiku-5-5"))
 
-agent = create_agent(
-    model=model,
-    system_prompt=SYSTEM_PROMPT,
-    middleware=[
-        FilesystemMiddleware(backend=WORKSPACE, tools=["ls", "read_file", "write_file", "edit_file"]),
-        SkillsMiddleware(backend=WORKSPACE, sources=["/skills/"]),
-    ],
-    checkpointer=InMemorySaver(),
-)
+
+def criar_agente(projeto: str):
+    """O mesmo agente para qualquer projeto: só a pasta do system prompt muda."""
+    return create_agent(
+        model=model,
+        system_prompt=f"Você analisa o projeto que está em /{projeto}. Leia os arquivos antes de responder.",
+        middleware=[
+            FilesystemMiddleware(backend=WORKSPACE, tools=["ls", "read_file", "write_file", "edit_file"]),
+            SkillsMiddleware(backend=WORKSPACE, sources=["/skills/"]),
+        ],
+        checkpointer=InMemorySaver(),
+    )

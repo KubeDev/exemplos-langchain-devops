@@ -9,10 +9,8 @@ dependencies = [
     "langchain>=1.4.7",
     "langchain-anthropic>=1.7.7",
     "python-dotenv>=1.2.4",
+    "streamlit>=1.66.1",
 ]
-
-[project.scripts]
-analise-projetos-skills = "src.app:main"
 
 [build-system]
 requires = ["hatchling"]
